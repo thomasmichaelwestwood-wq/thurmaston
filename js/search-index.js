@@ -12,6 +12,8 @@ const SITE_SEARCH_INDEX = [
     excerpt: "Melton Road follows the route of the old Roman Fosse Way through the village. Also covers Watermead Country Park and the River Soar." },
   { title: "Historic Map", url: "memories.html#map", category: "History",
     excerpt: "An interactive map of buildings and places that used to stand in Thurmaston." },
+  { title: "Photo Archive", url: "memories.html#photos", category: "History",
+    excerpt: "Old photographs of the village, organised by streets, people, nature and more." },
 
   { title: "Local Directory", url: "directory.html", category: "Directory",
     excerpt: "Shops, tradespeople, clubs and societies serving Thurmaston." },

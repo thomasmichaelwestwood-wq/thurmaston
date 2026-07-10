@@ -53,6 +53,20 @@
     </div>
   </section>
 
+  <section class="content-section container" id="photos">
+    <h2>Photo archive</h2>
+    <p>Old photographs of the village, synced automatically from our Google Drive archive.</p>
+
+    <div class="photo-filters" id="photo-filters">
+      <button type="button" data-category="all" class="active">All</button>
+      <button type="button" data-category="streets">Streets &amp; Buildings</button>
+      <button type="button" data-category="people">People &amp; Events</button>
+      <button type="button" data-category="nature">Nature &amp; Views</button>
+      <button type="button" data-category="other">Other</button>
+    </div>
+    <div class="photo-grid" id="photo-grid"></div>
+  </section>
+
   <section class="content-section container" id="map">
     <h2>Historic map — where buildings used to be</h2>
     <p>An interactive map of Thurmaston showing buildings and places that used to stand in the village.</p>
@@ -192,6 +206,17 @@
   </div>
 </footer>
 
+<div class="photo-lightbox" id="photo-lightbox">
+  <div class="photo-lightbox-inner">
+    <img class="photo-lightbox-img" src="" alt="">
+    <p class="photo-lightbox-caption"></p>
+    <p class="photo-lightbox-meta"></p>
+  </div>
+  <button class="photo-lightbox-close" type="button" aria-label="Close">×</button>
+  <button class="photo-lightbox-prev" type="button" aria-label="Previous photo">‹</button>
+  <button class="photo-lightbox-next" type="button" aria-label="Next photo">›</button>
+</div>
+
 <div class="search-overlay">
   <div class="search-panel" role="dialog" aria-modal="true" aria-label="Site search">
     <div class="search-panel-head">
@@ -204,6 +229,8 @@
 
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
+<script src="js/photos-data.js"></script>
+<script src="js/photos.js"></script>
 <script src="vendor/leaflet/leaflet.js"></script>
 <script src="js/map-data.js"></script>
 <script src="js/map.js"></script>
