@@ -758,6 +758,22 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 /* ---------- Photo archive ---------- */
 
+.photo-search-input {
+  width: 100%;
+  max-width: 420px;
+  display: block;
+  font-size: 0.95rem;
+  padding: 10px 14px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  margin-bottom: 14px;
+}
+.photo-search-input:focus {
+  outline: 2px solid var(--green-700);
+  outline-offset: 1px;
+}
+
 .photo-filters {
   display: flex;
   flex-wrap: wrap;

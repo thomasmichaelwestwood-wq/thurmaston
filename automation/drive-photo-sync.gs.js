@@ -35,6 +35,11 @@
  * 4. Inside the "Memories of Thurmaston Photos" Drive folder, create
  *    four subfolders, spelled exactly:
  *      "Streets & Buildings", "People & Events", "Nature & Views", "Other"
+ *    Each subfolder (and the top-level folder itself) needs sharing set
+ *    to "Anyone with the link" so the resize step below can fetch the
+ *    image — file contents never become public any other way, since
+ *    the only thing that uses that link is this script, briefly,
+ *    during resizing.
  *
  * 5. Triggers (clock icon, left sidebar) → Add Trigger →
  *      Function: syncPhotos
@@ -55,6 +60,7 @@ var CATEGORY_FOLDERS = {
 };
 
 var MAX_DIMENSION = 1600; // longest edge, in pixels, for published photos
+var JPEG_QUALITY = 82;
 
 function syncPhotos() {
   var props = PropertiesService.getScriptProperties();
@@ -106,7 +112,7 @@ function syncPhotos() {
 
 function publishPhoto(file, category, token, owner, repo) {
   var rawName = file.getName();
-  var ext = (rawName.match(/\.(jpe?g|png)$/i) || [".jpg"])[0].toLowerCase();
+  var ext = ".jpg"; // resized output is always re-encoded as JPEG
   var base = rawName.replace(/\.(jpe?g|png)$/i, "");
 
   var caption = base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
@@ -117,7 +123,7 @@ function publishPhoto(file, category, token, owner, repo) {
   var filename = shortId + "-" + slug + ext;
   var repoPath = "images/photos/" + filename;
 
-  var blob = resizeIfNeeded(file.getBlob());
+  var blob = resizeViaProxy(file);
   var base64 = Utilities.base64Encode(blob.getBytes());
 
   ghPut(repoPath, base64, "Add photo: " + rawName, token, owner, repo);
@@ -125,58 +131,48 @@ function publishPhoto(file, category, token, owner, repo) {
 }
 
 /**
- * Apps Script has no real image-resize API. Google Slides can rescale
- * an inserted image and re-export it, which is the only reliable way
- * to shrink a photo from server-side script code. If anything goes
- * wrong, the original blob is published as-is rather than blocking
- * the sync.
+ * Apps Script has no built-in image-resize API, so this hands the job
+ * to wsrv.nl (a free, widely used image resizing proxy) — it fetches
+ * the Drive file by its share link, returns a resized/compressed JPEG.
+ * The Drive link is only ever used transiently by this one request; it
+ * is never linked to from the live site. If the proxy call fails for
+ * any reason, the original file is published unresized rather than
+ * blocking the sync — a slightly larger photo beats a broken pipeline.
  */
-function resizeIfNeeded(blob) {
+function resizeViaProxy(file) {
   try {
-    var presentation = SlidesApp.create("tmp-resize-" + Date.now());
-    var slide = presentation.getSlides()[0];
-    var image = slide.insertImage(blob);
-
-    var width = image.getWidth();
-    var height = image.getHeight();
-    var longest = Math.max(width, height);
-    if (longest > MAX_DIMENSION) {
-      var scale = MAX_DIMENSION / longest;
-      image.setWidth(Math.round(width * scale));
-      image.setHeight(Math.round(height * scale));
-    }
-
-    var resizedBlob = image.getAs("image/png").setName(blob.getName());
-    DriveApp.getFileById(presentation.getId()).setTrashed(true);
-    return resizedBlob;
+    var sourceUrl = "https://drive.google.com/uc?export=view&id=" + file.getId();
+    var proxyUrl = "https://wsrv.nl/?url=" + encodeURIComponent(sourceUrl) +
+      "&w=" + MAX_DIMENSION + "&h=" + MAX_DIMENSION + "&fit=inside" +
+      "&output=jpg&q=" + JPEG_QUALITY;
+    var res = UrlFetchApp.fetch(proxyUrl, { muteHttpExceptions: true });
+    if (res.getResponseCode() !== 200) throw new Error("proxy returned " + res.getResponseCode());
+    return res.getBlob();
   } catch (e) {
     Logger.log("Resize skipped, publishing original: " + e);
-    return blob;
+    return file.getBlob();
   }
 }
 
 function appendMetadataEntry(shortId, slug, filename, caption, category, token, owner, repo) {
-  var dataPath = "js/photos-data.js";
+  var dataPath = "data/photos.json";
   var current = ghGet(dataPath, token, owner, repo);
-  var content = Utilities.newBlob(
-    Utilities.base64Decode(current.content), "text/plain"
-  ).getDataAsString();
+  var photos = JSON.parse(
+    Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
+  );
 
-  var entry =
-    '  {\n' +
-    '    id: "' + shortId + '-' + slug + '",\n' +
-    '    src: "images/photos/' + filename + '",\n' +
-    '    caption: "' + caption.replace(/"/g, '\\"') + '",\n' +
-    '    category: "' + category + '",\n' +
-    '    date: "Added ' + Utilities.formatDate(new Date(), "Europe/London", "MMMM yyyy") + '",\n' +
-    '    credit: "Unknown — needs a credit",\n' +
-    '    consentNoted: false,\n' +
-    '    example: false\n' +
-    '  },\n';
+  photos.unshift({
+    id: shortId + "-" + slug,
+    src: "images/photos/" + filename,
+    caption: caption,
+    category: category,
+    date: "Added " + Utilities.formatDate(new Date(), "Europe/London", "MMMM yyyy"),
+    credit: "Unknown — needs a credit",
+    consentNoted: false,
+    example: false
+  });
 
-  var marker = "const PHOTOS_DATA = [";
-  var idx = content.indexOf(marker);
-  var updated = content.slice(0, idx + marker.length) + "\n" + entry + content.slice(idx + marker.length);
+  var updated = JSON.stringify(photos, null, 2) + "\n";
 
   ghPut(
     dataPath,

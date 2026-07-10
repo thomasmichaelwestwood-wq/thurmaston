@@ -26,13 +26,17 @@ an hourly timer, independent of any chat session or person being online.
 Every run, it:
 
 1. Looks for any image in the four subfolders it hasn't seen before.
-2. Resizes it down to a sensible web size (longest edge ~1600px).
+2. Resizes it down to a sensible web size (longest edge ~1600px), via
+   a free image-resizing service — Apps Script can't resize images
+   itself, so it hands the job off rather than publishing full-size
+   originals.
 3. Commits it into `images/photos/` in this repo.
-4. Adds a matching entry to `js/photos-data.js` — category from the
+4. Adds a matching entry to `data/photos.json` — category from the
    subfolder, caption auto-generated from the filename, dated to when
    it was synced.
 5. Netlify redeploys automatically, and the photo appears on the
-   Memories page.
+   Memories page — searchable immediately, both in the photo archive's
+   own search box and in the site-wide search.
 
 No approval step in the middle — this is deliberately set up as a
 single-trusted-uploader pipeline (see "Who can upload," below), so
@@ -42,10 +46,11 @@ anything dropped in goes live within the hour.
 
 The auto-generated caption is just the filename, cleaned up — good
 enough to publish, but worth improving. To fix a caption, date, or
-credit, open `js/photos-data.js` and edit that photo's entry directly
-(no special tooling — it's plain text). The `consentNoted` field starts
-`false` for every auto-synced photo; flip it to `true` once you've
-confirmed it's fine to have public (see "Consent," below).
+credit, open `data/photos.json` and edit that photo's entry directly —
+it's a plain JSON file, safe to hand-edit alongside the automated
+writes. The `consentNoted` field starts `false` for every auto-synced
+photo; flip it to `true` once you've confirmed it's fine to have public
+(see "Consent," below).
 
 ## Who can upload
 

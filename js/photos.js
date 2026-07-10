@@ -1,26 +1,51 @@
+const PHOTO_CATEGORIES = {
+  streets: { label: "Streets & Buildings" },
+  people: { label: "People & Events" },
+  nature: { label: "Nature & Views" },
+  other: { label: "Other" }
+};
+
+var PHOTOS_DATA_PROMISE = fetch("data/photos.json")
+  .then(function (res) { return res.ok ? res.json() : []; })
+  .catch(function () { return []; });
+
 document.addEventListener("DOMContentLoaded", function () {
   var gridEl = document.getElementById("photo-grid");
-  if (!gridEl || typeof PHOTOS_DATA === "undefined") return;
+  if (!gridEl) return;
 
   var filterEl = document.getElementById("photo-filters");
+  var searchInput = document.getElementById("photo-search-input");
   var lightbox = document.getElementById("photo-lightbox");
   var lightboxImg = lightbox.querySelector(".photo-lightbox-img");
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
   var activeCategory = "all";
+  var allPhotos = [];
   var visiblePhotos = [];
   var currentIndex = 0;
 
+  PHOTOS_DATA_PROMISE.then(function (photos) {
+    allPhotos = photos;
+    renderGrid();
+    maybeOpenFromHash();
+  });
+
+  function matches(photo, query) {
+    if (activeCategory !== "all" && photo.category !== activeCategory) return false;
+    if (!query) return true;
+    var haystack = (photo.caption + " " + photo.date + " " + photo.credit).toLowerCase();
+    return haystack.indexOf(query) !== -1;
+  }
+
   function renderGrid() {
     gridEl.innerHTML = "";
-    visiblePhotos = PHOTOS_DATA.filter(function (p) {
-      return activeCategory === "all" || p.category === activeCategory;
-    });
+    var query = searchInput ? searchInput.value.trim().toLowerCase() : "";
+    visiblePhotos = allPhotos.filter(function (p) { return matches(p, query); });
 
     if (visiblePhotos.length === 0) {
       var empty = document.createElement("p");
       empty.className = "search-empty";
-      empty.textContent = "No photos in this category yet.";
+      empty.textContent = "No photos match. Try a different search or category.";
       gridEl.appendChild(empty);
       return;
     }
@@ -43,11 +68,14 @@ document.addEventListener("DOMContentLoaded", function () {
     showPhoto();
     lightbox.classList.add("open");
     document.addEventListener("keydown", onKeydown);
+    var photo = visiblePhotos[currentIndex];
+    if (photo) history.replaceState(null, "", "#photo-" + photo.id);
   }
 
   function closeLightbox() {
     lightbox.classList.remove("open");
     document.removeEventListener("keydown", onKeydown);
+    history.replaceState(null, "", location.pathname + location.search + "#photos");
   }
 
   function showPhoto() {
@@ -58,12 +86,22 @@ document.addEventListener("DOMContentLoaded", function () {
     var cat = (PHOTO_CATEGORIES[photo.category] || {}).label || photo.category;
     lightboxMeta.textContent = [cat, photo.date, photo.credit !== "—" ? "Credit: " + photo.credit : null]
       .filter(Boolean).join(" · ");
+    history.replaceState(null, "", "#photo-" + photo.id);
   }
 
   function onKeydown(e) {
     if (e.key === "Escape") closeLightbox();
     if (e.key === "ArrowRight") { currentIndex = (currentIndex + 1) % visiblePhotos.length; showPhoto(); }
     if (e.key === "ArrowLeft") { currentIndex = (currentIndex - 1 + visiblePhotos.length) % visiblePhotos.length; showPhoto(); }
+  }
+
+  function maybeOpenFromHash() {
+    var match = location.hash.match(/^#photo-(.+)$/);
+    if (!match) return;
+    var idx = visiblePhotos.findIndex(function (p) { return p.id === match[1]; });
+    if (idx === -1) return;
+    document.getElementById("photos").scrollIntoView();
+    openLightbox(idx);
   }
 
   lightbox.querySelector(".photo-lightbox-close").addEventListener("click", closeLightbox);
@@ -89,5 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  renderGrid();
+  if (searchInput) {
+    searchInput.addEventListener("input", renderGrid);
+  }
 });

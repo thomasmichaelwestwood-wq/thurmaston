@@ -95,9 +95,24 @@ function initSearch() {
     renderResults(input.value.trim());
   });
 
+  var photoSearchEntries = [];
+  if (typeof PHOTOS_DATA_PROMISE !== "undefined") {
+    PHOTOS_DATA_PROMISE.then(function (photos) {
+      photoSearchEntries = photos.map(function (p) {
+        return {
+          title: p.caption,
+          url: "memories.html#photo-" + p.id,
+          category: "Photo",
+          excerpt: [p.date, p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · ")
+        };
+      });
+      if (input.value.trim()) renderResults(input.value.trim());
+    });
+  }
+
   function renderResults(query) {
     resultsList.innerHTML = "";
-    var index = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX : [];
+    var index = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.concat(photoSearchEntries) : photoSearchEntries;
 
     if (!query) {
       var hint = document.createElement("li");
