@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="t5 d5">
+  <title id="t5">River Soar Marinas</title>
+  <desc id="d5">Illustration placeholder for a photo of narrowboats moored on the River Soar, where Thurmaston has two marinas.</desc>
+  <defs>
+    <linearGradient id="g5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#6fa9c2"/>
+      <stop offset="1" stop-color="#274d5c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g5)"/>
+  <rect x="0" y="600" width="1600" height="300" fill="#3a6e7d"/>
+  <g>
+    <rect x="200" y="640" width="260" height="70" rx="10" fill="#b9822f"/>
+    <rect x="200" y="620" width="260" height="24" rx="6" fill="#e7efe6"/>
+    <rect x="560" y="660" width="220" height="60" rx="10" fill="#7a3b3b"/>
+    <rect x="560" y="642" width="220" height="22" rx="6" fill="#e7efe6"/>
+    <rect x="960" y="650" width="240" height="65" rx="10" fill="#2c6b4f"/>
+    <rect x="960" y="630" width="240" height="24" rx="6" fill="#e7efe6"/>
+  </g>
+  <rect x="0" y="820" width="1600" height="80" fill="#1f4d3a"/>
+</svg>

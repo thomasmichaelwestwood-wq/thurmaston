@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Contact &amp; Get Involved | Thurmaston Village</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Get in touch with the Thurmaston village website team, report an issue, or volunteer to help.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">Th</span>
+      <span class="brand-text">Thurmaston<small>Village Website</small></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">☰ Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="parish-council.html">Parish Council</a>
+      <a href="public-buildings.html">Public Buildings</a>
+      <a href="memories.html">Memories</a>
+      <a href="events.html">What's On</a>
+      <a href="news.html">News</a>
+      <a href="gallery.html">Gallery</a>
+      <a href="directory.html">Directory</a>
+      <a href="contact.html" aria-current="page">Contact</a>
+    </nav>
+    <button class="search-btn" data-search-open type="button">🔍 Search</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Contact</div>
+      <h1>Contact &amp; Get Involved</h1>
+      <p>This site is run by and for the village. Get in touch to contribute content, report a problem, or help out.</p>
+    </div>
+  </section>
+
+  <section class="content-section container">
+    <div class="content-grid">
+      <div>
+        <h2>Send a message</h2>
+        <form class="stack" action="#" method="post">
+          <div>
+            <label for="c-name">Name</label>
+            <input type="text" id="c-name" name="name" required>
+          </div>
+          <div>
+            <label for="c-email">Email</label>
+            <input type="email" id="c-email" name="email" required>
+          </div>
+          <div>
+            <label for="c-reason">What's this about?</label>
+            <select id="c-reason" name="reason">
+              <option>General enquiry</option>
+              <option>Add a news item</option>
+              <option>Add an event</option>
+              <option>List a business or club</option>
+              <option>Share a memory or photo</option>
+              <option>Report a correction</option>
+              <option>Volunteer to help run the site</option>
+            </select>
+          </div>
+          <div>
+            <label for="c-message">Message</label>
+            <textarea id="c-message" name="message" rows="6" required></textarea>
+          </div>
+          <button class="btn btn-primary" type="submit" style="align-self:flex-start">Send message</button>
+          <p style="font-size:0.8rem;color:var(--ink-soft);margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
+        </form>
+      </div>
+
+      <div>
+        <h2>Other ways to reach us</h2>
+        <ul class="info-list">
+          <li><span class="dt">Parish Council</span><span>For official council matters, contact the clerk directly — see the <a href="parish-council.html#contact">Parish Council page</a>.</span></li>
+          <li><span class="dt">Site team</span><span>Add your preferred village-site email address here once set up.</span></li>
+        </ul>
+        <div class="callout" style="margin-top:20px">
+          <h3>Want to help run this site?</h3>
+          <p style="margin:0">We're looking for residents to help keep news, events and the directory up to date. No coding needed — just local knowledge. Let us know if you're interested.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Thurmaston Village</h4>
+        <p style="margin:0">A community website for Thurmaston, Leicestershire — independent of, and linking to, Thurmaston Parish Council.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="parish-council.html">Parish Council</a></li>
+          <li><a href="public-buildings.html">Public Buildings</a></li>
+          <li><a href="memories.html">Memories</a></li>
+          <li><a href="events.html">What's On</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More</h4>
+        <ul>
+          <li><a href="news.html">News</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="directory.html">Directory</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="https://www.thurmastonpc.gov.uk/" target="_blank" rel="noopener">Official Parish Council site ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Thurmaston Village Website. Made by and for residents.</span>
+      <span>Not an official council website.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="search-overlay">
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Site search">
+    <div class="search-panel-head">
+      <input type="text" id="site-search-input" placeholder="Search the village website…" autocomplete="off">
+      <button class="search-close" type="button" aria-label="Close search">×</button>
+    </div>
+    <ul id="site-search-results"></ul>
+  </div>
+</div>
+
+<script src="js/search-index.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

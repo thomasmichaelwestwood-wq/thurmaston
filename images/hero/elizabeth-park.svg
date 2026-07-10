@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="t3 d3">
+  <title id="t3">Elizabeth Park Sports &amp; Community Centre</title>
+  <desc id="d3">Illustration placeholder for a photo of Elizabeth Park Sports and Community Centre, home to the Parish Council office.</desc>
+  <defs>
+    <linearGradient id="g3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#4a8c66"/>
+      <stop offset="1" stop-color="#1f4d3a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g3)"/>
+  <rect x="0" y="640" width="1600" height="260" fill="#2a5940"/>
+  <rect x="380" y="380" width="840" height="320" rx="6" fill="#f3ede0"/>
+  <rect x="380" y="380" width="840" height="70" fill="#b9822f"/>
+  <g fill="#8fc7d9">
+    <rect x="430" y="480" width="90" height="90"/>
+    <rect x="560" y="480" width="90" height="90"/>
+    <rect x="690" y="480" width="90" height="90"/>
+    <rect x="820" y="480" width="90" height="90"/>
+    <rect x="950" y="480" width="90" height="90"/>
+    <rect x="1080" y="480" width="90" height="90"/>
+  </g>
+  <rect x="740" y="600" width="120" height="100" fill="#6b5636"/>
+  <circle cx="1150" cy="650" r="70" fill="none" stroke="#e7efe6" stroke-width="6" opacity="0.5"/>
+</svg>

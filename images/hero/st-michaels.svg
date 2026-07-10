@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="t4 d4">
+  <title id="t4">St Michael's Church</title>
+  <desc id="d4">Illustration placeholder for a photo of St Michael's Church, at the heart of the ecclesiastical parish formed in 1794.</desc>
+  <defs>
+    <linearGradient id="g4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d9c48f"/>
+      <stop offset="1" stop-color="#7a5a2e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g4)"/>
+  <rect x="0" y="700" width="1600" height="200" fill="#4a5a3f"/>
+  <rect x="700" y="300" width="200" height="400" fill="#efe6cf"/>
+  <polygon points="700,300 800,180 900,300" fill="#d9c48f"/>
+  <rect x="770" y="220" width="60" height="80" fill="#7a5a2e"/>
+  <rect x="600" y="500" width="140" height="200" fill="#efe6cf"/>
+  <rect x="860" y="500" width="140" height="200" fill="#efe6cf"/>
+  <g fill="#7a5a2e" opacity="0.8">
+    <rect x="740" y="420" width="24" height="60"/>
+    <rect x="836" y="420" width="24" height="60"/>
+  </g>
+</svg>

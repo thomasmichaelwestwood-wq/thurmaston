@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Photo Gallery | Thurmaston Village</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Photos of Thurmaston village, its parks, buildings and community events.">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">Th</span>
+      <span class="brand-text">Thurmaston<small>Village Website</small></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav">☰ Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="parish-council.html">Parish Council</a>
+      <a href="public-buildings.html">Public Buildings</a>
+      <a href="memories.html">Memories</a>
+      <a href="events.html">What's On</a>
+      <a href="news.html">News</a>
+      <a href="gallery.html" aria-current="page">Gallery</a>
+      <a href="directory.html">Directory</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <button class="search-btn" data-search-open type="button">🔍 Search</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / Gallery</div>
+      <h1>Photo Gallery</h1>
+      <p>Pictures of the village, its parks, buildings and community events.</p>
+    </div>
+  </section>
+
+  <section class="content-section container">
+    <div class="callout">
+      <h3>Photos coming soon</h3>
+      <p style="margin:0">The tiles below are placeholders standing in for real photography. If you have photos of Thurmaston you're happy to share, <a href="contact.html">send them in</a> — or add a memory with a photo on the <a href="memories.html#share">Memories page</a>.</p>
+    </div>
+  </section>
+
+  <section class="content-section container">
+    <div class="content-grid">
+      <div class="placeholder-photo">Melton Road</div>
+      <div class="placeholder-photo">Watermead Country Park</div>
+      <div class="placeholder-photo">Elizabeth Park Community Centre</div>
+      <div class="placeholder-photo">St Michael's Church</div>
+      <div class="placeholder-photo">River Soar Marinas</div>
+      <div class="placeholder-photo">Village events</div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Thurmaston Village</h4>
+        <p style="margin:0">A community website for Thurmaston, Leicestershire — independent of, and linking to, Thurmaston Parish Council.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="parish-council.html">Parish Council</a></li>
+          <li><a href="public-buildings.html">Public Buildings</a></li>
+          <li><a href="memories.html">Memories</a></li>
+          <li><a href="events.html">What's On</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>More</h4>
+        <ul>
+          <li><a href="news.html">News</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="directory.html">Directory</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a href="https://www.thurmastonpc.gov.uk/" target="_blank" rel="noopener">Official Parish Council site ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Thurmaston Village Website. Made by and for residents.</span>
+      <span>Not an official council website.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="search-overlay">
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Site search">
+    <div class="search-panel-head">
+      <input type="text" id="site-search-input" placeholder="Search the village website…" autocomplete="off">
+      <button class="search-close" type="button" aria-label="Close search">×</button>
+    </div>
+    <ul id="site-search-results"></ul>
+  </div>
+</div>
+
+<script src="js/search-index.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

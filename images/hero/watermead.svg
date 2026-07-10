@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="t2 d2">
+  <title id="t2">Watermead Country Park</title>
+  <desc id="d2">Illustration placeholder for a photo of Watermead Country Park and the River Soar on Thurmaston's western edge.</desc>
+  <defs>
+    <linearGradient id="g2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8fc7d9"/>
+      <stop offset="1" stop-color="#2d5f6c"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#g2)"/>
+  <path d="M0 560 Q 400 500 800 580 T 1600 560 V900 H0 Z" fill="#3f8f6a"/>
+  <path d="M0 660 Q 400 610 800 670 T 1600 650 V900 H0 Z" fill="#2f6e50"/>
+  <path d="M0 760 Q 500 700 900 770 T1600 750 V900 H0 Z" fill="#1f4d3a"/>
+  <ellipse cx="800" cy="800" rx="700" ry="60" fill="#bcd9de" opacity="0.85"/>
+  <g fill="#e7efe6" opacity="0.8">
+    <circle cx="300" cy="810" r="4"/>
+    <circle cx="450" cy="795" r="3"/>
+    <circle cx="950" cy="805" r="4"/>
+    <circle cx="1200" cy="790" r="3"/>
+  </g>
+</svg>
