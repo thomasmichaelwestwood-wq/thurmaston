@@ -2,7 +2,7 @@
    noticeboard item is added so it becomes searchable. */
 const SITE_SEARCH_INDEX = [
   { title: "Home", url: "index.html", category: "Page",
-    excerpt: "Welcome to the Thurmaston village website — history, memories, gallery and local information." },
+    excerpt: "Welcome to the Thurmaston village website — history, memories, historic map and local information." },
 
   { title: "Memories of Thurmaston", url: "memories.html", category: "History",
     excerpt: "Old photographs, personal stories and shared memories of the village through the years." },
@@ -10,9 +10,8 @@ const SITE_SEARCH_INDEX = [
     excerpt: "Submit a photo, story or memory of Thurmaston to add to the village archive." },
   { title: "Fosse Way & village history", url: "memories.html#history", category: "History",
     excerpt: "Melton Road follows the route of the old Roman Fosse Way through the village. Also covers Watermead Country Park and the River Soar." },
-
-  { title: "Photo Gallery", url: "gallery.html", category: "Gallery",
-    excerpt: "Photos of the village, its buildings, parks and community events." },
+  { title: "Historic Map", url: "memories.html#map", category: "History",
+    excerpt: "An interactive map of buildings and places that used to stand in Thurmaston." },
 
   { title: "Local Directory", url: "directory.html", category: "Directory",
     excerpt: "Shops, tradespeople, clubs and societies serving Thurmaston." },

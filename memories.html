@@ -4,7 +4,8 @@
 <meta charset="utf-8">
 <title>Memories of Thurmaston | Thurmaston Village</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Old photographs, personal stories and shared history of Thurmaston through the years.">
+<meta name="description" content="Old photographs, personal stories, shared history and an interactive map of Thurmaston through the years.">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -20,7 +21,6 @@
     <nav class="main-nav" id="main-nav" aria-label="Main">
       <a href="index.html">Home</a>
       <a href="memories.html" aria-current="page">Memories</a>
-      <a href="gallery.html">Gallery</a>
       <a href="directory.html">Directory</a>
       <a href="contact.html">Contact</a>
     </nav>
@@ -42,6 +42,66 @@
     <p>The historic heart of the village stands on Melton Road, which follows the route of the old Fosse Way — the Roman road running from Exeter to Lincoln. Thurmaston St Michael was formed as an ecclesiastical parish in 1794, combining a chapelry in Belgrave with the South Thurmaston chapelry.</p>
     <p>The village sits on the eastern bank of the River Soar, bordered by Watermead Country Park to the west, Syston to the north, and Barkby and Barkby Thorpe to the east. Two marinas on the River Soar reflect the village's long relationship with the water.</p>
     <p style="font-size:0.85rem;color:var(--ink-soft)">This is a brief starting point, not a complete history — if you have corrections, sources, or a longer account to contribute, we'd love to include it.</p>
+  </section>
+
+  <section class="content-section container" id="map">
+    <h2>Historic map — where buildings used to be</h2>
+    <p>An interactive map of Thurmaston showing buildings and places that used to stand in the village.</p>
+
+    <div class="callout">
+      <h3>This map is just getting started</h3>
+      <p style="margin:0">Every pin marked <strong>“Example”</strong> is a placeholder showing how the map works — not a verified historical record. We don't yet have confirmed details of specific buildings that used to stand in Thurmaston. If you know one — a name, roughly where it was, roughly when it went — <a href="contact.html">tell us</a> or use the form below, and we'll add it properly.</p>
+    </div>
+
+    <div class="map-layout" style="margin-top:20px">
+      <div class="map-canvas-wrap">
+        <div id="historic-map" role="application" aria-label="Interactive historic map of Thurmaston"></div>
+      </div>
+      <div class="map-sidebar">
+        <div class="map-filters" id="map-filters">
+          <button type="button" data-category="all" class="active">All</button>
+          <button type="button" data-category="residential">Residential</button>
+          <button type="button" data-category="trade">Trade &amp; Industry</button>
+          <button type="button" data-category="inn">Inn / Pub</button>
+          <button type="button" data-category="civic">Civic / Religious</button>
+        </div>
+        <ul id="map-list"></ul>
+      </div>
+    </div>
+    <p style="font-size:0.8rem;color:var(--ink-soft);margin-top:10px">Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors. Pin locations for lost buildings are approximate.</p>
+
+    <div style="margin-top:28px">
+      <h3 style="font-size:1.1rem">Know a building that used to stand here?</h3>
+      <p>Tell us what it was, roughly where, and roughly when it disappeared — a photo helps but isn't essential.</p>
+      <form class="stack" action="#" method="post">
+        <div>
+          <label for="map-name">Your name</label>
+          <input type="text" id="map-name" name="name" required>
+        </div>
+        <div>
+          <label for="map-building">What was it called / what was it?</label>
+          <input type="text" id="map-building" name="building" required>
+        </div>
+        <div>
+          <label for="map-location">Roughly where was it?</label>
+          <input type="text" id="map-location" name="location" placeholder="e.g. Melton Road, near the church" required>
+        </div>
+        <div>
+          <label for="map-period">Roughly when did it disappear?</label>
+          <input type="text" id="map-period" name="period" placeholder="e.g. 1960s, or “before my time”">
+        </div>
+        <div>
+          <label for="map-details">What do you remember about it?</label>
+          <textarea id="map-details" name="details" rows="5" required></textarea>
+        </div>
+        <div>
+          <label for="map-photo">Photo (optional)</label>
+          <input type="file" id="map-photo" name="photo" accept="image/*">
+        </div>
+        <button class="btn btn-primary" type="submit" style="align-self:flex-start">Submit building</button>
+        <p style="font-size:0.8rem;color:var(--ink-soft);margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
+      </form>
+    </div>
   </section>
 
   <section class="content-section container">
@@ -103,7 +163,7 @@
         <h4>Explore</h4>
         <ul>
           <li><a href="memories.html">Memories</a></li>
-          <li><a href="gallery.html">Gallery</a></li>
+          <li><a href="memories.html#map">Historic Map</a></li>
           <li><a href="directory.html">Directory</a></li>
         </ul>
       </div>
@@ -134,5 +194,8 @@
 
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="js/map-data.js"></script>
+<script src="js/map.js"></script>
 </body>
 </html>
