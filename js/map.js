@@ -106,4 +106,25 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   renderList();
+
+  var photoMarker = null;
+  window.flyToPhotoLocation = function (lat, lng, photo) {
+    var mapSection = document.getElementById("map");
+    if (mapSection) mapSection.scrollIntoView({ behavior: "smooth" });
+
+    map.flyTo([lat, lng], 17, { duration: 0.6 });
+    map.once("moveend", function () {
+      if (photoMarker) map.removeLayer(photoMarker);
+      photoMarker = L.marker([lat, lng], { icon: makeIcon("photo") }).addTo(map);
+      var cat = MAP_CATEGORIES.photo;
+      photoMarker.bindPopup(
+        '<div class="map-popup">' +
+          '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
+          "<h3>" + escapeHtml(photo.caption) + "</h3>" +
+          '<img src="' + photo.src + '" alt="" style="width:100%;border-radius:6px;margin:6px 0 8px">' +
+          '<p class="map-popup-period">' + escapeHtml(photo.date) + "</p>" +
+        "</div>"
+      ).openPopup();
+    });
+  };
 });

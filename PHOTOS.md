@@ -15,9 +15,40 @@ Memories of Thurmaston Photos/
 └── Other/
 ```
 
-That's the entire interface: drag a photo into whichever folder matches
-what it shows. No renaming, no app, nothing else to learn. A photo dropped
+Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
+
+**To make a photo searchable:** rename the file to something descriptive
+before uploading — e.g. `Old forge on Melton Road 1960s.jpg`, not
+`IMG_4213.jpg`. The filename becomes the photo's caption, and the caption
+is what search matches against. Worth doing even for photos you're not
+sure about the exact date of — "Melton Road shops, unsure of date" is a
+perfectly good filename.
+
+**To make a photo appear on the interactive map:** if you know roughly
+where it was taken and it's one of these recognised village spots, put
+it in a further subfolder named exactly that, inside the matching
+category folder:
+
+```
+Streets & Buildings/
+├── Melton Road/
+├── St Michael's Church/
+└── (loose photos — no exact spot known, that's completely fine)
+
+Nature & Views/
+├── Watermead Country Park/
+├── River Soar/
+└── (loose photos)
+
+People & Events/
+├── Elizabeth Park/
+└── (loose photos)
+```
+
+Most old photos won't have a known exact spot, and that's the normal
+case — just leave them loose in the category folder. Want a new place
+added to the recognised list? Just ask — it takes a one-line change.
 
 ## 2. It publishes itself, automatically
 
@@ -33,10 +64,12 @@ Every run, it:
 3. Commits it into `images/photos/` in this repo.
 4. Adds a matching entry to `data/photos.json` — category from the
    subfolder, caption auto-generated from the filename, dated to when
-   it was synced.
+   it was synced, plus coordinates if it was in a recognised place
+   subfolder (see above).
 5. Netlify redeploys automatically, and the photo appears on the
    Memories page — searchable immediately, both in the photo archive's
-   own search box and in the site-wide search.
+   own search box and in the site-wide search, with a "View on map"
+   link in its lightbox if it has a location.
 
 No approval step in the middle — this is deliberately set up as a
 single-trusted-uploader pipeline (see "Who can upload," below), so
@@ -45,12 +78,12 @@ anything dropped in goes live within the hour.
 ## 3. Tidying up afterwards (optional, whenever)
 
 The auto-generated caption is just the filename, cleaned up — good
-enough to publish, but worth improving. To fix a caption, date, or
-credit, open `data/photos.json` and edit that photo's entry directly —
-it's a plain JSON file, safe to hand-edit alongside the automated
-writes. The `consentNoted` field starts `false` for every auto-synced
-photo; flip it to `true` once you've confirmed it's fine to have public
-(see "Consent," below).
+enough to publish, but worth improving. To fix a caption, date, credit,
+or add/correct a precise `lat`/`lng`, open `data/photos.json` and edit
+that photo's entry directly — it's a plain JSON file, safe to hand-edit
+alongside the automated writes. The `consentNoted` field starts `false`
+for every auto-synced photo; flip it to `true` once you've confirmed
+it's fine to have public (see "Consent," below).
 
 ## Who can upload
 

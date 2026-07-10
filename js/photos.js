@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightboxImg = lightbox.querySelector(".photo-lightbox-img");
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
+  var lightboxViewMap = lightbox.querySelector(".photo-lightbox-viewmap");
   var activeCategory = "all";
   var allPhotos = [];
   var visiblePhotos = [];
@@ -87,6 +88,17 @@ document.addEventListener("DOMContentLoaded", function () {
     lightboxMeta.textContent = [cat, photo.date, photo.credit !== "—" ? "Credit: " + photo.credit : null]
       .filter(Boolean).join(" · ");
     history.replaceState(null, "", "#photo-" + photo.id);
+
+    if (lightboxViewMap) {
+      var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";
+      lightboxViewMap.hidden = !hasLocation;
+      lightboxViewMap.onclick = hasLocation ? function () {
+        closeLightbox();
+        if (typeof window.flyToPhotoLocation === "function") {
+          window.flyToPhotoLocation(photo.lat, photo.lng, photo);
+        }
+      } : null;
+    }
   }
 
   function onKeydown(e) {

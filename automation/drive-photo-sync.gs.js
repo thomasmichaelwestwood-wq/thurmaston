@@ -2,10 +2,18 @@
  * Thurmaston Village — Google Drive → GitHub photo sync
  *
  * Watches the "Memories of Thurmaston Photos" Drive folder. Any image
- * dropped into one of its four subfolders (Streets & Buildings,
- * People & Events, Nature & Views, Other) is automatically resized down
- * to a sensible web size, committed into the site repo, and added to
- * the photo archive — no chat session, no manual step, runs on its own.
+ * dropped into one of its four category subfolders (Streets &
+ * Buildings, People & Events, Nature & Views, Other) is automatically
+ * resized down to a sensible web size, committed into the site repo,
+ * and added to the photo archive — no chat session, no manual step,
+ * runs on its own.
+ *
+ * Optionally, a photo can also be placed on the site's interactive
+ * Historic Map: inside a category folder, create a further subfolder
+ * named after a recognised village landmark (see KNOWN_PLACES below)
+ * and drop the photo there instead of loose in the category folder.
+ * Photos not in a recognised place folder just don't get a map pin —
+ * that's the normal case, most old photos won't have a known spot.
  *
  * This file lives in the site repo for reference and version history.
  * The version that actually runs lives in Google Apps Script (see setup
@@ -50,6 +58,20 @@
  *    to grant the script permission to read Drive and call external
  *    URLs. After that it runs unattended on the hourly trigger.
  * ---------------------------------------------------------------------
+ *
+ * HOW A PHOTO BECOMES SEARCHABLE AND SHOWS ON THE MAP
+ * ---------------------------------------------------------------------
+ * Searchable: automatic, no extra step — but name the file
+ * descriptively before uploading (e.g. "Old forge on Melton Road
+ * 1960s.jpg", not "IMG_4213.jpg"). The filename becomes the caption,
+ * and the caption is what search matches against.
+ *
+ * On the map: only if the photo goes in a place-named subfolder that
+ * matches KNOWN_PLACES below (case-insensitive). To add a new
+ * recognised place, add an entry to KNOWN_PLACES with its approximate
+ * coordinates and re-save the script — ask for help finding
+ * coordinates for a specific spot if needed.
+ * ---------------------------------------------------------------------
  */
 
 var CATEGORY_FOLDERS = {
@@ -57,6 +79,14 @@ var CATEGORY_FOLDERS = {
   "People & Events": "people",
   "Nature & Views": "nature",
   "Other": "other"
+};
+
+var KNOWN_PLACES = {
+  "melton road": { lat: 52.6800, lng: -1.0973 },
+  "st michael's church": { lat: 52.6779, lng: -1.0958 },
+  "elizabeth park": { lat: 52.6810, lng: -1.0940 },
+  "watermead country park": { lat: 52.6760, lng: -1.1030 },
+  "river soar": { lat: 52.6755, lng: -1.1010 }
 };
 
 var MAX_DIMENSION = 1600; // longest edge, in pixels, for published photos
@@ -76,17 +106,24 @@ function syncPhotos() {
   var root = DriveApp.getFolderById(folderId);
   var newIds = [];
 
-  // Root-level photos (no category chosen) default to "other".
-  scanFolder(root, "other");
+  // Root-level photos (no category chosen) default to "other", no place.
+  scanFolder(root, "other", null);
 
   var subfolders = root.getFolders();
   while (subfolders.hasNext()) {
     var sub = subfolders.next();
     var category = CATEGORY_FOLDERS[sub.getName()] || "other";
-    scanFolder(sub, category);
+    scanFolder(sub, category, null);
+
+    var placeFolders = sub.getFolders();
+    while (placeFolders.hasNext()) {
+      var placeFolder = placeFolders.next();
+      var place = KNOWN_PLACES[placeFolder.getName().toLowerCase().trim()] || null;
+      scanFolder(placeFolder, category, place);
+    }
   }
 
-  function scanFolder(folder, category) {
+  function scanFolder(folder, category, place) {
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
@@ -97,7 +134,7 @@ function syncPhotos() {
       if (processedSet[id]) continue;
 
       try {
-        publishPhoto(file, category, token, owner, repo);
+        publishPhoto(file, category, place, token, owner, repo);
         newIds.push(id);
       } catch (e) {
         Logger.log("Failed to publish " + file.getName() + ": " + e);
@@ -110,7 +147,7 @@ function syncPhotos() {
   }
 }
 
-function publishPhoto(file, category, token, owner, repo) {
+function publishPhoto(file, category, place, token, owner, repo) {
   var rawName = file.getName();
   var ext = ".jpg"; // resized output is always re-encoded as JPEG
   var base = rawName.replace(/\.(jpe?g|png)$/i, "");
@@ -127,7 +164,7 @@ function publishPhoto(file, category, token, owner, repo) {
   var base64 = Utilities.base64Encode(blob.getBytes());
 
   ghPut(repoPath, base64, "Add photo: " + rawName, token, owner, repo);
-  appendMetadataEntry(shortId, slug, filename, caption, category, token, owner, repo);
+  appendMetadataEntry(shortId, slug, filename, caption, category, place, token, owner, repo);
 }
 
 /**
@@ -154,14 +191,14 @@ function resizeViaProxy(file) {
   }
 }
 
-function appendMetadataEntry(shortId, slug, filename, caption, category, token, owner, repo) {
+function appendMetadataEntry(shortId, slug, filename, caption, category, place, token, owner, repo) {
   var dataPath = "data/photos.json";
   var current = ghGet(dataPath, token, owner, repo);
   var photos = JSON.parse(
     Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
   );
 
-  photos.unshift({
+  var entry = {
     id: shortId + "-" + slug,
     src: "images/photos/" + filename,
     caption: caption,
@@ -170,8 +207,13 @@ function appendMetadataEntry(shortId, slug, filename, caption, category, token, 
     credit: "Unknown — needs a credit",
     consentNoted: false,
     example: false
-  });
+  };
+  if (place) {
+    entry.lat = place.lat;
+    entry.lng = place.lng;
+  }
 
+  photos.unshift(entry);
   var updated = JSON.stringify(photos, null, 2) + "\n";
 
   ghPut(

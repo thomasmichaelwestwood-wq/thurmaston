@@ -866,6 +866,23 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin-top: 4px;
 }
 
+.photo-lightbox-viewmap {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 14px;
+  background: var(--gold-600);
+  color: #241a06;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+.photo-lightbox-viewmap:hover { background: #d29b46; }
+
 .photo-lightbox-close {
   position: absolute;
   top: 20px;

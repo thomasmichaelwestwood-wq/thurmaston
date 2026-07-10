@@ -7,7 +7,9 @@
     "date": "Example only",
     "credit": "—",
     "consentNoted": false,
-    "example": true
+    "example": true,
+    "lat": 52.6800,
+    "lng": -1.0973
   },
   {
     "id": "example-watermead",

@@ -65,5 +65,6 @@ const MAP_CATEGORIES = {
   trade:       { label: "Trade & Industry", color: "#7a5a2e" },
   inn:         { label: "Inn / Pub", color: "#b9822f" },
   civic:       { label: "Civic / Religious", color: "#274d5c" },
-  other:       { label: "Other", color: "#7a3b3b" }
+  other:       { label: "Other", color: "#7a3b3b" },
+  photo:       { label: "Photo", color: "#2f6f9e" }
 };
