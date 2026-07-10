@@ -368,6 +368,29 @@ h1, h2, h3, h4 {
 .btn-outline { border-color: #fff; color: #fff; }
 .btn-outline:hover { background: #fff; color: var(--green-900); }
 
+.btn-facebook {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #1877F2;
+  color: #fff;
+  border-color: #1877F2;
+  box-shadow: 0 2px 8px rgba(24, 119, 242, 0.35);
+}
+.btn-facebook:hover {
+  background: #0d5fd1;
+  border-color: #0d5fd1;
+  color: #fff;
+}
+.btn-facebook svg { flex-shrink: 0; }
+
+.footer-fb-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-fb-link svg { flex-shrink: 0; }
+
 .hero-dots {
   position: absolute;
   bottom: 16px;
