@@ -453,7 +453,8 @@ h1, h2, h3, h4 {
 /* ---------- Tiles ---------- */
 
 .tiles-section {
-  padding: 56px 0 20px;
+  padding-top: 56px;
+  padding-bottom: 20px;
 }
 
 .tiles-section h2 {
@@ -541,7 +542,8 @@ h1, h2, h3, h4 {
 .breadcrumb a { color: #e7efe6; }
 
 .content-section {
-  padding: 44px 0;
+  padding-top: 44px;
+  padding-bottom: 44px;
 }
 
 .content-section + .content-section {
