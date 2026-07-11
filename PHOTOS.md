@@ -53,7 +53,7 @@ added to the recognised list? Just ask — it takes a one-line change.
 ## 2. It publishes itself, automatically
 
 A small script (`automation/drive-photo-sync.gs.js` in this repo) runs on
-an hourly timer, independent of any chat session or person being online.
+a 5-minute timer, independent of any chat session or person being online.
 Every run, it:
 
 1. Looks for any image in the four subfolders it hasn't seen before.
@@ -74,7 +74,7 @@ Every run, it:
 
 No approval step in the middle — this is deliberately set up as a
 single-trusted-uploader pipeline (see "Who can upload," below), so
-anything dropped in goes live within the hour.
+anything dropped in goes live within a few minutes.
 
 ## 2a. Attaching a supporting document to a photo (optional)
 
@@ -133,7 +133,7 @@ Full instructions are in the comment block at the top of
 `automation/drive-photo-sync.gs.js` — covers creating the Apps Script
 project, the GitHub token it needs (scoped to just this repo, stored in
 Apps Script's own settings, never in this repo or in chat), and wiring
-up the hourly trigger.
+up the 5-minute trigger.
 
 ## Why not commit full-resolution originals?
 

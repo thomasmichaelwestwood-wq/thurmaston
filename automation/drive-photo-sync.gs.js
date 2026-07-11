@@ -52,11 +52,11 @@
  * 5. Triggers (clock icon, left sidebar) → Add Trigger →
  *      Function: syncPhotos
  *      Event source: Time-driven
- *      Type: Hour timer, Every hour
+ *      Type: Minutes timer, Every 5 minutes
  *
  * 6. Run `syncPhotos` once manually from the editor (the ▷ Run button)
  *    to grant the script permission to read Drive and call external
- *    URLs. After that it runs unattended on the hourly trigger.
+ *    URLs. After that it runs unattended on the 5-minute trigger.
  * ---------------------------------------------------------------------
  *
  * HOW A PHOTO BECOMES SEARCHABLE AND SHOWS ON THE MAP

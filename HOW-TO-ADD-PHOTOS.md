@@ -2,7 +2,7 @@
 
 Everything below happens through Google Drive — no website login, no
 technical steps. Just put photos in the right folder, and they appear
-on the site automatically within about an hour.
+on the site automatically within a few minutes.
 
 ## 1. Pick the right folder
 
@@ -66,7 +66,7 @@ naming it to match.
 
 ## 5. That's it
 
-Nothing else to do. Within about an hour, the photo appears on the
+Nothing else to do. Within a few minutes, the photo appears on the
 Memories page, searchable by whatever you named it. No need to tell
 anyone or check anything — it just happens.
 
