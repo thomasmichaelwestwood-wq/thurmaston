@@ -776,14 +776,6 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   transition: opacity 0.15s ease;
 }
 .map-popup-photo-btn:hover img { opacity: 0.85; }
-.map-example-badge {
-  display: inline-block;
-  font-size: 0.72rem;
-  background: var(--gold-100);
-  color: #7a5a2e;
-  padding: 3px 9px;
-  border-radius: 20px;
-}
 
 @media (max-width: 780px) {
   .map-layout { grid-template-columns: 1fr; }
@@ -935,13 +927,6 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   transition: transform 0.2s ease;
 }
 .photo-thumb:hover img { transform: scale(1.05); }
-
-.photo-thumb-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  margin: 0;
-}
 
 .photo-thumb-docbadge {
   position: absolute;

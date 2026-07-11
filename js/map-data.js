@@ -1,9 +1,8 @@
 /* Historic Map data.
    Each entry is a building or place that no longer stands (or has
    substantially changed) in Thurmaston. Add new entries as residents
-   confirm them — remove the "example: true" flag once a location is
-   backed by a real source (a photo, a resident's account, a map, a
-   directory listing, etc).
+   confirm them, backed by a real source (a photo, a resident's account,
+   a map, a directory listing, etc).
 
    category must be one of: streets, people, nature, other — the same
    categories used by the photo archive, so both features sort things
@@ -22,8 +21,7 @@ const MAP_DATA = [
     period: "Pictured c.1936",
     description: "A village pub, pictured around 1936. If you know more about it — when it closed, or what stands there now — get in touch.",
     photoSrc: "images/photos/1RjrLTG9-003-generous-briton-c1936-mot-1-11.jpg",
-    photoId: "1RjrLTG9-003-generous-briton-c1936-mot-1-11",
-    example: false
+    photoId: "1RjrLTG9-003-generous-briton-c1936-mot-1-11"
   },
   {
     id: "manor-hotel-building",
@@ -34,8 +32,7 @@ const MAP_DATA = [
     period: "Exact date unknown",
     description: "If you know more about the Manor Hotel's history — when it operated, or what's there now — get in touch.",
     photoSrc: "images/photos/1w3CZ0o6-manor-hotel.jpg",
-    photoId: "1w3CZ0o6-manor-hotel",
-    example: false
+    photoId: "1w3CZ0o6-manor-hotel"
   }
 ];
 

@@ -39,7 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function popupHtml(item) {
     var cat = MAP_CATEGORIES[item.category] || MAP_CATEGORIES.other;
-    var badge = item.example ? '<span class="map-example-badge">Example — needs a real source</span>' : "";
     var photo = item.photoSrc ?
       '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(item.photoId || "") + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
         '<img src="' + item.photoSrc + '" alt="">' +
@@ -51,7 +50,6 @@ document.addEventListener("DOMContentLoaded", function () {
         photo +
         '<p class="map-popup-period">' + escapeHtml(item.period) + "</p>" +
         "<p>" + escapeHtml(item.description) + "</p>" +
-        badge +
       "</div>"
     );
   }

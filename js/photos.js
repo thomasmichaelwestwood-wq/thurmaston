@@ -120,7 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
       fig.setAttribute("aria-label", "View photo: " + photo.caption);
       fig.innerHTML =
         '<img src="' + photo.src + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
-        (photo.example ? '<span class="map-example-badge photo-thumb-badge">Example</span>' : "") +
         (photo.doc ? '<span class="photo-thumb-docbadge" title="Includes a document">' + DOC_ICON + '</span>' : "");
       fig.addEventListener("click", function () { openLightbox(index); });
       gridEl.appendChild(fig);

@@ -416,8 +416,7 @@ function appendMetadataEntry(shortId, slug, filename, caption, category, place, 
     category: category,
     date: "Added " + Utilities.formatDate(new Date(), "Europe/London", "MMMM yyyy"),
     credit: "Unknown — needs a credit",
-    consentNoted: false,
-    example: false
+    consentNoted: false
   };
   if (place) {
     entry.lat = place.lat;
