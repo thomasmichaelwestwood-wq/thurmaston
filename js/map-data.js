@@ -16,7 +16,7 @@ const MAP_DATA = [
   {
     id: "generous-briton",
     name: "The Generous Briton",
-    category: "people",
+    category: "streets",
     lat: 52.679363200371284,
     lng: -1.0979936680376168,
     period: "Pictured c.1936",

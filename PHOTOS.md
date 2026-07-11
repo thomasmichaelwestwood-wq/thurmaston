@@ -5,18 +5,22 @@ How photos get from Drive to the live site — fully automated, one-time setup.
 ## 1. Drop photos into Google Drive
 
 Inside the shared **"Memories of Thurmaston Photos"** folder, there are
-four subfolders:
+five subfolders:
 
 ```
 Memories of Thurmaston Photos/
 ├── Streets & Buildings/
 ├── People & Events/
 ├── Nature & Views/
-└── Other/
+├── Other/
+└── Hero images/
 ```
 
 Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
+
+**Hero images** is different from the rest — see "The homepage hero banner,"
+below.
 
 **To make a photo searchable:** rename the file to something descriptive
 before uploading — e.g. `Old forge on Melton Road 1960s.jpg`, not
@@ -100,6 +104,18 @@ with a photo, so the script never has to guess which is which. If two
 different photos ever end up with the same name (unusual, but
 possible over a long archive), the document links to whichever of them
 is more recent.
+
+## 2b. The homepage hero banner
+
+Photos in the **Hero images** folder skip the whole category/map/document
+pipeline — they go straight into `data/hero.json` and become the
+rotating banner slides at the top of the homepage, replacing the
+placeholder illustrations that are there until real photos exist.
+Published to `images/hero-photos/`, resized a bit larger than regular
+photos (2000px vs 1600px) since they're shown full-width. Any number
+works; the banner just rotates through whatever's in the list. Name
+them the same way as any other photo — the filename becomes the
+caption in the corner of the slide.
 
 ## 3. Tidying up afterwards (optional, whenever)
 

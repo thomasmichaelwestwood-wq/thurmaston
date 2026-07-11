@@ -41,8 +41,8 @@
  *    property — never into a chat, an email, or committed to the repo.
  *
  * 4. Inside the "Memories of Thurmaston Photos" Drive folder, create
- *    four subfolders, spelled exactly:
- *      "Streets & Buildings", "People & Events", "Nature & Views", "Other"
+ *    five subfolders, spelled exactly:
+ *      "Streets & Buildings", "People & Events", "Nature & Views", "Other", "Hero images"
  *    Each subfolder (and the top-level folder itself) needs sharing set
  *    to "Anyone with the link" so the resize step below can fetch the
  *    image — file contents never become public any other way, since
@@ -106,6 +106,18 @@
  * scan-to-PDF feature, or in Drive right-click the image → "Open with
  * Google Docs" → File → Download → PDF.
  * ---------------------------------------------------------------------
+ *
+ * THE HOMEPAGE HERO BANNER
+ * ---------------------------------------------------------------------
+ * Drop photos into the "Hero images" subfolder and they become the rotating
+ * banner slides at the top of the homepage, replacing the placeholder
+ * illustrations there now. Any number of photos works — the banner just
+ * cycles through however many are in data/hero.json. There's no
+ * category, map location, or document support for these; they're just
+ * a straight photo → caption → slide pipeline. Name them the same way
+ * as any other photo — the filename becomes the caption shown in the
+ * corner of the slide.
+ * ---------------------------------------------------------------------
  */
 
 var CATEGORY_FOLDERS = {
@@ -124,7 +136,9 @@ var KNOWN_PLACES = {
 };
 
 var MAX_DIMENSION = 1600; // longest edge, in pixels, for published photos
+var HERO_MAX_DIMENSION = 2000; // hero banner slides are shown large, full-width
 var JPEG_QUALITY = 82;
+var HERO_FOLDER_NAME = "Hero images";
 
 function syncPhotos() {
   var props = PropertiesService.getScriptProperties();
@@ -146,6 +160,12 @@ function syncPhotos() {
   var subfolders = root.getFolders();
   while (subfolders.hasNext()) {
     var sub = subfolders.next();
+
+    if (sub.getName() === HERO_FOLDER_NAME) {
+      scanHeroFolder(sub);
+      continue;
+    }
+
     var category = CATEGORY_FOLDERS[sub.getName()] || "other";
     scanFolder(sub, category, null);
 
@@ -154,6 +174,24 @@ function syncPhotos() {
       var placeFolder = placeFolders.next();
       var place = KNOWN_PLACES[placeFolder.getName().toLowerCase().trim()] || null;
       scanFolder(placeFolder, category, place);
+    }
+  }
+
+  function scanHeroFolder(folder) {
+    var files = folder.getFiles();
+    while (files.hasNext()) {
+      var file = files.next();
+      if (processedSet[file.getId()]) continue;
+
+      var mime = file.getMimeType();
+      if (mime !== "image/jpeg" && mime !== "image/png") continue;
+
+      try {
+        publishHeroImage(file, token, owner, repo);
+        newIds.push(file.getId());
+      } catch (e) {
+        Logger.log("Failed to publish hero image " + file.getName() + ": " + e);
+      }
     }
   }
 
@@ -278,6 +316,47 @@ function linkDocumentToPhoto(slug, repoPath, rawName, token, owner, repo) {
 }
 
 /**
+ * Publishes a photo from the "Hero images" folder straight to the homepage
+ * banner rotation — no category, map location, or document matching,
+ * just a resized image and a caption appended to data/hero.json.
+ */
+function publishHeroImage(file, token, owner, repo) {
+  var rawName = file.getName();
+  var base = rawName.replace(/\.(jpe?g|png)$/i, "");
+  var caption = base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+  caption = caption.charAt(0).toUpperCase() + caption.slice(1);
+
+  var slug = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  var shortId = file.getId().slice(0, 8);
+  var filename = shortId + "-" + slug + ".jpg";
+  var repoPath = "images/hero-photos/" + filename;
+
+  var blob = resizeViaProxy(file, HERO_MAX_DIMENSION);
+  var base64 = Utilities.base64Encode(blob.getBytes());
+
+  ghPut(repoPath, base64, "Add hero photo: " + rawName, token, owner, repo);
+  appendHeroEntry(repoPath, caption, token, owner, repo);
+}
+
+function appendHeroEntry(repoPath, caption, token, owner, repo) {
+  var dataPath = "data/hero.json";
+  var current = ghGet(dataPath, token, owner, repo);
+  var heroPhotos = JSON.parse(
+    Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
+  );
+
+  heroPhotos.push({ src: repoPath, caption: caption });
+  var updated = JSON.stringify(heroPhotos, null, 2) + "\n";
+
+  ghPut(
+    dataPath,
+    Utilities.base64Encode(Utilities.newBlob(updated).getBytes()),
+    "Add hero photo entry: " + caption,
+    token, owner, repo, current.sha
+  );
+}
+
+/**
  * Apps Script has no built-in image-resize API, so this hands the job
  * to wsrv.nl (a free, widely used image resizing proxy) — it fetches
  * the Drive file by its share link, returns a resized/compressed JPEG.
@@ -286,11 +365,12 @@ function linkDocumentToPhoto(slug, repoPath, rawName, token, owner, repo) {
  * any reason, the original file is published unresized rather than
  * blocking the sync — a slightly larger photo beats a broken pipeline.
  */
-function resizeViaProxy(file) {
+function resizeViaProxy(file, maxDimension) {
+  var dimension = maxDimension || MAX_DIMENSION;
   try {
     var sourceUrl = "https://drive.google.com/uc?export=view&id=" + file.getId();
     var proxyUrl = "https://wsrv.nl/?url=" + encodeURIComponent(sourceUrl) +
-      "&w=" + MAX_DIMENSION + "&h=" + MAX_DIMENSION + "&fit=inside" +
+      "&w=" + dimension + "&h=" + dimension + "&fit=inside" +
       "&output=jpg&q=" + JPEG_QUALITY;
     var res = UrlFetchApp.fetch(proxyUrl, { muteHttpExceptions: true });
     if (res.getResponseCode() !== 200) throw new Error("proxy returned " + res.getResponseCode());

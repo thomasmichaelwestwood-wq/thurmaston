@@ -17,49 +17,78 @@ function initNavToggle() {
 function initHero() {
   var hero = document.querySelector("[data-hero]");
   if (!hero) return;
-  var slides = Array.prototype.slice.call(hero.querySelectorAll(".hero-slide"));
-  var dotsWrap = hero.querySelector(".hero-dots");
-  if (slides.length < 2) return;
 
-  var current = 0;
-  var timer;
+  fetch("data/hero.json")
+    .then(function (res) { return res.ok ? res.json() : []; })
+    .catch(function () { return []; })
+    .then(function (heroPhotos) {
+      // Real synced photos replace the placeholder illustrations
+      // outright, once there are any — otherwise the illustrations
+      // already in the page stay as the fallback.
+      if (heroPhotos && heroPhotos.length > 0) {
+        Array.prototype.forEach.call(hero.querySelectorAll(".hero-slide"), function (el) { el.remove(); });
+        var contentEl = hero.querySelector(".hero-content");
+        heroPhotos.forEach(function (photo, i) {
+          var slide = document.createElement("div");
+          slide.className = "hero-slide" + (i === 0 ? " active" : "");
+          slide.style.backgroundImage = "url('" + photo.src + "')";
+          if (photo.caption) {
+            var caption = document.createElement("span");
+            caption.className = "hero-slide-caption";
+            caption.textContent = photo.caption;
+            slide.appendChild(caption);
+          }
+          hero.insertBefore(slide, contentEl);
+        });
+      }
+      startSlideshow();
+    });
 
-  slides.forEach(function (slide, i) {
-    if (dotsWrap) {
-      var dot = document.createElement("button");
-      dot.className = "hero-dot" + (i === 0 ? " active" : "");
-      dot.setAttribute("aria-label", "Show slide " + (i + 1) + " of " + slides.length);
-      dot.addEventListener("click", function () {
-        goTo(i);
-        restart();
-      });
-      dotsWrap.appendChild(dot);
+  function startSlideshow() {
+    var slides = Array.prototype.slice.call(hero.querySelectorAll(".hero-slide"));
+    var dotsWrap = hero.querySelector(".hero-dots");
+    if (slides.length < 2) return;
+
+    var current = 0;
+    var timer;
+
+    slides.forEach(function (slide, i) {
+      if (dotsWrap) {
+        var dot = document.createElement("button");
+        dot.className = "hero-dot" + (i === 0 ? " active" : "");
+        dot.setAttribute("aria-label", "Show slide " + (i + 1) + " of " + slides.length);
+        dot.addEventListener("click", function () {
+          goTo(i);
+          restart();
+        });
+        dotsWrap.appendChild(dot);
+      }
+    });
+
+    var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.children) : [];
+
+    function goTo(index) {
+      slides[current].classList.remove("active");
+      if (dots[current]) dots[current].classList.remove("active");
+      current = index;
+      slides[current].classList.add("active");
+      if (dots[current]) dots[current].classList.add("active");
     }
-  });
 
-  var dots = dotsWrap ? Array.prototype.slice.call(dotsWrap.children) : [];
+    function next() {
+      goTo((current + 1) % slides.length);
+    }
 
-  function goTo(index) {
-    slides[current].classList.remove("active");
-    if (dots[current]) dots[current].classList.remove("active");
-    current = index;
-    slides[current].classList.add("active");
-    if (dots[current]) dots[current].classList.add("active");
+    function restart() {
+      clearInterval(timer);
+      timer = setInterval(next, 6000);
+    }
+
+    restart();
+
+    hero.addEventListener("mouseenter", function () { clearInterval(timer); });
+    hero.addEventListener("mouseleave", restart);
   }
-
-  function next() {
-    goTo((current + 1) % slides.length);
-  }
-
-  function restart() {
-    clearInterval(timer);
-    timer = setInterval(next, 6000);
-  }
-
-  restart();
-
-  hero.addEventListener("mouseenter", function () { clearInterval(timer); });
-  hero.addEventListener("mouseleave", restart);
 }
 
 function initSearch() {
