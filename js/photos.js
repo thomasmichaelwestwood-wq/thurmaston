@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
   var lightboxViewMap = lightbox.querySelector(".photo-lightbox-viewmap");
-  var activeCategory = "all";
+  var activeCategory = "streets";
   var allPhotos = [];
   var visiblePhotos = [];
   var currentIndex = 0;
@@ -32,7 +32,7 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   function matches(photo, query) {
-    if (activeCategory !== "all" && photo.category !== activeCategory) return false;
+    if (photo.category !== activeCategory) return false;
     if (!query) return true;
     var haystack = (photo.caption + " " + photo.date + " " + photo.credit).toLowerCase();
     return haystack.indexOf(query) !== -1;
@@ -107,9 +107,22 @@ document.addEventListener("DOMContentLoaded", function () {
     if (e.key === "ArrowLeft") { currentIndex = (currentIndex - 1 + visiblePhotos.length) % visiblePhotos.length; showPhoto(); }
   }
 
+  function setActiveCategory(category) {
+    activeCategory = category;
+    if (filterEl) {
+      Array.prototype.forEach.call(filterEl.querySelectorAll("button"), function (b) {
+        b.classList.toggle("active", b.dataset.category === category);
+      });
+    }
+    renderGrid();
+  }
+
   function maybeOpenFromHash() {
     var match = location.hash.match(/^#photo-(.+)$/);
     if (!match) return;
+    var target = allPhotos.find(function (p) { return p.id === match[1]; });
+    if (!target) return;
+    if (target.category !== activeCategory) setActiveCategory(target.category);
     var idx = visiblePhotos.findIndex(function (p) { return p.id === match[1]; });
     if (idx === -1) return;
     document.getElementById("photos").scrollIntoView();
@@ -131,11 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
     filterEl.addEventListener("click", function (e) {
       var btn = e.target.closest("button[data-category]");
       if (!btn) return;
-      activeCategory = btn.dataset.category;
-      Array.prototype.forEach.call(filterEl.querySelectorAll("button"), function (b) {
-        b.classList.toggle("active", b === btn);
-      });
-      renderGrid();
+      setActiveCategory(btn.dataset.category);
     });
   }
 

@@ -51,6 +51,28 @@ img { max-width: 100%; display: block; }
 a { color: var(--green-700); }
 a:hover { color: var(--gold-600); }
 
+/* Visible, consistent keyboard focus everywhere — only for keyboard
+   navigation (:focus-visible), so mouse clicks stay visually quiet. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--gold-600);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 h1, h2, h3, h4 {
   font-family: var(--font-head);
   font-weight: 700;
@@ -266,7 +288,7 @@ h1, h2, h3, h4 {
   text-transform: uppercase;
   letter-spacing: 0.05em;
   background: var(--gold-100);
-  color: var(--gold-600);
+  color: #7a5a2e; /* darker than gold-600 — that pairing fails WCAG AA (2.8:1) on this background */
   padding: 2px 8px;
   border-radius: 20px;
   margin-left: 8px;
@@ -393,20 +415,35 @@ h1, h2, h3, h4 {
 
 .hero-dots {
   position: absolute;
-  bottom: 16px;
-  left: 20px;
+  bottom: 0;
+  left: 4px;
   z-index: 2;
   display: flex;
-  gap: 8px;
 }
 .hero-dot {
+  /* Visual dot stays 9px, but the actual tap target is 44x44 (WCAG/HIG
+     minimum) via padding + a centered pseudo-element. */
+  width: 44px;
+  height: 44px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+}
+.hero-dot::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   width: 9px;
   height: 9px;
   border-radius: 50%;
   background: rgba(255,255,255,0.45);
-  border: none;
-  cursor: pointer;
-  padding: 0;
+}
+.hero-dot.active::after {
+  background: #fff;
 }
 .hero-dot.active { background: #fff; }
 
