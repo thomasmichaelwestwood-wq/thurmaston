@@ -32,12 +32,6 @@ function initHero() {
           var slide = document.createElement("div");
           slide.className = "hero-slide" + (i === 0 ? " active" : "");
           slide.style.backgroundImage = "url('" + photo.src + "')";
-          if (photo.caption) {
-            var caption = document.createElement("span");
-            caption.className = "hero-slide-caption";
-            caption.textContent = photo.caption;
-            slide.appendChild(caption);
-          }
           hero.insertBefore(slide, contentEl);
         });
       }
