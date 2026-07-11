@@ -5,9 +5,23 @@ const PHOTO_CATEGORIES = {
   other: { label: "Other" }
 };
 
-var PHOTOS_DATA_PROMISE = fetch("data/photos.json")
-  .then(function (res) { return res.ok ? res.json() : []; })
-  .catch(function () { return []; });
+// Hero images are for the homepage banner only — a photo used there
+// (even one that's also archived from a category folder) is excluded
+// here so it never also shows up in the photo archive or site search.
+// The same Drive file gets resized into images/photos/ and
+// images/hero-photos/ separately but keeps the same filename in both
+// (it's derived from the shared Drive file ID), so matching by
+// filename rather than full path catches the duplicate.
+var PHOTOS_DATA_PROMISE = Promise.all([
+  fetch("data/photos.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }),
+  fetch("data/hero.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; })
+]).then(function (results) {
+  var photos = results[0];
+  function filename(src) { return src.split("/").pop(); }
+  var heroFilenames = {};
+  results[1].forEach(function (p) { heroFilenames[filename(p.src)] = true; });
+  return photos.filter(function (p) { return !heroFilenames[filename(p.src)]; });
+});
 
 document.addEventListener("DOMContentLoaded", function () {
   var gridEl = document.getElementById("photo-grid");
