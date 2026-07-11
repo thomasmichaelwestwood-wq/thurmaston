@@ -4,7 +4,9 @@ Static HTML/CSS/JS site (no build step) for the "Memories of Thurmaston" communi
 
 ## Site structure
 
-Two pages only: `index.html` (the whole site — hero banner, photo archive, historic map, shared memories, share-a-memory form) and `contact.html`. There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
+Three pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|nature|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), and `contact.html`. There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
+
+`js/photos.js` and `js/map.js` are shared by all pages that use them. A page sets `window.LOCKED_CATEGORY = "streets"` (etc.) in an inline `<script>` before loading `photos.js`/`map.js` to lock both to one category; `index.html` doesn't set it, so it shows everything. Don't fork these scripts per-page — extend the shared ones.
 
 ## Categorisation rule — always read from the Drive folder structure
 
