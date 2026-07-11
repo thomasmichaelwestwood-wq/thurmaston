@@ -8,57 +8,34 @@
    category must be one of: streets, people, nature, other — the same
    categories used by the photo archive, so both features sort things
    the same way.
-   lat/lng: approximate coordinates of the site today. */
+   lat/lng: approximate coordinates of the site today.
+   photoSrc/photoId (optional): shows the real photo in the pin's popup,
+   and links to it in the Photo Archive lightbox — photoId must match
+   that photo's id in data/photos.json. */
 const MAP_DATA = [
   {
-    id: "example-forge",
-    name: "Example: The Old Forge (approximate site)",
-    category: "streets",
-    lat: 52.6805,
-    lng: -1.0978,
-    period: "Gone by the mid-20th century (example only)",
-    description: "Placeholder entry showing how a village blacksmith's forge or workshop could be marked. Replace with a real record — a photo, a name, and roughly when it disappeared.",
-    example: true
-  },
-  {
-    id: "example-cottages",
-    name: "Example: Row of cottages on Melton Road",
-    category: "streets",
-    lat: 52.6795,
-    lng: -1.0970,
-    period: "Demolished — exact date unknown (example only)",
-    description: "Placeholder entry for housing that once stood along the historic Melton Road / Fosse Way corridor before redevelopment. If you remember these, or have a photo, please tell us.",
-    example: true
-  },
-  {
-    id: "example-inn",
-    name: "Example: Old coaching inn",
+    id: "generous-briton",
+    name: "The Generous Briton",
     category: "people",
-    lat: 52.6788,
-    lng: -1.0965,
-    period: "Example only — no date recorded",
-    description: "Placeholder entry for a former pub or coaching inn on the old Fosse Way route. Thurmaston likely had several over the centuries — help us record where and what they were called.",
-    example: true
+    lat: 52.679363200371284,
+    lng: -1.0979936680376168,
+    period: "Pictured c.1936",
+    description: "A village pub, pictured around 1936. If you know more about it — when it closed, or what stands there now — get in touch.",
+    photoSrc: "images/photos/1RjrLTG9-003-generous-briton-c1936-mot-1-11.jpg",
+    photoId: "1RjrLTG9-003-generous-briton-c1936-mot-1-11",
+    example: false
   },
   {
-    id: "example-schoolroom",
-    name: "Example: Former chapel schoolroom",
-    category: "people",
-    lat: 52.6779,
-    lng: -1.0958,
-    period: "Example only — no date recorded",
-    description: "Placeholder entry near St Michael's for a former schoolroom or chapel building. Swap this for a verified building and a short history once confirmed.",
-    example: true
-  },
-  {
-    id: "example-mill",
-    name: "Example: Mill on the River Soar",
-    category: "nature",
-    lat: 52.6760,
-    lng: -1.1005,
-    period: "Example only — no date recorded",
-    description: "Placeholder entry for a watermill or similar riverside building on the Soar. Thurmaston's location on the river makes this plausible, but it needs a real source before it's more than a guess.",
-    example: true
+    id: "manor-hotel-building",
+    name: "Manor Hotel",
+    category: "streets",
+    lat: 52.672797650614264,
+    lng: -1.1033455758707467,
+    period: "Exact date unknown",
+    description: "If you know more about the Manor Hotel's history — when it operated, or what's there now — get in touch.",
+    photoSrc: "images/photos/1w3CZ0o6-manor-hotel.jpg",
+    photoId: "1w3CZ0o6-manor-hotel",
+    example: false
   }
 ];
 
