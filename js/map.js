@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var listEl = document.getElementById("map-list");
   var filterEl = document.getElementById("map-filters");
   var markers = {};
-  var activeCategory = "all";
+  var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "all";
 
   function makeIcon(category) {
     var color = (MAP_CATEGORIES[category] || MAP_CATEGORIES.other).color;
@@ -119,7 +119,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  renderList();
+  applyFilter(activeCategory);
 
   var photoMarker = null;
   window.flyToPhotoLocation = function (lat, lng, photo) {

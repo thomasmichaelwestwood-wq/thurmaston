@@ -65,15 +65,14 @@
 
   <section class="content-section container" id="photos">
     <h2>Photo archive</h2>
+    <p>Pick a category to browse its photos alongside the historic map.</p>
 
-    <input type="text" id="photo-search-input" class="photo-search-input" placeholder="Search photos by caption, date or credit…" autocomplete="off">
     <div class="photo-filters" id="photo-filters">
-      <button type="button" data-category="streets" class="active"><span>Streets &amp; Buildings</span></button>
-      <button type="button" data-category="people"><span>People &amp; Events</span></button>
-      <button type="button" data-category="nature"><span>Nature &amp; Views</span></button>
-      <button type="button" data-category="other"><span>Other</span></button>
+      <a href="category.html?cat=streets" data-category="streets"><span>Streets &amp; Buildings</span></a>
+      <a href="category.html?cat=people" data-category="people"><span>People &amp; Events</span></a>
+      <a href="category.html?cat=nature" data-category="nature"><span>Nature &amp; Views</span></a>
+      <a href="category.html?cat=other" data-category="other"><span>Other</span></a>
     </div>
-    <div class="photo-grid" id="photo-grid"></div>
   </section>
 
   <section class="content-section container" id="map">

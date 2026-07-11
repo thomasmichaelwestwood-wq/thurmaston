@@ -24,12 +24,16 @@ var PHOTOS_DATA_PROMISE = Promise.all([
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-  var gridEl = document.getElementById("photo-grid");
-  if (!gridEl) return;
+  // The lightbox (and the map's ability to open a photo in it) is
+  // needed on any page with a historic map, even ones with no photo
+  // grid of their own — e.g. the homepage now only links out to
+  // per-category pages, but its own map can still open a photo.
+  var lightbox = document.getElementById("photo-lightbox");
+  if (!lightbox) return;
 
+  var gridEl = document.getElementById("photo-grid");
   var filterEl = document.getElementById("photo-filters");
   var searchInput = document.getElementById("photo-search-input");
-  var lightbox = document.getElementById("photo-lightbox");
   var lightboxImg = lightbox.querySelector(".photo-lightbox-img");
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
@@ -43,7 +47,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var minimapEl = document.getElementById("photo-lightbox-minimap");
   var miniMap = null;
   var miniMarker = null;
-  var activeCategory = "streets";
+  var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "streets";
   var allPhotos = [];
   var visiblePhotos = [];
   var currentIndex = 0;
@@ -64,7 +68,7 @@ document.addEventListener("DOMContentLoaded", function () {
     allPhotos.forEach(function (photo) {
       if (!latestByCategory[photo.category]) latestByCategory[photo.category] = photo;
     });
-    Array.prototype.forEach.call(filterEl.querySelectorAll("button[data-category]"), function (btn) {
+    Array.prototype.forEach.call(filterEl.querySelectorAll("[data-category]"), function (btn) {
       var photo = latestByCategory[btn.dataset.category];
       if (photo) btn.style.backgroundImage = "url('" + photo.src + "')";
     });
@@ -78,9 +82,14 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderGrid() {
-    gridEl.innerHTML = "";
     var query = searchInput ? searchInput.value.trim().toLowerCase() : "";
     visiblePhotos = allPhotos.filter(function (p) { return matches(p, query); });
+
+    // Some pages (the homepage) have no grid of their own, just a map
+    // that can open a photo in the lightbox — visiblePhotos above still
+    // needs computing for that to work, but there's nothing to draw.
+    if (!gridEl) return;
+    gridEl.innerHTML = "";
 
     if (visiblePhotos.length === 0) {
       var empty = document.createElement("p");

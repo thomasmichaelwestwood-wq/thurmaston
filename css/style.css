@@ -776,26 +776,26 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   gap: 12px;
   margin-bottom: 20px;
 }
-.photo-filters button {
+.photo-filters a {
   position: relative;
+  display: block;
   aspect-ratio: 3/2;
   border: 3px solid transparent;
   border-radius: 10px;
   overflow: hidden;
-  cursor: pointer;
-  padding: 0;
+  text-decoration: none;
   background-color: var(--green-100);
   background-size: cover;
   background-position: center;
   font-family: var(--font-body);
 }
-.photo-filters button::after {
+.photo-filters a::after {
   content: "";
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgba(20,30,22,0) 45%, rgba(17,26,19,0.8) 100%);
 }
-.photo-filters button span {
+.photo-filters a span {
   position: absolute;
   z-index: 1;
   left: 10px;
@@ -806,8 +806,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 0.88rem;
   text-align: left;
 }
-.photo-filters button.active { border-color: var(--gold-600); }
-.photo-filters button:hover:not(.active) { border-color: var(--green-700); }
+.photo-filters a:hover { border-color: var(--green-700); }
 
 .photo-grid {
   display: grid;
