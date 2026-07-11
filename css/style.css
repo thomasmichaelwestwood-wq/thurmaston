@@ -614,8 +614,10 @@ h1, h2, h3, h4 {
 }
 
 form.stack { display: flex; flex-direction: column; gap: 14px; max-width: 480px; }
-form.stack label { font-weight: 600; font-size: 0.9rem; }
+form.stack label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; }
 form.stack input, form.stack textarea, form.stack select {
+  width: 100%;
+  box-sizing: border-box;
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
