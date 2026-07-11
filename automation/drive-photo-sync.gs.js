@@ -178,21 +178,24 @@ function syncPhotos() {
   }
 
   function scanHeroFolder(folder) {
+    var imageFiles = [];
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
       if (processedSet[file.getId()]) continue;
 
       var mime = file.getMimeType();
-      if (mime !== "image/jpeg" && mime !== "image/png") continue;
+      if (mime === "image/jpeg" || mime === "image/png") imageFiles.push(file);
+    }
 
+    imageFiles.forEach(function (file) {
       try {
         publishHeroImage(file, token, owner, repo);
         newIds.push(file.getId());
       } catch (e) {
         Logger.log("Failed to publish hero image " + file.getName() + ": " + e);
       }
-    }
+    });
   }
 
   function scanFolder(folder, category, place) {
