@@ -117,6 +117,12 @@
  * a straight photo → caption → slide pipeline. Name them the same way
  * as any other photo — the filename becomes the caption shown in the
  * corner of the slide.
+ *
+ * A photo already synced from a category folder can also be added to
+ * Hero images to reuse it as a banner slide — Drive lets the same file
+ * live in two folders at once, and this script tracks "already synced
+ * to the archive" and "already synced as a hero slide" separately, so
+ * one doesn't block the other.
  * ---------------------------------------------------------------------
  */
 
@@ -151,8 +157,17 @@ function syncPhotos() {
   var processedSet = {};
   processed.forEach(function (id) { processedSet[id] = true; });
 
+  // Tracked separately from the set above: a photo already synced into
+  // the archive from a category folder can also be dropped into Hero
+  // images to reuse it as a banner slide — the two pipelines shouldn't
+  // block each other just because they share the same underlying file.
+  var processedHero = JSON.parse(props.getProperty("PROCESSED_HERO_IDS") || "[]");
+  var processedHeroSet = {};
+  processedHero.forEach(function (id) { processedHeroSet[id] = true; });
+
   var root = DriveApp.getFolderById(folderId);
   var newIds = [];
+  var newHeroIds = [];
 
   // Root-level photos (no category chosen) default to "other", no place.
   scanFolder(root, "other", null);
@@ -160,7 +175,6 @@ function syncPhotos() {
   var subfolders = root.getFolders();
   while (subfolders.hasNext()) {
     var sub = subfolders.next();
-    Logger.log("Found subfolder: \"" + sub.getName() + "\"");
 
     if (sub.getName() === HERO_FOLDER_NAME) {
       scanHeroFolder(sub);
@@ -180,23 +194,19 @@ function syncPhotos() {
 
   function scanHeroFolder(folder) {
     var imageFiles = [];
-    var seenCount = 0;
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
-      seenCount++;
-      Logger.log("Hero folder file: \"" + file.getName() + "\" (" + file.getMimeType() + "), already processed: " + !!processedSet[file.getId()]);
-      if (processedSet[file.getId()]) continue;
+      if (processedHeroSet[file.getId()]) continue;
 
       var mime = file.getMimeType();
       if (mime === "image/jpeg" || mime === "image/png") imageFiles.push(file);
     }
-    Logger.log("Hero folder: saw " + seenCount + " file(s), " + imageFiles.length + " new image(s) to publish.");
 
     imageFiles.forEach(function (file) {
       try {
         publishHeroImage(file, token, owner, repo);
-        newIds.push(file.getId());
+        newHeroIds.push(file.getId());
       } catch (e) {
         Logger.log("Failed to publish hero image " + file.getName() + ": " + e);
       }
@@ -239,6 +249,9 @@ function syncPhotos() {
 
   if (newIds.length > 0) {
     props.setProperty("PROCESSED_IDS", JSON.stringify(processed.concat(newIds)));
+  }
+  if (newHeroIds.length > 0) {
+    props.setProperty("PROCESSED_HERO_IDS", JSON.stringify(processedHero.concat(newHeroIds)));
   }
 }
 
