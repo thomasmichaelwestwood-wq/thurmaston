@@ -2,6 +2,10 @@
 
 Static HTML/CSS/JS site (no build step) for the "Memories of Thurmaston" community site. See `PHOTOS.md` and `HOW-TO-ADD-PHOTOS.md` for the Google Drive → GitHub photo sync pipeline.
 
+## Site structure
+
+Two pages only: `index.html` (the whole site — hero banner, photo archive, historic map, shared memories, share-a-memory form) and `contact.html`. There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
+
 ## Categorisation rule — always read from the Drive folder structure
 
 A photo's category (`streets`, `people`, `nature`, `other`) is decided **only** by which Drive subfolder it was uploaded into — that's what `CATEGORY_FOLDERS` in `automation/drive-photo-sync.gs.js` encodes, and it's already correct in `data/photos.json`.

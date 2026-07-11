@@ -124,7 +124,7 @@ function initSearch() {
       photoSearchEntries = photos.map(function (p) {
         return {
           title: p.caption,
-          url: "memories.html#photo-" + p.id,
+          url: "index.html#photo-" + p.id,
           category: "Photo",
           excerpt: [p.date, p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · ")
         };

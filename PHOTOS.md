@@ -71,7 +71,7 @@ Every run, it:
    it was synced, plus coordinates if it was in a recognised place
    subfolder (see above).
 5. Netlify redeploys automatically, and the photo appears on the
-   Memories page — searchable immediately, both in the photo archive's
+   homepage — searchable immediately, both in the photo archive's
    own search box and in the site-wide search, with a "View on map"
    link in its lightbox if it has a location, and a "View document"
    link if a matching PDF was found (see 2a, below).

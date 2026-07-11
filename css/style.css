@@ -450,77 +450,11 @@ h1, h2, h3, h4 {
 }
 .hero-dot.active { background: #fff; }
 
-/* ---------- Tiles ---------- */
-
-.tiles-section {
-  padding-top: 56px;
-  padding-bottom: 20px;
-}
-
-.tiles-section h2 {
-  font-size: 1.8rem;
-  text-align: center;
-}
 .tiles-lede {
   text-align: center;
   color: var(--ink-soft);
   max-width: 560px;
   margin: 0 auto 36px;
-}
-
-.tile-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-  gap: 20px;
-}
-
-.tile {
-  background: var(--paper);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 26px 22px;
-  text-decoration: none;
-  color: var(--ink);
-  box-shadow: var(--shadow);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.tile:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-  border-color: var(--green-700);
-}
-
-.tile-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  background: var(--green-100);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--green-900);
-}
-
-.tile h3 {
-  font-size: 1.15rem;
-  margin-bottom: 2px;
-}
-
-.tile p {
-  color: var(--ink-soft);
-  font-size: 0.92rem;
-  margin: 0;
-}
-
-.tile-arrow {
-  margin-top: auto;
-  color: var(--gold-600);
-  font-weight: 600;
-  font-size: 0.85rem;
 }
 
 /* ---------- Generic content sections ---------- */

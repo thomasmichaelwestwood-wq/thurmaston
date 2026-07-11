@@ -67,7 +67,7 @@ naming it to match.
 ## 5. That's it
 
 Nothing else to do. Within a few minutes, the photo appears on the
-Memories page, searchable by whatever you named it. No need to tell
+homepage, searchable by whatever you named it. No need to tell
 anyone or check anything — it just happens.
 
 ---
