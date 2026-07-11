@@ -787,6 +787,22 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin: 0 0 8px;
 }
 .map-popup p { margin: 0 0 8px; font-size: 0.88rem; }
+.map-popup-photo-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  margin: 6px 0 8px;
+}
+.map-popup-photo-btn img {
+  width: 100%;
+  border-radius: 6px;
+  display: block;
+  transition: opacity 0.15s ease;
+}
+.map-popup-photo-btn:hover img { opacity: 0.85; }
 .map-example-badge {
   display: inline-block;
   font-size: 0.72rem;

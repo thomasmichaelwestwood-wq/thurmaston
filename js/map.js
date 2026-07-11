@@ -9,7 +9,16 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
   }).addTo(map);
 
-  mapEl.addEventListener("click", function () { map.scrollWheelZoom.enable(); });
+  mapEl.addEventListener("click", function (e) {
+    var photoBtn = e.target.closest(".map-popup-photo-btn");
+    if (photoBtn) {
+      if (typeof window.openPhotoById === "function") {
+        window.openPhotoById(photoBtn.dataset.photoId, true);
+      }
+      return;
+    }
+    map.scrollWheelZoom.enable();
+  });
   mapEl.addEventListener("mouseleave", function () { map.scrollWheelZoom.disable(); });
 
   var listEl = document.getElementById("map-list");
@@ -121,7 +130,9 @@ document.addEventListener("DOMContentLoaded", function () {
         '<div class="map-popup">' +
           '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
           "<h3>" + escapeHtml(photo.caption) + "</h3>" +
-          '<img src="' + photo.src + '" alt="" style="width:100%;border-radius:6px;margin:6px 0 8px">' +
+          '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(photo.id) + '" aria-label="View photo: ' + escapeHtml(photo.caption) + '">' +
+            '<img src="' + photo.src + '" alt="">' +
+          "</button>" +
           '<p class="map-popup-period">' + escapeHtml(photo.date) + "</p>" +
         "</div>"
       ).openPopup();

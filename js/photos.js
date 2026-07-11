@@ -147,16 +147,21 @@ document.addEventListener("DOMContentLoaded", function () {
     renderGrid();
   }
 
+  function openPhotoById(id, skipScroll) {
+    var target = allPhotos.find(function (p) { return p.id === id; });
+    if (!target) return;
+    if (target.category !== activeCategory) setActiveCategory(target.category);
+    var idx = visiblePhotos.findIndex(function (p) { return p.id === id; });
+    if (idx === -1) return;
+    if (!skipScroll) document.getElementById("photos").scrollIntoView();
+    openLightbox(idx);
+  }
+  window.openPhotoById = openPhotoById;
+
   function maybeOpenFromHash() {
     var match = location.hash.match(/^#photo-(.+)$/);
     if (!match) return;
-    var target = allPhotos.find(function (p) { return p.id === match[1]; });
-    if (!target) return;
-    if (target.category !== activeCategory) setActiveCategory(target.category);
-    var idx = visiblePhotos.findIndex(function (p) { return p.id === match[1]; });
-    if (idx === -1) return;
-    document.getElementById("photos").scrollIntoView();
-    openLightbox(idx);
+    openPhotoById(match[1]);
   }
 
   lightbox.querySelector(".photo-lightbox-close").addEventListener("click", closeLightbox);
