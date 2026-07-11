@@ -160,6 +160,7 @@ function syncPhotos() {
   var subfolders = root.getFolders();
   while (subfolders.hasNext()) {
     var sub = subfolders.next();
+    Logger.log("Found subfolder: \"" + sub.getName() + "\"");
 
     if (sub.getName() === HERO_FOLDER_NAME) {
       scanHeroFolder(sub);
@@ -179,14 +180,18 @@ function syncPhotos() {
 
   function scanHeroFolder(folder) {
     var imageFiles = [];
+    var seenCount = 0;
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
+      seenCount++;
+      Logger.log("Hero folder file: \"" + file.getName() + "\" (" + file.getMimeType() + "), already processed: " + !!processedSet[file.getId()]);
       if (processedSet[file.getId()]) continue;
 
       var mime = file.getMimeType();
       if (mime === "image/jpeg" || mime === "image/png") imageFiles.push(file);
     }
+    Logger.log("Hero folder: saw " + seenCount + " file(s), " + imageFiles.length + " new image(s) to publish.");
 
     imageFiles.forEach(function (file) {
       try {
