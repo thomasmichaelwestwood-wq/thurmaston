@@ -66,11 +66,26 @@
  * 1960s.jpg", not "IMG_4213.jpg"). The filename becomes the caption,
  * and the caption is what search matches against.
  *
- * On the map: only if the photo goes in a place-named subfolder that
- * matches KNOWN_PLACES below (case-insensitive). To add a new
- * recognised place, add an entry to KNOWN_PLACES with its approximate
- * coordinates and re-save the script — ask for help finding
- * coordinates for a specific spot if needed.
+ * On the map: two ways, either works —
+ *
+ * 1. Precise: put "@lat,lng" anywhere in the filename, e.g.
+ *      "Manor Hotel @52.6812,-1.0968.jpg"
+ *    Find coordinates by right-clicking the spot on Google Maps (or,
+ *    for something very small and precise like a grave plot, look it
+ *    up on what3words.com/map — it shows the lat/lng alongside the
+ *    3-word address). The "@lat,lng" part is stripped out of the
+ *    caption automatically, so it never shows up in the text.
+ *
+ * 2. Approximate: drop the photo in a place-named subfolder that
+ *    matches KNOWN_PLACES below (case-insensitive) instead of loose in
+ *    the category folder. Good for "somewhere on this street" — not
+ *    precise, but better than nothing. To add a new recognised place,
+ *    add an entry to KNOWN_PLACES with its approximate coordinates and
+ *    re-save the script.
+ *
+ * If a filename has an "@lat,lng", that always wins over the folder's
+ * approximate place. Neither one present just means no map pin —
+ * that's the normal case for most old photos.
  * ---------------------------------------------------------------------
  */
 
@@ -151,6 +166,14 @@ function publishPhoto(file, category, place, token, owner, repo) {
   var rawName = file.getName();
   var ext = ".jpg"; // resized output is always re-encoded as JPEG
   var base = rawName.replace(/\.(jpe?g|png)$/i, "");
+
+  // A precise "@lat,lng" in the filename always overrides the
+  // folder-based approximate place.
+  var coordMatch = base.match(/@\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+  if (coordMatch) {
+    place = { lat: parseFloat(coordMatch[1]), lng: parseFloat(coordMatch[2]) };
+    base = base.slice(0, coordMatch.index) + base.slice(coordMatch.index + coordMatch[0].length);
+  }
 
   var caption = base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
   caption = caption.charAt(0).toUpperCase() + caption.slice(1);
