@@ -603,6 +603,8 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   overflow: hidden;
   box-shadow: var(--shadow);
   border: 1px solid var(--line);
+  position: relative;
+  isolation: isolate;
 }
 
 #historic-map {
