@@ -32,8 +32,12 @@ document.addEventListener("DOMContentLoaded", function () {
   if (!lightbox) return;
 
   var gridEl = document.getElementById("photo-grid");
+  var gridStatusEl = document.getElementById("photo-grid-status");
+  var gridFooterEl = document.getElementById("photo-grid-footer");
   var filterEl = document.getElementById("photo-filters");
   var searchInput = document.getElementById("photo-search-input");
+  var PREVIEW_COUNT = 8;
+  var showingAll = false;
   var lightboxImg = lightbox.querySelector(".photo-lightbox-img");
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
@@ -81,6 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return haystack.indexOf(query) !== -1;
   }
 
+  // The grid never dumps the whole archive by default — with hundreds or
+  // thousands of photos that's just an endless scroll. Instead it shows the
+  // most recent PREVIEW_COUNT (allPhotos is newest-first) and leaves finding
+  // anything older to the search box above or the map's pins, with a "show
+  // all" escape hatch for anyone who really wants to scroll the lot.
   function renderGrid() {
     var query = searchInput ? searchInput.value.trim().toLowerCase() : "";
     visiblePhotos = allPhotos.filter(function (p) { return matches(p, query); });
@@ -96,10 +105,15 @@ document.addEventListener("DOMContentLoaded", function () {
       empty.className = "search-empty";
       empty.textContent = "No photos match. Try a different search or category.";
       gridEl.appendChild(empty);
+      setGridStatus("");
+      renderShowAllButton(0, false);
       return;
     }
 
-    visiblePhotos.forEach(function (photo, index) {
+    var capped = !query && !showingAll && visiblePhotos.length > PREVIEW_COUNT;
+    var displayPhotos = capped ? visiblePhotos.slice(0, PREVIEW_COUNT) : visiblePhotos;
+
+    displayPhotos.forEach(function (photo, index) {
       var fig = document.createElement("button");
       fig.type = "button";
       fig.className = "photo-thumb";
@@ -111,6 +125,36 @@ document.addEventListener("DOMContentLoaded", function () {
       fig.addEventListener("click", function () { openLightbox(index); });
       gridEl.appendChild(fig);
     });
+
+    setGridStatus(query, visiblePhotos.length, capped);
+    renderShowAllButton(visiblePhotos.length, capped);
+  }
+
+  function setGridStatus(query, total, capped) {
+    if (!gridStatusEl) return;
+    if (!query && !total) { gridStatusEl.textContent = ""; return; }
+    if (query) {
+      gridStatusEl.textContent = total + (total === 1 ? " photo matches " : " photos match ") + "“" + query + "”.";
+    } else if (capped) {
+      gridStatusEl.textContent = "Showing the " + PREVIEW_COUNT + " most recently added photos of " + total + " — search above or use the map to find more.";
+    } else {
+      gridStatusEl.textContent = "All " + total + (total === 1 ? " photo" : " photos") + " in this category.";
+    }
+  }
+
+  function renderShowAllButton(total, capped) {
+    if (!gridFooterEl) return;
+    gridFooterEl.innerHTML = "";
+    if (!capped) return;
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-show-all";
+    btn.textContent = "Show all " + total + " photos";
+    btn.addEventListener("click", function () {
+      showingAll = true;
+      renderGrid();
+    });
+    gridFooterEl.appendChild(btn);
   }
 
   function openLightbox(index) {
@@ -211,6 +255,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function setActiveCategory(category) {
     activeCategory = category;
+    showingAll = false;
     if (filterEl) {
       Array.prototype.forEach.call(filterEl.querySelectorAll("button"), function (b) {
         b.classList.toggle("active", b.dataset.category === category);

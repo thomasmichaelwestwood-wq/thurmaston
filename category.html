@@ -49,6 +49,11 @@
     </div>
   </section>
 
+  <section class="category-search-bar container">
+    <label for="photo-search-input" class="category-search-label">Looking for something specific?</label>
+    <input type="text" id="photo-search-input" class="photo-search-input photo-search-input-wide" placeholder="Search this category by caption, date or credit…" autocomplete="off">
+  </section>
+
   <section class="content-section container" id="map">
     <h2>On the map</h2>
     <div class="map-layout" style="margin-top:12px">
@@ -64,8 +69,9 @@
 
   <section class="content-section container" id="photos">
     <h2>Photos</h2>
-    <input type="text" id="photo-search-input" class="photo-search-input" placeholder="Search these photos by caption, date or credit…" autocomplete="off">
+    <p class="photo-grid-status" id="photo-grid-status"></p>
     <div class="photo-grid" id="photo-grid"></div>
+    <div class="photo-grid-footer" id="photo-grid-footer"></div>
   </section>
 </main>
 
