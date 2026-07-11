@@ -39,22 +39,6 @@
     </div>
   </section>
 
-  <section class="content-section container" id="history">
-    <h2>A brief history</h2>
-    <p>The historic heart of the village stands on Melton Road, which follows the route of the old Fosse Way — the Roman road running from Exeter to Lincoln. Thurmaston St Michael was formed as an ecclesiastical parish in 1794, combining a chapelry in Belgrave with the South Thurmaston chapelry.</p>
-    <p>The village sits on the eastern bank of the River Soar, bordered by Watermead Country Park to the west, Syston to the north, and Barkby and Barkby Thorpe to the east. Two marinas on the River Soar reflect the village's long relationship with the water.</p>
-    <p style="font-size:0.85rem;color:var(--ink-soft)">This is a brief starting point, not a complete history — if you have corrections, sources, or a longer account to contribute, we'd love to include it.</p>
-
-    <div class="callout" style="margin-top:20px">
-      <h3>Looking for more old photos?</h3>
-      <p>The <strong>Memories of Thurmaston</strong> Facebook group is an active community archive of old photos and stories from residents past and present — well worth a browse and a follow.</p>
-      <a class="btn btn-facebook" href="https://www.facebook.com/memoriesofthurmaston/" target="_blank" rel="noopener">
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M14 8h-1.5c-.8 0-1 .3-1 1v1.5H14l-.2 2H11.5V19H9v-6.5H7.5V10H9V8.5C9 6.6 10 5 12.3 5H14v3z" fill="#fff"/></svg>
-        Follow on Facebook
-      </a>
-    </div>
-  </section>
-
   <section class="content-section container" id="photos">
     <h2>Photo archive</h2>
 
@@ -125,6 +109,17 @@
         <button class="btn btn-primary" type="submit" style="align-self:flex-start">Submit building</button>
         <p style="font-size:0.8rem;color:var(--ink-soft);margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
       </form>
+    </div>
+  </section>
+
+  <section class="content-section container">
+    <div class="callout">
+      <h3>Looking for more old photos?</h3>
+      <p>The <strong>Memories of Thurmaston</strong> Facebook group is an active community archive of old photos and stories from residents past and present — well worth a browse and a follow.</p>
+      <a class="btn btn-facebook" href="https://www.facebook.com/memoriesofthurmaston/" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M14 8h-1.5c-.8 0-1 .3-1 1v1.5H14l-.2 2H11.5V19H9v-6.5H7.5V10H9V8.5C9 6.6 10 5 12.3 5H14v3z" fill="#fff"/></svg>
+        Follow on Facebook
+      </a>
     </div>
   </section>
 
@@ -208,13 +203,17 @@
 
 <div class="photo-lightbox" id="photo-lightbox">
   <div class="photo-lightbox-inner">
-    <img class="photo-lightbox-img" src="" alt="">
-    <p class="photo-lightbox-caption"></p>
-    <p class="photo-lightbox-meta"></p>
-    <div class="photo-lightbox-minimap" id="photo-lightbox-minimap" title="Click to view on the full map"></div>
-    <div class="photo-lightbox-actions">
-      <button class="photo-lightbox-viewmap" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg> View on map</button>
-      <button class="photo-lightbox-viewdoc" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg> View document</button>
+    <div class="photo-lightbox-media">
+      <img class="photo-lightbox-img" src="" alt="">
+    </div>
+    <div class="photo-lightbox-info">
+      <p class="photo-lightbox-caption"></p>
+      <p class="photo-lightbox-meta"></p>
+      <div class="photo-lightbox-minimap" id="photo-lightbox-minimap" title="Click to view on the full map"></div>
+      <div class="photo-lightbox-actions">
+        <button class="photo-lightbox-viewmap" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg> View on map</button>
+        <button class="photo-lightbox-viewdoc" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg> View document</button>
+      </div>
     </div>
   </div>
   <button class="photo-lightbox-close" type="button" aria-label="Close">×</button>
