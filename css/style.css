@@ -980,6 +980,88 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 .photo-lightbox-next { right: 20px; }
 .photo-lightbox-prev:hover, .photo-lightbox-next:hover { background: rgba(255,255,255,0.3); }
 
+/* ---------- Document lightbox ---------- */
+
+.doc-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 13, 11, 0.94);
+  z-index: 400;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.doc-lightbox.open { display: flex; }
+
+.doc-lightbox-inner {
+  width: min(900px, 94vw);
+  height: min(800px, 88vh);
+  background: var(--paper);
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+}
+
+.doc-lightbox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--green-900);
+  color: #fff;
+}
+
+.doc-lightbox-title {
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.95rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.doc-lightbox-download {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  background: var(--gold-600);
+  color: #241a06;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.doc-lightbox-download:hover { background: #d29b46; }
+
+.doc-lightbox-frame {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: #525659;
+}
+
+.doc-lightbox-close {
+  position: absolute;
+  top: 20px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+@media (max-width: 600px) {
+  .doc-lightbox-title { display: none; }
+}
+
 /* ---------- Footer ---------- */
 
 .site-footer {

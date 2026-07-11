@@ -22,6 +22,10 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightboxViewMap = lightbox.querySelector(".photo-lightbox-viewmap");
   var lightboxViewDoc = lightbox.querySelector(".photo-lightbox-viewdoc");
   var DOC_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
+  var docLightbox = document.getElementById("doc-lightbox");
+  var docLightboxFrame = docLightbox.querySelector(".doc-lightbox-frame");
+  var docLightboxTitle = docLightbox.querySelector(".doc-lightbox-title");
+  var docLightboxDownload = docLightbox.querySelector(".doc-lightbox-download");
   var activeCategory = "streets";
   var allPhotos = [];
   var visiblePhotos = [];
@@ -106,11 +110,28 @@ document.addEventListener("DOMContentLoaded", function () {
     if (lightboxViewDoc) {
       var hasDoc = typeof photo.doc === "string" && photo.doc;
       lightboxViewDoc.hidden = !hasDoc;
-      if (hasDoc) lightboxViewDoc.href = photo.doc;
+      lightboxViewDoc.onclick = hasDoc ? function () { openDocLightbox(photo); } : null;
     }
   }
 
+  function openDocLightbox(photo) {
+    docLightboxTitle.textContent = photo.caption;
+    docLightboxFrame.src = photo.doc;
+    docLightboxDownload.href = photo.doc;
+    docLightboxDownload.setAttribute("download", photo.doc.split("/").pop());
+    docLightbox.classList.add("open");
+  }
+
+  function closeDocLightbox() {
+    docLightbox.classList.remove("open");
+    docLightboxFrame.src = "";
+  }
+
   function onKeydown(e) {
+    if (docLightbox.classList.contains("open")) {
+      if (e.key === "Escape") closeDocLightbox();
+      return;
+    }
     if (e.key === "Escape") closeLightbox();
     if (e.key === "ArrowRight") { currentIndex = (currentIndex + 1) % visiblePhotos.length; showPhoto(); }
     if (e.key === "ArrowLeft") { currentIndex = (currentIndex - 1 + visiblePhotos.length) % visiblePhotos.length; showPhoto(); }
@@ -147,6 +168,11 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   lightbox.addEventListener("click", function (e) {
     if (e.target === lightbox) closeLightbox();
+  });
+
+  docLightbox.querySelector(".doc-lightbox-close").addEventListener("click", closeDocLightbox);
+  docLightbox.addEventListener("click", function (e) {
+    if (e.target === docLightbox) closeDocLightbox();
   });
 
   if (filterEl) {
