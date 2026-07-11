@@ -18,9 +18,6 @@ const SITE_SEARCH_INDEX = [
   { title: "Contact & Get Involved", url: "contact.html", category: "Contact",
     excerpt: "Get in touch with the village website team, report an issue, or volunteer." },
 
-  { title: "Thurmaston Parish Council", url: "https://www.thurmastonpc.gov.uk/", category: "Council",
-    excerpt: "The official Parish Council website — meetings, agendas, minutes and how to contact the clerk." },
-
   { title: "Memories of Thurmaston (Facebook)", url: "https://www.facebook.com/memoriesofthurmaston/", category: "History",
     excerpt: "An active community Facebook group sharing old photos and memories of Thurmaston." },
 ];
