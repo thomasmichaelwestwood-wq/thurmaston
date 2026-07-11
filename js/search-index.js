@@ -15,9 +15,6 @@ const SITE_SEARCH_INDEX = [
   { title: "Photo Archive", url: "memories.html#photos", category: "History",
     excerpt: "Old photographs of the village, organised by streets, people, nature and more." },
 
-  { title: "Local Directory", url: "directory.html", category: "Directory",
-    excerpt: "Shops, tradespeople, clubs and societies serving Thurmaston." },
-
   { title: "Contact & Get Involved", url: "contact.html", category: "Contact",
     excerpt: "Get in touch with the village website team, report an issue, or volunteer." },
 
