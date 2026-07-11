@@ -182,12 +182,15 @@ h1, h2, h3, h4 {
 
 .nav-toggle {
   display: none;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: 1px solid var(--line);
   border-radius: 6px;
   padding: 8px 10px;
   font-size: 1.1rem;
   cursor: pointer;
+  color: var(--ink);
 }
 
 .search-btn {
@@ -498,7 +501,7 @@ h1, h2, h3, h4 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.5rem;
+  color: var(--green-900);
 }
 
 .tile h3 {
@@ -999,5 +1002,5 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   }
   .main-nav.open { display: flex; }
   .main-nav a { padding: 12px; }
-  .nav-toggle { display: inline-block; }
+  .nav-toggle { display: inline-flex; }
 }
