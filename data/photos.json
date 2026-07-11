@@ -1,5 +1,17 @@
 [
   {
+    "id": "1w3CZ0o6-manor-hotel",
+    "src": "images/photos/1w3CZ0o6-manor-hotel.jpg",
+    "caption": "Manor hotel",
+    "category": "streets",
+    "date": "Added July 2026",
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "example": false,
+    "lat": 52.68,
+    "lng": -1.0973
+  },
+  {
     "id": "example-melton-road",
     "src": "images/hero/melton-road.svg",
     "caption": "Example: Melton Road (placeholder illustration, not a real photo)",
@@ -8,7 +20,7 @@
     "credit": "—",
     "consentNoted": false,
     "example": true,
-    "lat": 52.6800,
+    "lat": 52.68,
     "lng": -1.0973
   },
   {
