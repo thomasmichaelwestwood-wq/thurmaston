@@ -87,6 +87,25 @@
  * approximate place. Neither one present just means no map pin —
  * that's the normal case for most old photos.
  * ---------------------------------------------------------------------
+ *
+ * ATTACHING A DOCUMENT TO A PHOTO
+ * ---------------------------------------------------------------------
+ * If there's a supporting document for a photo — a newspaper clipping,
+ * a deeds extract, an old programme — save it as a PDF with the exact
+ * same name as the photo (just ".pdf" instead of ".jpg") and drop it in
+ * the same folder. E.g.:
+ *
+ *   Streets & Buildings/
+ *     Manor Hotel.jpg
+ *     Manor Hotel.pdf   <- automatically linked to the photo above
+ *
+ * The site shows a small document icon on that photo's thumbnail and a
+ * "View document" link when it's opened. Only PDF is supported (so the
+ * script can always tell a photo apart from a document by file type
+ * alone) — if you only have a photographed page, use your phone's
+ * scan-to-PDF feature, or in Drive right-click the image → "Open with
+ * Google Docs" → File → Download → PDF.
+ * ---------------------------------------------------------------------
  */
 
 var CATEGORY_FOLDERS = {
@@ -139,22 +158,37 @@ function syncPhotos() {
   }
 
   function scanFolder(folder, category, place) {
+    var imageFiles = [];
+    var docFiles = [];
     var files = folder.getFiles();
     while (files.hasNext()) {
       var file = files.next();
+      if (processedSet[file.getId()]) continue;
+
       var mime = file.getMimeType();
-      if (mime !== "image/jpeg" && mime !== "image/png") continue;
+      if (mime === "image/jpeg" || mime === "image/png") imageFiles.push(file);
+      else if (mime === "application/pdf") docFiles.push(file);
+    }
 
-      var id = file.getId();
-      if (processedSet[id]) continue;
-
+    // Photos are published first so that a document dropped in the same
+    // batch can be matched against the photo it belongs to straight away.
+    imageFiles.forEach(function (file) {
       try {
         publishPhoto(file, category, place, token, owner, repo);
-        newIds.push(id);
+        newIds.push(file.getId());
       } catch (e) {
         Logger.log("Failed to publish " + file.getName() + ": " + e);
       }
-    }
+    });
+
+    docFiles.forEach(function (file) {
+      try {
+        publishDocument(file, token, owner, repo);
+        newIds.push(file.getId());
+      } catch (e) {
+        Logger.log("Failed to publish document " + file.getName() + ": " + e);
+      }
+    });
   }
 
   if (newIds.length > 0) {
@@ -188,6 +222,59 @@ function publishPhoto(file, category, place, token, owner, repo) {
 
   ghPut(repoPath, base64, "Add photo: " + rawName, token, owner, repo);
   appendMetadataEntry(shortId, slug, filename, caption, category, place, token, owner, repo);
+}
+
+/**
+ * Publishes a PDF as-is (no resizing needed) and links it to whichever
+ * photo shares its filename, by matching the same slug both would
+ * produce from their name. Matching is done against the live
+ * photos.json on GitHub, not just photos published in this run, so a
+ * document can be added at any time after its photo already exists.
+ */
+function publishDocument(file, token, owner, repo) {
+  var rawName = file.getName();
+  var base = rawName.replace(/\.pdf$/i, "");
+  base = base.replace(/@\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/, "");
+
+  var slug = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  var shortId = file.getId().slice(0, 8);
+  var filename = shortId + "-" + slug + ".pdf";
+  var repoPath = "documents/" + filename;
+
+  var base64 = Utilities.base64Encode(file.getBlob().getBytes());
+  ghPut(repoPath, base64, "Add document: " + rawName, token, owner, repo);
+  linkDocumentToPhoto(slug, repoPath, rawName, token, owner, repo);
+}
+
+/**
+ * A photo's id is always "<8-char Drive id>-<slug>" (see publishPhoto),
+ * so the slug is reliably everything from character 9 onward — no
+ * separate lookup table needed. If more than one photo happens to
+ * share a slug (the same name reused at different times), the most
+ * recently added one wins, since photos.json is newest-first.
+ */
+function linkDocumentToPhoto(slug, repoPath, rawName, token, owner, repo) {
+  var dataPath = "data/photos.json";
+  var current = ghGet(dataPath, token, owner, repo);
+  var photos = JSON.parse(
+    Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
+  );
+
+  var match = photos.filter(function (p) { return p.id.slice(9) === slug; })[0];
+  if (!match) {
+    Logger.log("No matching photo found for document: " + rawName);
+    return;
+  }
+
+  match.doc = repoPath;
+  var updated = JSON.stringify(photos, null, 2) + "\n";
+
+  ghPut(
+    dataPath,
+    Utilities.base64Encode(Utilities.newBlob(updated).getBytes()),
+    "Link document to photo: " + match.caption,
+    token, owner, repo, current.sha
+  );
 }
 
 /**

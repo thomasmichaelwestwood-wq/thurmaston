@@ -69,11 +69,37 @@ Every run, it:
 5. Netlify redeploys automatically, and the photo appears on the
    Memories page — searchable immediately, both in the photo archive's
    own search box and in the site-wide search, with a "View on map"
-   link in its lightbox if it has a location.
+   link in its lightbox if it has a location, and a "View document"
+   link if a matching PDF was found (see 2a, below).
 
 No approval step in the middle — this is deliberately set up as a
 single-trusted-uploader pipeline (see "Who can upload," below), so
 anything dropped in goes live within the hour.
+
+## 2a. Attaching a supporting document to a photo (optional)
+
+Drop a PDF in the same folder as its photo, with the exact same
+filename (just `.pdf` instead of `.jpg`):
+
+```
+Streets & Buildings/
+├── Manor Hotel.jpg
+└── Manor Hotel.pdf   <- linked to the photo above
+```
+
+The sync script matches them by filename (both produce the same slug),
+publishes the PDF to `documents/` in this repo, and adds a `doc` field
+to that photo's entry in `photos.json`. The site then shows a small
+document-icon badge on the thumbnail and a "View document" link in the
+lightbox. Matching is done against the live `photos.json`, not just
+files from the same sync run, so the document can be added before or
+after the photo, in any later run.
+
+PDF only, deliberately — it's the one file type that can't be confused
+with a photo, so the script never has to guess which is which. If two
+different photos ever end up with the same name (unusual, but
+possible over a long archive), the document links to whichever of them
+is more recent.
 
 ## 3. Tidying up afterwards (optional, whenever)
 

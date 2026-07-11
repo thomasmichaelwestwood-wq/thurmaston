@@ -20,6 +20,8 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
   var lightboxViewMap = lightbox.querySelector(".photo-lightbox-viewmap");
+  var lightboxViewDoc = lightbox.querySelector(".photo-lightbox-viewdoc");
+  var DOC_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
   var activeCategory = "streets";
   var allPhotos = [];
   var visiblePhotos = [];
@@ -58,7 +60,8 @@ document.addEventListener("DOMContentLoaded", function () {
       fig.setAttribute("aria-label", "View photo: " + photo.caption);
       fig.innerHTML =
         '<img src="' + photo.src + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
-        (photo.example ? '<span class="map-example-badge photo-thumb-badge">Example</span>' : "");
+        (photo.example ? '<span class="map-example-badge photo-thumb-badge">Example</span>' : "") +
+        (photo.doc ? '<span class="photo-thumb-docbadge" title="Includes a document">' + DOC_ICON + '</span>' : "");
       fig.addEventListener("click", function () { openLightbox(index); });
       gridEl.appendChild(fig);
     });
@@ -98,6 +101,12 @@ document.addEventListener("DOMContentLoaded", function () {
           window.flyToPhotoLocation(photo.lat, photo.lng, photo);
         }
       } : null;
+    }
+
+    if (lightboxViewDoc) {
+      var hasDoc = typeof photo.doc === "string" && photo.doc;
+      lightboxViewDoc.hidden = !hasDoc;
+      if (hasDoc) lightboxViewDoc.href = photo.doc;
     }
   }
 
