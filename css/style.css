@@ -918,8 +918,8 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 .photo-lightbox.open { display: flex; }
 
 .photo-lightbox-inner {
-  max-width: 900px;
-  width: 100%;
+  max-width: min(900px, 92vw);
+  max-height: 90vh;
   text-align: center;
 }
 
@@ -994,22 +994,6 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   cursor: pointer;
 }
 
-.photo-lightbox-prev, .photo-lightbox-next {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  background: rgba(255,255,255,0.15);
-  border: none;
-  color: #fff;
-  font-size: 1.6rem;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
-}
-.photo-lightbox-prev { left: 20px; }
-.photo-lightbox-next { right: 20px; }
-.photo-lightbox-prev:hover, .photo-lightbox-next:hover { background: rgba(255,255,255,0.3); }
 
 /* ---------- Document lightbox ---------- */
 

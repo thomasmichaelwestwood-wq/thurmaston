@@ -168,8 +168,6 @@ document.addEventListener("DOMContentLoaded", function () {
       return;
     }
     if (e.key === "Escape") closeLightbox();
-    if (e.key === "ArrowRight") { currentIndex = (currentIndex + 1) % visiblePhotos.length; showPhoto(); }
-    if (e.key === "ArrowLeft") { currentIndex = (currentIndex - 1 + visiblePhotos.length) % visiblePhotos.length; showPhoto(); }
   }
 
   function setActiveCategory(category) {
@@ -200,12 +198,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   lightbox.querySelector(".photo-lightbox-close").addEventListener("click", closeLightbox);
-  lightbox.querySelector(".photo-lightbox-next").addEventListener("click", function () {
-    currentIndex = (currentIndex + 1) % visiblePhotos.length; showPhoto();
-  });
-  lightbox.querySelector(".photo-lightbox-prev").addEventListener("click", function () {
-    currentIndex = (currentIndex - 1 + visiblePhotos.length) % visiblePhotos.length; showPhoto();
-  });
   lightbox.addEventListener("click", function (e) {
     if (e.target === lightbox) closeLightbox();
   });
