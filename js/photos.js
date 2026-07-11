@@ -36,9 +36,25 @@ document.addEventListener("DOMContentLoaded", function () {
 
   PHOTOS_DATA_PROMISE.then(function (photos) {
     allPhotos = photos;
+    setCategoryTileImages();
     renderGrid();
     maybeOpenFromHash();
   });
+
+  // Each category tab shows its most recently uploaded photo as a
+  // background image — allPhotos is newest-first, so the first match
+  // per category found while scanning is the most recent one.
+  function setCategoryTileImages() {
+    if (!filterEl) return;
+    var latestByCategory = {};
+    allPhotos.forEach(function (photo) {
+      if (!latestByCategory[photo.category]) latestByCategory[photo.category] = photo;
+    });
+    Array.prototype.forEach.call(filterEl.querySelectorAll("button[data-category]"), function (btn) {
+      var photo = latestByCategory[btn.dataset.category];
+      if (photo) btn.style.backgroundImage = "url('" + photo.src + "')";
+    });
+  }
 
   function matches(photo, query) {
     if (photo.category !== activeCategory) return false;

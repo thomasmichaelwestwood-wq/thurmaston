@@ -771,26 +771,42 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 
 .photo-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-bottom: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
 }
 .photo-filters button {
-  border: 1px solid var(--line);
-  background: var(--paper);
-  color: var(--ink);
-  font-size: 0.82rem;
-  padding: 6px 13px;
-  border-radius: 20px;
+  position: relative;
+  aspect-ratio: 3/2;
+  border: 3px solid transparent;
+  border-radius: 10px;
+  overflow: hidden;
   cursor: pointer;
+  padding: 0;
+  background-color: var(--green-100);
+  background-size: cover;
+  background-position: center;
   font-family: var(--font-body);
 }
-.photo-filters button.active {
-  background: var(--green-900);
-  border-color: var(--green-900);
-  color: #fff;
+.photo-filters button::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20,30,22,0) 45%, rgba(17,26,19,0.8) 100%);
 }
+.photo-filters button span {
+  position: absolute;
+  z-index: 1;
+  left: 10px;
+  right: 10px;
+  bottom: 8px;
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.88rem;
+  text-align: left;
+}
+.photo-filters button.active { border-color: var(--gold-600); }
 .photo-filters button:hover:not(.active) { border-color: var(--green-700); }
 
 .photo-grid {
