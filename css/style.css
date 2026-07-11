@@ -942,6 +942,21 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin-top: 4px;
 }
 
+.photo-lightbox-minimap {
+  display: none;
+  width: 100%;
+  max-width: 340px;
+  height: 140px;
+  margin: 14px auto 0;
+  border-radius: 10px;
+  overflow: hidden;
+  cursor: pointer;
+  border: 2px solid rgba(255, 255, 255, 0.15);
+}
+.photo-lightbox-minimap.visible { display: block; }
+.photo-lightbox-minimap:hover { border-color: var(--gold-600); }
+.photo-lightbox-minimap .leaflet-control-attribution { font-size: 0.6rem; }
+
 .photo-lightbox-actions {
   display: flex;
   flex-wrap: wrap;

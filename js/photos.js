@@ -26,6 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var docLightboxFrame = docLightbox.querySelector(".doc-lightbox-frame");
   var docLightboxTitle = docLightbox.querySelector(".doc-lightbox-title");
   var docLightboxDownload = docLightbox.querySelector(".doc-lightbox-download");
+  var minimapEl = document.getElementById("photo-lightbox-minimap");
+  var miniMap = null;
+  var miniMarker = null;
   var activeCategory = "streets";
   var allPhotos = [];
   var visiblePhotos = [];
@@ -73,8 +76,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function openLightbox(index) {
     currentIndex = index;
-    showPhoto();
     lightbox.classList.add("open");
+    showPhoto();
     document.addEventListener("keydown", onKeydown);
     var photo = visiblePhotos[currentIndex];
     if (photo) history.replaceState(null, "", "#photo-" + photo.id);
@@ -96,15 +99,17 @@ document.addEventListener("DOMContentLoaded", function () {
       .filter(Boolean).join(" · ");
     history.replaceState(null, "", "#photo-" + photo.id);
 
+    var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";
+
     if (lightboxViewMap) {
-      var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";
       lightboxViewMap.hidden = !hasLocation;
-      lightboxViewMap.onclick = hasLocation ? function () {
-        closeLightbox();
-        if (typeof window.flyToPhotoLocation === "function") {
-          window.flyToPhotoLocation(photo.lat, photo.lng, photo);
-        }
-      } : null;
+      lightboxViewMap.onclick = hasLocation ? function () { goToFullMap(photo); } : null;
+    }
+
+    if (minimapEl) {
+      minimapEl.classList.toggle("visible", hasLocation);
+      minimapEl.onclick = hasLocation ? function () { goToFullMap(photo); } : null;
+      if (hasLocation) updateMinimap(photo);
     }
 
     if (lightboxViewDoc) {
@@ -112,6 +117,36 @@ document.addEventListener("DOMContentLoaded", function () {
       lightboxViewDoc.hidden = !hasDoc;
       lightboxViewDoc.onclick = hasDoc ? function () { openDocLightbox(photo); } : null;
     }
+  }
+
+  function goToFullMap(photo) {
+    closeLightbox();
+    if (typeof window.flyToPhotoLocation === "function") {
+      window.flyToPhotoLocation(photo.lat, photo.lng, photo);
+    }
+  }
+
+  function updateMinimap(photo) {
+    if (typeof L === "undefined") return;
+    var latlng = [photo.lat, photo.lng];
+    if (!miniMap) {
+      miniMap = L.map(minimapEl, {
+        zoomControl: false,
+        dragging: false,
+        scrollWheelZoom: false,
+        doubleClickZoom: false,
+        touchZoom: false,
+        boxZoom: false,
+        keyboard: false,
+        attributionControl: false
+      }).setView(latlng, 15);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(miniMap);
+      miniMarker = L.marker(latlng).addTo(miniMap);
+    } else {
+      miniMap.setView(latlng, 15);
+      miniMarker.setLatLng(latlng);
+    }
+    miniMap.invalidateSize();
   }
 
   function openDocLightbox(photo) {
