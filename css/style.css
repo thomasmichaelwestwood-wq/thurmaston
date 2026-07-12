@@ -476,9 +476,8 @@ h1, h2, h3, h4 {
   background: rgba(255,255,255,0.45);
 }
 .hero-dot.active::after {
-  background: #fff;
+  background: var(--green-700);
 }
-.hero-dot.active { background: #fff; }
 
 .tiles-lede {
   text-align: center;
