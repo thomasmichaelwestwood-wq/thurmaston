@@ -66,6 +66,15 @@
  * 1960s.jpg", not "IMG_4213.jpg"). The filename becomes the caption,
  * and the caption is what search matches against.
  *
+ * Dad's own filing habits (a leading catalog number like "003 ", or a
+ * "MOT 1-11" style reference code) don't need to be stripped before
+ * uploading — cleanCaption() below removes both automatically so the
+ * public caption stays tidy (e.g. "003 Generous Briton c1936 MOT1-11"
+ * becomes "Generous Briton c1936"). Nothing is lost: the exact original
+ * filename is kept as the photo's "ref" field and shown as a small
+ * reference tag when the photo is opened, so his numbering still maps
+ * back to the physical prints/albums.
+ *
  * On the map: two ways, either works —
  *
  * 1. Precise: put "@lat,lng" anywhere in the filename, e.g.
@@ -268,10 +277,8 @@ function publishPhoto(file, category, place, token, owner, repo) {
     base = base.slice(0, coordMatch.index) + base.slice(coordMatch.index + coordMatch[0].length);
   }
 
-  var caption = base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
-  caption = caption.charAt(0).toUpperCase() + caption.slice(1);
-
-  var slug = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  var caption = cleanCaption(base);
+  var slug = slugify(caption);
   var shortId = file.getId().slice(0, 8);
   var filename = shortId + "-" + slug + ext;
   var repoPath = "images/photos/" + filename;
@@ -280,7 +287,29 @@ function publishPhoto(file, category, place, token, owner, repo) {
   var base64 = Utilities.base64Encode(blob.getBytes());
 
   ghPut(repoPath, base64, "Add photo: " + rawName, token, owner, repo);
-  appendMetadataEntry(shortId, slug, filename, caption, category, place, token, owner, repo);
+  appendMetadataEntry(shortId, slug, filename, caption, rawName, category, place, token, owner, repo);
+}
+
+/**
+ * Strips Dad's internal filing codes out of a filename to get a clean,
+ * public-facing caption:
+ *  - a leading catalog number, e.g. "003 " or "233_"
+ *  - a "MOT <n>-<n>" style reference code, anywhere in the name
+ * Neither is lost — the untouched original filename is kept as the
+ * photo's "ref" field and shown as a small reference tag when the photo
+ * is opened, so Dad's own numbering system stays traceable.
+ */
+function cleanCaption(base) {
+  var text = base;
+  text = text.replace(/^\d+[\s._-]+/, "");
+  text = text.replace(/\s*\bMOT[\s.-]*\d+(?:[\s-]+\d+)*\b\s*/i, " ");
+  text = text.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+  if (!text) text = base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+function slugify(text) {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
 /**
@@ -295,7 +324,10 @@ function publishDocument(file, token, owner, repo) {
   var base = rawName.replace(/\.pdf$/i, "");
   base = base.replace(/@\s*(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/, "");
 
-  var slug = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  // Cleaned the same way as publishPhoto, so a document named after its
+  // photo (Dad's catalog number and MOT code included or not) still
+  // resolves to the same slug and gets matched up correctly.
+  var slug = slugify(cleanCaption(base));
   var shortId = file.getId().slice(0, 8);
   var filename = shortId + "-" + slug + ".pdf";
   var repoPath = "documents/" + filename;
@@ -344,10 +376,9 @@ function linkDocumentToPhoto(slug, repoPath, rawName, token, owner, repo) {
 function publishHeroImage(file, token, owner, repo) {
   var rawName = file.getName();
   var base = rawName.replace(/\.(jpe?g|png)$/i, "");
-  var caption = base.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
-  caption = caption.charAt(0).toUpperCase() + caption.slice(1);
+  var caption = cleanCaption(base);
 
-  var slug = base.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+  var slug = slugify(caption);
   var shortId = file.getId().slice(0, 8);
   var filename = shortId + "-" + slug + ".jpg";
   var repoPath = "images/hero-photos/" + filename;
@@ -402,7 +433,7 @@ function resizeViaProxy(file, maxDimension) {
   }
 }
 
-function appendMetadataEntry(shortId, slug, filename, caption, category, place, token, owner, repo) {
+function appendMetadataEntry(shortId, slug, filename, caption, ref, category, place, token, owner, repo) {
   var dataPath = "data/photos.json";
   var current = ghGet(dataPath, token, owner, repo);
   var photos = JSON.parse(
@@ -413,6 +444,7 @@ function appendMetadataEntry(shortId, slug, filename, caption, category, place, 
     id: shortId + "-" + slug,
     src: "images/photos/" + filename,
     caption: caption,
+    ref: ref,
     category: category,
     date: "Added " + Utilities.formatDate(new Date(), "Europe/London", "MMMM yyyy"),
     credit: "Unknown — needs a credit",

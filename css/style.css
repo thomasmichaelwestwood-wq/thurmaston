@@ -1007,6 +1007,15 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin-top: 4px;
 }
 
+.photo-lightbox-ref {
+  display: none;
+  color: rgba(255,255,255,0.45);
+  font-size: 0.72rem;
+  font-family: ui-monospace, "SF Mono", "Courier New", monospace;
+  margin-top: 6px;
+}
+.photo-lightbox-ref.visible { display: block; }
+
 .photo-lightbox-minimap {
   display: none;
   width: 100%;

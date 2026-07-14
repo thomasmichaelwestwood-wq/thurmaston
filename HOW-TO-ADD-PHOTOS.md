@@ -27,6 +27,12 @@ description instead of leaving it as "IMG_4213":
 You don't need to be precise about dates — "unsure of date" or "1970s?"
 in the name is perfectly fine.
 
+Already got your own numbering system, like `003 Generous Briton c1936
+MOT1-11.jpg`? No need to change it — the site automatically tidies that
+up for the caption ("Generous Briton c1936"), and keeps your original
+filename tucked away as a small reference note when the photo is opened,
+so nothing is lost.
+
 ## 3. Know exactly where it was taken? Add the map coordinates (optional)
 
 If you want the photo to show up as a pin on the village map, add the

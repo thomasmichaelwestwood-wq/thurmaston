@@ -29,6 +29,16 @@ is what search matches against. Worth doing even for photos you're not
 sure about the exact date of — "Melton Road shops, unsure of date" is a
 perfectly good filename.
 
+**Filing codes in the name are fine, no need to strip them first.** If a
+filename has a leading catalog number ("003 ...") or a "MOT 1-11" style
+reference code, the sync script automatically removes both from the
+public caption — "003 Generous Briton c1936 MOT1-11.jpg" becomes the
+caption "Generous Briton c1936". Nothing is lost: the exact original
+filename is kept and shown as a small "Ref: …" tag when the photo is
+opened, so it still maps back to your own numbering/albums. That ref
+text is also searchable, so searching "MOT 1-11" or "003" still finds
+the photo.
+
 **To make a photo appear on the interactive map:** if you know roughly
 where it was taken and it's one of these recognised village spots, put
 it in a further subfolder named exactly that, inside the matching
@@ -67,9 +77,10 @@ Every run, it:
    originals.
 3. Commits it into `images/photos/` in this repo.
 4. Adds a matching entry to `data/photos.json` — category from the
-   subfolder, caption auto-generated from the filename, dated to when
-   it was synced, plus coordinates if it was in a recognised place
-   subfolder (see above).
+   subfolder, caption auto-generated from the filename (with catalog
+   numbers and MOT-style reference codes stripped out, see above),
+   dated to when it was synced, plus coordinates if it was in a
+   recognised place subfolder (see above).
 5. Netlify redeploys automatically, and the photo appears on the
    homepage — searchable immediately, both in the photo archive's
    own search box and in the site-wide search, with a "View on map"
@@ -119,13 +130,15 @@ caption in the corner of the slide.
 
 ## 3. Tidying up afterwards (optional, whenever)
 
-The auto-generated caption is just the filename, cleaned up — good
-enough to publish, but worth improving. To fix a caption, date, credit,
-or add/correct a precise `lat`/`lng`, open `data/photos.json` and edit
-that photo's entry directly — it's a plain JSON file, safe to hand-edit
-alongside the automated writes. The `consentNoted` field starts `false`
-for every auto-synced photo; flip it to `true` once you've confirmed
-it's fine to have public (see "Consent," below).
+The auto-generated caption is the filename with catalog numbers and MOT
+codes stripped out — good enough to publish, but worth improving. To fix
+a caption, date, credit, or add/correct a precise `lat`/`lng`, open
+`data/photos.json` and edit that photo's entry directly — it's a plain
+JSON file, safe to hand-edit alongside the automated writes. The
+`ref` field holds the untouched original filename (shown as a small tag
+in the lightbox) — leave it as-is unless it's wrong. The `consentNoted`
+field starts `false` for every auto-synced photo; flip it to `true` once
+you've confirmed it's fine to have public (see "Consent," below).
 
 ## Who can upload
 
