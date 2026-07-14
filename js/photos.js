@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightboxRef = lightbox.querySelector(".photo-lightbox-ref");
   var lightboxViewMap = lightbox.querySelector(".photo-lightbox-viewmap");
   var lightboxViewDoc = lightbox.querySelector(".photo-lightbox-viewdoc");
+  var lightboxViewPage = lightbox.querySelector(".photo-lightbox-viewpage");
   var DOC_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
   var docLightbox = document.getElementById("doc-lightbox");
   var docLightboxFrame = docLightbox.querySelector(".doc-lightbox-frame");
@@ -204,6 +205,12 @@ document.addEventListener("DOMContentLoaded", function () {
       var hasDoc = typeof photo.doc === "string" && photo.doc;
       lightboxViewDoc.hidden = !hasDoc;
       lightboxViewDoc.onclick = hasDoc ? function () { openDocLightbox(photo); } : null;
+    }
+
+    if (lightboxViewPage) {
+      var hasPage = typeof photo.pageSlug === "string" && photo.pageSlug;
+      lightboxViewPage.hidden = !hasPage;
+      if (hasPage) lightboxViewPage.href = "place.html?slug=" + encodeURIComponent(photo.pageSlug);
     }
   }
 

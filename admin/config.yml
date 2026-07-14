@@ -1,0 +1,112 @@
+backend:
+  name: git-gateway
+  branch: main
+
+# No editorial workflow (draft/review step) — matches the rest of the
+# site's "single trusted uploader, no approval gate" approach. Saving in
+# the CMS commits straight to `main` and Netlify redeploys automatically.
+publish_mode: simple
+
+# Any images uploaded directly through the CMS (not synced from Google
+# Drive) land here, kept separate from the automated Drive→GitHub photo
+# pipeline's own images/photos and images/hero-photos folders.
+media_folder: "images/cms-uploads"
+public_folder: "/images/cms-uploads"
+
+collections:
+  - name: "pages"
+    label: "Story pages"
+    description: "Dedicated pages for buildings or places — linked from a map pin or a photo's \"Read full story\" button."
+    folder: "data/pages"
+    create: true
+    delete: true
+    slug: "{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "title"
+    fields:
+      - { label: "Title", name: "title", widget: "string", hint: "e.g. \"The Generous Briton\"" }
+      - label: "Content"
+        name: "blocks"
+        widget: "list"
+        label_singular: "block"
+        summary: "{{fields.type}}"
+        types:
+          - label: "Text"
+            name: "text"
+            widget: "object"
+            fields:
+              - label: "Text"
+                name: "text"
+                widget: "text"
+                hint: "Leave a blank line between paragraphs. You can use **bold**, *italic*, and [link text](https://example.com) for links to other websites."
+          - label: "Photo (from the archive)"
+            name: "photo"
+            widget: "object"
+            fields:
+              - label: "Photo ID"
+                name: "photoId"
+                widget: "string"
+                hint: "Open the photo in the archive and copy the ID from its \"Ref\" tag, or ask Tom if you're not sure."
+          - label: "Document"
+            name: "document"
+            widget: "object"
+            fields:
+              - { label: "Label", name: "label", widget: "string", hint: "e.g. \"Photograph record (1936)\"" }
+              - label: "PDF file"
+                name: "file"
+                widget: "file"
+                media_folder: "/documents"
+                public_folder: "/documents"
+                hint: "Pick an existing PDF already on the site, or upload a new one."
+
+  - name: "map_pins"
+    label: "Map pins"
+    description: "The hand-picked pins on the historic map. Ordinary located photos already show up on the map automatically and don't need an entry here — this is only for pins with their own name and description."
+    files:
+      - name: "pins"
+        label: "Map pins"
+        file: "data/map-pins.json"
+        fields:
+          - label: "Pins"
+            name: "pins"
+            widget: "list"
+            summary: "{{fields.name}}"
+            fields:
+              - { label: "Internal ID", name: "id", widget: "string", hint: "Unique, no spaces — never shown on the site, just used internally." }
+              - { label: "Name", name: "name", widget: "string" }
+              - label: "Category"
+                name: "category"
+                widget: "select"
+                options:
+                  - { label: "Streets & Buildings", value: "streets" }
+                  - { label: "People & Events", value: "people" }
+                  - { label: "Nature & Views", value: "nature" }
+                  - { label: "Other", value: "other" }
+              - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
+              - { label: "Longitude", name: "lng", widget: "number", value_type: "float" }
+              - { label: "Period / date", name: "period", widget: "string", hint: "e.g. \"Pictured c.1936\" or \"Exact date unknown\"" }
+              - label: "Short description"
+                name: "description"
+                widget: "text"
+                required: false
+                hint: "Shown in the map pin's popup — keep it brief, the full story goes on the page below."
+              - label: "Photo path"
+                name: "photoSrc"
+                widget: "string"
+                required: false
+                hint: "e.g. images/photos/xxxxxxxx-name.jpg — copy the \"src\" from that photo's entry."
+              - label: "Photo ID"
+                name: "photoId"
+                widget: "string"
+                required: false
+                hint: "Must match that photo's ID exactly, so the popup photo links into the archive correctly."
+              - label: "Full story page"
+                name: "pageSlug"
+                widget: "relation"
+                collection: "pages"
+                search_fields: ["title"]
+                value_field: "{{slug}}"
+                display_fields: ["title"]
+                required: false
+                hint: "Optional — pick one of your Story pages to add a \"Read the full story\" link to this pin's popup."

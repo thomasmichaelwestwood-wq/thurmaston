@@ -4,7 +4,7 @@ Static HTML/CSS/JS site (no build step) for the "Memories of Thurmaston" communi
 
 ## Site structure
 
-Three pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|nature|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), and `contact.html`. There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
+Five pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|nature|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), `place.html` (one template driven by `?slug=X`, a dedicated story page for a building/place — see "Story pages" below), `contact.html`, and `admin/index.html` (the Decap CMS login/editor). There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
 
 `js/photos.js` and `js/map.js` are shared by all pages that use them. A page sets `window.LOCKED_CATEGORY = "streets"` (etc.) in an inline `<script>` before loading `photos.js`/`map.js` to lock both to one category; `index.html` doesn't set it, so it shows everything. Don't fork these scripts per-page — extend the shared ones.
 
@@ -16,7 +16,7 @@ A photo's category (`streets`, `people`, `nature`, `other`) is decided **only** 
 - A photo uploaded to "Streets & Buildings" stays `streets` even if a person appears in it.
 - A photo uploaded to "People & Events" stays `people` even if a building is visible behind them.
 
-When adding or editing anything that assigns a category by hand (e.g. `js/map-data.js` entries for the Historic Map), copy the category straight from that photo's existing entry in `data/photos.json` rather than guessing from the subject matter.
+When adding or editing anything that assigns a category by hand (e.g. `data/map-pins.json` entries for the Historic Map), copy the category straight from that photo's existing entry in `data/photos.json` rather than guessing from the subject matter.
 
 ## General rule: a photo's Drive folder decides how it's used, full stop
 
@@ -32,6 +32,25 @@ The untouched original filename is never discarded: it's stored verbatim in that
 
 ## Map pins come from two sources — don't require a manual step for either
 
-`MAP_DATA` in `js/map-data.js` is a small hand-curated list (richer written descriptions, for pins worth a proper story). But most located photos get their `lat`/`lng` automatically, via an "@lat,lng" in the filename or a recognised place subfolder (see `KNOWN_PLACES` in `automation/drive-photo-sync.gs.js`) — those must **not** require someone to also hand-add a `map-data.js` entry, or pins silently go missing (this happened: 5 photos had coordinates, only 2 showed on the map, because 3 were never added to `MAP_DATA`).
+`data/map-pins.json` (`{ "pins": [...] }`) is a small hand-curated list, editable via the admin (richer written descriptions, for pins worth a proper story). But most located photos get their `lat`/`lng` automatically, via an "@lat,lng" in the filename or a recognised place subfolder (see `KNOWN_PLACES` in `automation/drive-photo-sync.gs.js`) — those must **not** require someone to also hand-add a curated pin, or pins silently go missing (this happened once: 5 photos had coordinates, only 2 showed on the map, because 3 were never added to the curated list).
 
-`js/map.js` fixes this by merging `MAP_DATA` with an auto-generated pin for every other photo in `data/photos.json` that has `lat`/`lng` and isn't already covered by a curated entry (matched by `photoId`). Keep it this way — if you ever touch map pin logic, a located photo appearing on the map should never depend on a manual `map-data.js` edit.
+`js/map.js` fixes this by fetching `data/map-pins.json` and merging it with an auto-generated pin for every other photo in `data/photos.json` that has `lat`/`lng` and isn't already covered by a curated entry (matched by `photoId`). Keep it this way — if you ever touch map pin logic, a located photo appearing on the map should never depend on a manual `data/map-pins.json` edit.
+
+`js/map-categories.js` holds only `MAP_CATEGORIES` (the fixed colour/label taxonomy) — that one's a genuinely static lookup table, not editorial content, so it stays as plain JS rather than a CMS-editable file.
+
+## Story pages, and the admin (Decap CMS)
+
+Any pin — a curated one in `data/map-pins.json`, or an ordinary auto-generated photo pin — can *optionally* link to a full dedicated page, decided individually per pin/photo (not a blanket rule). This is a deliberate, requested feature: don't default new pins to having a page, and don't remove the option to leave `pageSlug` blank.
+
+- **`data/pages/<slug>.json`** — one file per page: `{ "title": "...", "blocks": [...] }`. Each block has a `type` of `text`, `photo`, or `document`:
+  - `text`: `{ "type": "text", "text": "..." }` — rendered by `js/place.js`'s tiny built-in markdown-lite (paragraphs on blank lines, `**bold**`, `*italic*`, `[label](url)` links). Not a full markdown library on purpose — this is a static, no-build-step site, so no npm dependency was added for it. Don't casually extend the syntax without checking `renderInline`/`renderTextBlock` in `js/place.js` can actually handle it.
+  - `photo`: `{ "type": "photo", "photoId": "..." }` — must match an id in `data/photos.json`; renders as a thumbnail linking to that photo's lightbox on `category.html`.
+  - `document`: `{ "type": "document", "label": "...", "file": "documents/....pdf" }` — renders as a button opening the PDF in a new tab.
+- **`place.html?slug=X`** fetches `data/pages/X.json` (+ `data/photos.json`, to resolve `photo` blocks) and renders it. One shared template, same pattern as `category.html?cat=X`.
+- A pin/photo opts in by setting `pageSlug` to a page's slug (the filename minus `.json`). `js/map.js`'s `popupHtml()` and `js/photos.js`'s lightbox both show a "Read the full story →" link/button when `pageSlug` is set, and hide it otherwise.
+- **The existing single-PDF-per-photo feature (`photo.doc`, the "View document" button) still works exactly as before** — it wasn't replaced. A photo can have a `doc`, a `pageSlug`, both, or neither; the three lightbox buttons (View on map / View document / Read full story) show independently based on what's actually present.
+- **Ordinary photos currently need their `pageSlug` hand-set** in `data/photos.json` (no CMS UI for that yet — see below) — or, more practically, give that photo a proper entry in `data/map-pins.json` instead (reusing its existing `lat`/`lng`/`photoSrc`/`photoId`), which also gets it a name, a description, and a `pageSlug` field editable through the admin, and automatically suppresses the auto-generated version of that same pin (matched by `photoId`).
+
+**Admin: `admin/index.html` + `admin/config.yml`** is [Decap CMS](https://decapcms.org/), backed by `git-gateway` (Netlify Identity for login, saves commit straight to `main` on GitHub, no custom backend code). Two collections: `pages` (the story-page blocks editor described above) and `map_pins` (edits `data/map-pins.json`, including a `relation` field to pick a `pages` entry for `pageSlug`). `publish_mode: simple` — no draft/review step, matching the rest of the site's single-trusted-uploader approach; switch to `editorial_workflow` in `config.yml` if that ever needs to change (e.g. more admins added).
+
+This can't be tested end-to-end without the one-time Netlify Identity setup in the site owner's Netlify account (enable Identity, invite a user) — I can build and verify the config's shape and the front-end rendering, but not the actual login flow, myself.

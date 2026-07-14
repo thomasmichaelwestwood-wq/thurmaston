@@ -10,6 +10,20 @@
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="css/style.css">
+<!-- Handles the Netlify Identity invite/reset email link, which opens
+     here at the site root before redirecting into /admin/. -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+<script>
+  if (window.netlifyIdentity) {
+    window.netlifyIdentity.on("init", function (user) {
+      if (!user) {
+        window.netlifyIdentity.on("login", function () {
+          document.location.href = "/admin/";
+        });
+      }
+    });
+  }
+</script>
 </head>
 <body>
 <a class="skip-link" href="#main">Skip to content</a>
@@ -236,6 +250,7 @@
       <div class="photo-lightbox-actions">
         <button class="photo-lightbox-viewmap" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg> View on map</button>
         <button class="photo-lightbox-viewdoc" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg> View document</button>
+        <a class="photo-lightbox-viewpage" href="#" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> Read full story</a>
       </div>
     </div>
   </div>
@@ -267,7 +282,7 @@
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
 <script src="vendor/leaflet/leaflet.js"></script>
-<script src="js/map-data.js"></script>
+<script src="js/map-categories.js"></script>
 <script src="js/map.js"></script>
 </body>
 </html>

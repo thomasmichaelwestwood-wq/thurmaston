@@ -26,12 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
   var markers = {};
   var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "all";
 
-  // MAP_DATA is the hand-curated list (richer, written descriptions).
-  // mapItems extends it with a pin for every OTHER geotagged photo in
-  // data/photos.json — via the "@lat,lng" filename trick or a recognised
-  // place subfolder — so a located photo shows up on the map without
-  // anyone needing to also add it to map-data.js by hand.
-  var mapItems = MAP_DATA.slice();
+  // Curated pins (richer, hand-written descriptions, editable via the
+  // admin) live in data/map-pins.json. mapItems extends that list with a
+  // pin for every OTHER geotagged photo in data/photos.json — via an
+  // "@lat,lng" in the filename or a recognised place subfolder — so a
+  // located photo shows up on the map without anyone needing to also
+  // add a curated entry by hand.
+  var mapItems = [];
 
   function makeIcon(category) {
     var color = (MAP_CATEGORIES[category] || MAP_CATEGORIES.other).color;
@@ -51,6 +52,8 @@ document.addEventListener("DOMContentLoaded", function () {
         '<img src="' + item.photoSrc + '" alt="">' +
       '</button>' : "";
     var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
+    var pageLink = item.pageSlug ?
+      '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + '">Read the full story →</a>' : "";
     return (
       '<div class="map-popup">' +
         '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
@@ -58,6 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         photo +
         '<p class="map-popup-period">' + escapeHtml(item.period) + "</p>" +
         desc +
+        pageLink +
       "</div>"
     );
   }
@@ -72,30 +76,35 @@ document.addEventListener("DOMContentLoaded", function () {
     applyFilter(activeCategory);
   }
 
-  if (typeof PHOTOS_DATA_PROMISE !== "undefined") {
-    PHOTOS_DATA_PROMISE.then(function (photos) {
-      var curatedPhotoIds = {};
-      MAP_DATA.forEach(function (item) { if (item.photoId) curatedPhotoIds[item.photoId] = true; });
-      photos.forEach(function (photo) {
-        if (typeof photo.lat !== "number" || typeof photo.lng !== "number") return;
-        if (curatedPhotoIds[photo.id]) return;
-        mapItems.push({
-          id: "photo-" + photo.id,
-          name: photo.caption,
-          category: photo.category,
-          lat: photo.lat,
-          lng: photo.lng,
-          period: photo.date,
-          description: photo.credit && photo.credit !== "—" ? "Credit: " + photo.credit : "",
-          photoSrc: photo.src,
-          photoId: photo.id
-        });
+  var mapPinsPromise = fetch("data/map-pins.json").then(function (res) { return res.ok ? res.json() : { pins: [] }; }).then(function (data) { return data.pins || []; }).catch(function () { return []; });
+  var photosPromise = (typeof PHOTOS_DATA_PROMISE !== "undefined") ? PHOTOS_DATA_PROMISE : Promise.resolve([]);
+
+  Promise.all([mapPinsPromise, photosPromise]).then(function (results) {
+    var curatedPins = results[0];
+    var photos = results[1];
+
+    mapItems = curatedPins.slice();
+
+    var curatedPhotoIds = {};
+    curatedPins.forEach(function (item) { if (item.photoId) curatedPhotoIds[item.photoId] = true; });
+    photos.forEach(function (photo) {
+      if (typeof photo.lat !== "number" || typeof photo.lng !== "number") return;
+      if (curatedPhotoIds[photo.id]) return;
+      mapItems.push({
+        id: "photo-" + photo.id,
+        name: photo.caption,
+        category: photo.category,
+        lat: photo.lat,
+        lng: photo.lng,
+        period: photo.date,
+        description: photo.credit && photo.credit !== "—" ? "Credit: " + photo.credit : "",
+        photoSrc: photo.src,
+        photoId: photo.id,
+        pageSlug: photo.pageSlug || ""
       });
-      addMarkers();
-    }).catch(addMarkers);
-  } else {
+    });
     addMarkers();
-  }
+  });
 
   function renderList() {
     listEl.innerHTML = "";

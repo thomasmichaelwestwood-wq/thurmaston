@@ -600,6 +600,61 @@ table.simple th, table.simple td {
 }
 table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
+/* ---------- Place page (dedicated per-pin story pages) ---------- */
+
+.place-content {
+  max-width: 680px;
+  margin: 0 auto;
+}
+.place-content p {
+  margin: 0 0 1.1em;
+  line-height: 1.7;
+}
+.place-content p:last-child { margin-bottom: 0; }
+
+.place-photo-block {
+  display: block;
+  text-decoration: none;
+  margin: 24px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--glass-border);
+}
+.place-photo-block img {
+  width: 100%;
+  display: block;
+  transition: transform 0.2s ease;
+}
+.place-photo-block:hover img { transform: scale(1.03); }
+.place-photo-caption {
+  display: block;
+  padding: 10px 14px;
+  background: var(--glass-bg-strong);
+  color: var(--ink);
+  font-size: 0.85rem;
+}
+
+.place-doc-block {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 8px 12px 8px 0;
+  background: var(--gold-600);
+  color: #241a06;
+  border-radius: var(--radius-pill);
+  padding: 9px 18px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.place-doc-block:hover { background: #d29b46; color: #241a06; }
+
+.place-not-found {
+  color: var(--ink-soft);
+  text-align: center;
+}
+
 /* ---------- Historic map ---------- */
 
 .map-layout {
@@ -773,6 +828,14 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin: 0 0 8px;
 }
 .map-popup p { margin: 0 0 8px; font-size: 0.88rem; }
+.map-popup-page-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--green-700);
+  text-decoration: none;
+}
+.map-popup-page-link:hover { color: var(--gold-600); }
 .map-popup-photo-btn {
   display: block;
   width: 100%;
@@ -1062,7 +1125,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   .photo-lightbox-actions { justify-content: center; }
 }
 
-.photo-lightbox-viewmap, .photo-lightbox-viewdoc {
+.photo-lightbox-viewmap, .photo-lightbox-viewdoc, .photo-lightbox-viewpage {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -1079,6 +1142,12 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   transition: background 0.15s ease;
 }
 .photo-lightbox-viewmap:hover, .photo-lightbox-viewdoc:hover { background: #d29b46; }
+
+.photo-lightbox-viewpage {
+  background: var(--green-700);
+  color: #fff;
+}
+.photo-lightbox-viewpage:hover { background: var(--green-900); color: #fff; }
 
 .photo-lightbox-close {
   position: absolute;

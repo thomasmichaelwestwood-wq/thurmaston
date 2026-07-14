@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Loading… | Memories of Thurmaston</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="A dedicated page for a place or building in Thurmaston, Leicestershire.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand" href="index.html">
+      <span class="brand-mark">Th</span>
+      <span class="brand-text">Memories of Thurmaston<small>Thurmaston Village</small></span>
+    </a>
+    <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Menu</button>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
+      <a href="index.html">Home</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+    <button class="search-btn" data-search-open type="button"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Search</button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="page-hero">
+    <div class="container">
+      <div class="breadcrumb"><a href="index.html">Home</a> / <span id="place-crumb">…</span></div>
+      <h1 id="place-heading">…</h1>
+    </div>
+  </section>
+
+  <section class="content-section container">
+    <div class="place-content" id="place-content"></div>
+    <p class="place-not-found" id="place-not-found" hidden>We couldn't find that page. It may have been renamed or removed — <a href="index.html">back to the homepage</a>.</p>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div>
+        <h4>Memories of Thurmaston</h4>
+        <p style="margin:0">A community website for Thurmaston, Leicestershire — independent of Thurmaston Parish Council.</p>
+      </div>
+      <div>
+        <h4>Explore</h4>
+        <ul>
+          <li><a href="index.html#photos">Photo Archive</a></li>
+          <li><a href="index.html#map">Historic Map</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4>Get in touch</h4>
+        <ul>
+          <li><a href="contact.html">Contact us</a></li>
+          <li><a class="footer-fb-link" href="https://www.facebook.com/memoriesofthurmaston/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M14 8h-1.5c-.8 0-1 .3-1 1v1.5H14l-.2 2H11.5V19H9v-6.5H7.5V10H9V8.5C9 6.6 10 5 12.3 5H14v3z" fill="#fff"/></svg>Memories of Thurmaston (Facebook) ↗</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Memories of Thurmaston. Made by and for residents.</span>
+      <span>Not an official council website.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="search-overlay">
+  <div class="search-panel" role="dialog" aria-modal="true" aria-label="Site search">
+    <div class="search-panel-head">
+      <input type="text" id="site-search-input" placeholder="Search the village website…" autocomplete="off">
+      <button class="search-close" type="button" aria-label="Close search">×</button>
+    </div>
+    <ul id="site-search-results"></ul>
+  </div>
+</div>
+
+<script src="js/search-index.js"></script>
+<script src="js/main.js"></script>
+<script src="js/place.js"></script>
+</body>
+</html>
