@@ -79,9 +79,12 @@ document.addEventListener("DOMContentLoaded", function () {
       var cat = MAP_CATEGORIES[item.category] || MAP_CATEGORIES.other;
       var li = document.createElement("li");
       li.className = "map-list-item";
+      li.style.setProperty("--pin-color", cat.color);
       li.innerHTML =
-        '<span class="map-list-dot" style="--pin-color:' + cat.color + '"></span>' +
-        '<span><strong>' + escapeHtml(item.name) + "</strong>" +
+        (item.photoSrc
+          ? '<img class="map-list-thumb" src="' + item.photoSrc + '" alt="" loading="lazy">'
+          : '<span class="map-list-dot"></span>') +
+        '<span class="map-list-text"><strong>' + escapeHtml(item.name) + "</strong>" +
         '<span class="map-list-period">' + escapeHtml(item.period) + "</span></span>";
       li.addEventListener("click", function () {
         map.flyTo([item.lat, item.lng], 17, { duration: 0.6 });

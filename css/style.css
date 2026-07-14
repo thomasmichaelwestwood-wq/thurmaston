@@ -674,30 +674,44 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 .map-list-item {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
-  padding: 10px 6px;
+  padding: 8px 6px;
   border-bottom: 1px solid var(--line);
+  border-left: 3px solid var(--pin-color, transparent);
   cursor: pointer;
   border-radius: 6px;
 }
 .map-list-item:hover { background: var(--green-100); }
 .map-list-item:last-child { border-bottom: none; }
 
+.map-list-thumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  object-fit: cover;
+  flex-shrink: 0;
+  display: block;
+}
+
 .map-list-dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
   background: var(--pin-color, var(--green-700));
-  margin-top: 4px;
   flex-shrink: 0;
 }
+
+.map-list-text { min-width: 0; }
 
 .map-list-item strong {
   display: block;
   font-size: 0.9rem;
   color: var(--green-900);
   font-family: var(--font-head);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .map-list-period {
