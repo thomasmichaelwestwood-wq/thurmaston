@@ -125,6 +125,68 @@
     }
   });
   CMS.registerPreviewTemplate("map_pins", MapPinsPreview);
+
+  // Edit log — a plain read-only history of changes to the site's
+  // content, pulled from GitHub's commit history (every CMS save is a
+  // commit, so this is "for free" — no separate log to maintain). Only
+  // reachable from inside this logged-in admin, via a link Decap adds
+  // to its own sidebar; it's not linked from anywhere on the public
+  // site and never runs there. Wrapped in a feature check since
+  // registerAdditionalLink is a newer, less-documented part of Decap's
+  // API — if it's missing in whatever version loads, this just quietly
+  // does nothing rather than breaking the rest of the admin.
+  if (typeof CMS.registerAdditionalLink === "function") {
+    var EditLog = createClass({
+      getInitialState: function () {
+        return { commits: null, error: null };
+      },
+      componentDidMount: function () {
+        var self = this;
+        fetch("https://api.github.com/repos/thomasmichaelwestwood-wq/thurmaston/commits?per_page=50")
+          .then(function (res) {
+            if (!res.ok) throw new Error("GitHub returned " + res.status);
+            return res.json();
+          })
+          .then(function (commits) { self.setState({ commits: commits }); })
+          .catch(function (err) { self.setState({ error: err.message }); });
+      },
+      render: function () {
+        if (this.state.error) {
+          return h("div", { style: { padding: "30px", fontFamily: "sans-serif" } },
+            "Couldn't load the edit log: " + this.state.error);
+        }
+        if (!this.state.commits) {
+          return h("div", { style: { padding: "30px", fontFamily: "sans-serif" } }, "Loading…");
+        }
+        return h("div", { style: { padding: "30px", maxWidth: "760px", fontFamily: "sans-serif" } },
+          h("h1", {}, "Edit log"),
+          h("p", { style: { color: "#666" } },
+            "Every save made here, and every photo synced from Google Drive, shows up as a change below. This page is only visible to logged-in editors — it's never shown on the public site."),
+          h("ul", { style: { listStyle: "none", padding: 0, margin: 0 } },
+            this.state.commits.map(function (c) {
+              var message = c.commit.message.split("\n")[0];
+              var author = (c.commit.author && c.commit.author.name) || "Unknown";
+              var date = c.commit.author ? new Date(c.commit.author.date).toLocaleString() : "";
+              return h("li", { key: c.sha, style: { borderBottom: "1px solid #eee", padding: "12px 0" } },
+                h("div", { style: { fontWeight: 600 } }, message),
+                h("div", { style: { fontSize: "0.85em", color: "#888" } },
+                  author + " · " + date + " · ",
+                  h("a", { href: c.html_url, target: "_blank", rel: "noopener" }, "view on GitHub")
+                )
+              );
+            })
+          )
+        );
+      }
+    });
+
+    CMS.registerAdditionalLink({
+      id: "edit-log",
+      title: "Edit log",
+      data: EditLog,
+      options: { icon: "page" }
+    });
+  }
 </script>
 </body>
 </html>
