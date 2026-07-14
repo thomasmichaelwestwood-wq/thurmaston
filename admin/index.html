@@ -116,7 +116,7 @@
             h("span", { className: "map-popup-cat" }, pin.get("category")),
             h("h3", {}, pin.get("name") || "Untitled pin"),
             pin.get("photoSrc") ? h("img", { src: pin.get("photoSrc"), style: { width: "100%", borderRadius: "6px", display: "block", margin: "6px 0" } }) : null,
-            h("p", { className: "map-popup-period" }, pin.get("period")),
+            h("p", { className: "map-popup-period" }, [pin.get("period"), pin.get("location")].filter(Boolean).join(" · ")),
             pin.get("description") ? h("p", {}, pin.get("description")) : null,
             pin.get("pageSlug") ? h("a", { className: "map-popup-page-link" }, "Read the full story →") : null
           );

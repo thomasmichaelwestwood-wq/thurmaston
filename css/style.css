@@ -1004,6 +1004,42 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .photo-thumb:hover img { transform: scale(1.05); }
 
+.photo-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(20,30,22,0) 50%, rgba(17,26,19,0.82) 100%);
+  pointer-events: none;
+}
+
+.photo-thumb-caption {
+  position: absolute;
+  z-index: 1;
+  left: 8px;
+  right: 8px;
+  bottom: 7px;
+  text-align: left;
+  color: #fff;
+}
+.photo-thumb-caption strong {
+  display: block;
+  font-family: var(--font-head);
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.photo-thumb-caption span {
+  display: block;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.85);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .photo-thumb-docbadge {
   position: absolute;
   top: 8px;
@@ -1078,11 +1114,28 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 1.1rem;
   margin-top: 0;
 }
+.photo-lightbox-datelocation {
+  color: #e7efe6;
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
 .photo-lightbox-meta {
   color: #c7d9c9;
   font-size: 0.85rem;
   margin-top: 4px;
 }
+
+.photo-lightbox-history {
+  display: none;
+  color: #e7efe6;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+.photo-lightbox-history.visible { display: block; }
 
 .photo-lightbox-ref {
   display: none;
@@ -1112,6 +1165,40 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 14px;
+}
+
+.photo-lightbox-submit {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255,255,255,0.15);
+}
+.photo-lightbox-submit h4 {
+  color: #fff;
+  font-family: var(--font-head);
+  font-size: 0.95rem;
+  margin: 0 0 4px;
+}
+.photo-lightbox-submit > p {
+  color: #c7d9c9;
+  font-size: 0.82rem;
+  margin: 0 0 12px;
+}
+.photo-lightbox-submit form.stack { gap: 10px; max-width: none; }
+.photo-lightbox-submit form.stack label {
+  color: #e7efe6;
+  font-size: 0.8rem;
+  margin-bottom: 4px;
+}
+.photo-lightbox-submit form.stack input,
+.photo-lightbox-submit form.stack textarea {
+  background: rgba(255,255,255,0.92);
+  font-size: 0.85rem;
+  padding: 8px 10px;
+}
+.photo-lightbox-submit .btn-primary {
+  align-self: flex-start;
+  padding: 9px 18px;
+  font-size: 0.85rem;
 }
 
 @media (max-width: 780px) {

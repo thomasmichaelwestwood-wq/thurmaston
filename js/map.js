@@ -51,6 +51,7 @@ document.addEventListener("DOMContentLoaded", function () {
       '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(item.photoId || "") + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
         '<img src="' + item.photoSrc + '" alt="">' +
       '</button>' : "";
+    var subtitle = [item.period, item.location].filter(Boolean).join(" · ");
     var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
     var pageLink = item.pageSlug ?
       '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + '">Read the full story →</a>' : "";
@@ -59,7 +60,7 @@ document.addEventListener("DOMContentLoaded", function () {
         '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
         "<h3>" + escapeHtml(item.name) + "</h3>" +
         photo +
-        '<p class="map-popup-period">' + escapeHtml(item.period) + "</p>" +
+        (subtitle ? '<p class="map-popup-period">' + escapeHtml(subtitle) + "</p>" : "") +
         desc +
         pageLink +
       "</div>"
@@ -110,6 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
         lat: photo.lat,
         lng: photo.lng,
         period: photo.date,
+        location: photo.location || "",
         description: photo.credit && photo.credit !== "—" ? "Credit: " + photo.credit : "",
         photoSrc: photo.src,
         photoId: photo.id,
@@ -138,12 +140,13 @@ document.addEventListener("DOMContentLoaded", function () {
       var li = document.createElement("li");
       li.className = "map-list-item";
       li.style.setProperty("--pin-color", cat.color);
+      var subtitle = [item.period, item.location].filter(Boolean).join(" · ");
       li.innerHTML =
         (item.photoSrc
           ? '<img class="map-list-thumb" src="' + item.photoSrc + '" alt="" loading="lazy">'
           : '<span class="map-list-dot"></span>') +
         '<span class="map-list-text"><strong>' + escapeHtml(item.name) + "</strong>" +
-        '<span class="map-list-period">' + escapeHtml(item.period) + "</span></span>";
+        '<span class="map-list-period">' + escapeHtml(subtitle) + "</span></span>";
       li.addEventListener("click", function () {
         map.flyTo([item.lat, item.lng], 17, { duration: 0.6 });
         map.once("moveend", function () {
@@ -189,6 +192,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (photoMarker) map.removeLayer(photoMarker);
       photoMarker = L.marker([lat, lng], { icon: makeIcon("photo") }).addTo(map);
       var cat = MAP_CATEGORIES.photo;
+      var subtitle = [photo.date, photo.location].filter(Boolean).join(" · ");
       photoMarker.bindPopup(
         '<div class="map-popup">' +
           '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
@@ -196,7 +200,7 @@ document.addEventListener("DOMContentLoaded", function () {
           '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(photo.id) + '" aria-label="View photo: ' + escapeHtml(photo.caption) + '">' +
             '<img src="' + photo.src + '" alt="">' +
           "</button>" +
-          '<p class="map-popup-period">' + escapeHtml(photo.date) + "</p>" +
+          (subtitle ? '<p class="map-popup-period">' + escapeHtml(subtitle) + "</p>" : "") +
         "</div>"
       ).openPopup();
     });

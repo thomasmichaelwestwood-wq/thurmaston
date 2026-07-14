@@ -40,11 +40,14 @@ document.addEventListener("DOMContentLoaded", function () {
   var showingAll = false;
   var lightboxImg = lightbox.querySelector(".photo-lightbox-img");
   var lightboxCaption = lightbox.querySelector(".photo-lightbox-caption");
+  var lightboxDateLocation = lightbox.querySelector(".photo-lightbox-datelocation");
   var lightboxMeta = lightbox.querySelector(".photo-lightbox-meta");
+  var lightboxHistory = lightbox.querySelector(".photo-lightbox-history");
   var lightboxRef = lightbox.querySelector(".photo-lightbox-ref");
   var lightboxViewMap = lightbox.querySelector(".photo-lightbox-viewmap");
   var lightboxViewDoc = lightbox.querySelector(".photo-lightbox-viewdoc");
   var lightboxViewPage = lightbox.querySelector(".photo-lightbox-viewpage");
+  var lightboxSubmitPhotoId = lightbox.querySelector(".photo-lightbox-submit-photoid");
   var DOC_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
   var docLightbox = document.getElementById("doc-lightbox");
   var docLightboxFrame = docLightbox.querySelector(".doc-lightbox-frame");
@@ -83,7 +86,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function matches(photo, query) {
     if (photo.category !== activeCategory) return false;
     if (!query) return true;
-    var haystack = (photo.caption + " " + photo.date + " " + photo.credit + " " + (photo.ref || "")).toLowerCase();
+    var haystack = (photo.caption + " " + photo.date + " " + photo.credit + " " + (photo.ref || "") +
+      " " + (photo.location || "") + " " + (photo.history || "")).toLowerCase();
     return haystack.indexOf(query) !== -1;
   }
 
@@ -120,9 +124,12 @@ document.addEventListener("DOMContentLoaded", function () {
       fig.type = "button";
       fig.className = "photo-thumb";
       fig.setAttribute("aria-label", "View photo: " + photo.caption);
+      var subtitle = [photo.date, photo.location].filter(Boolean).join(" · ");
       fig.innerHTML =
         '<img src="' + photo.src + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
-        (photo.doc ? '<span class="photo-thumb-docbadge" title="Includes a document">' + DOC_ICON + '</span>' : "");
+        (photo.doc ? '<span class="photo-thumb-docbadge" title="Includes a document">' + DOC_ICON + '</span>' : "") +
+        '<span class="photo-thumb-caption"><strong>' + escapeHtml(photo.caption) + '</strong>' +
+        (subtitle ? '<span>' + escapeHtml(subtitle) + '</span>' : '') + '</span>';
       fig.addEventListener("click", function () { openLightbox(index); });
       gridEl.appendChild(fig);
     });
@@ -178,14 +185,23 @@ document.addEventListener("DOMContentLoaded", function () {
     lightboxImg.src = photo.src;
     lightboxImg.alt = photo.caption;
     lightboxCaption.textContent = photo.caption;
+    if (lightboxDateLocation) {
+      lightboxDateLocation.textContent = [photo.date, photo.location].filter(Boolean).join(" · ");
+    }
     var cat = (PHOTO_CATEGORIES[photo.category] || {}).label || photo.category;
-    lightboxMeta.textContent = [cat, photo.date, photo.credit !== "—" ? "Credit: " + photo.credit : null]
+    lightboxMeta.textContent = [cat, photo.credit !== "—" ? "Credit: " + photo.credit : null]
       .filter(Boolean).join(" · ");
+    if (lightboxHistory) {
+      var hasHistory = typeof photo.history === "string" && photo.history;
+      lightboxHistory.classList.toggle("visible", hasHistory);
+      lightboxHistory.textContent = hasHistory ? photo.history : "";
+    }
     if (lightboxRef) {
       var hasRef = typeof photo.ref === "string" && photo.ref;
       lightboxRef.classList.toggle("visible", hasRef);
       lightboxRef.textContent = hasRef ? "Ref: " + photo.ref : "";
     }
+    if (lightboxSubmitPhotoId) lightboxSubmitPhotoId.value = photo.id;
     history.replaceState(null, "", "#photo-" + photo.id);
 
     var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";

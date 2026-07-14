@@ -89,6 +89,7 @@ collections:
                 hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\"."
                 pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
               - { label: "Period / date", name: "period", widget: "string", hint: "e.g. \"Pictured c.1936\" or \"Exact date unknown\"" }
+              - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known." }
               - label: "Short description"
                 name: "description"
                 widget: "text"
