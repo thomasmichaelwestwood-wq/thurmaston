@@ -20,5 +20,111 @@
     });
   }
 </script>
+
+<script>
+  // Live preview pane, styled to actually look like the real site rather
+  // than a generic form dump — updates as you type, no need to save first.
+  // Loads the site's own stylesheet into the preview iframe so fonts,
+  // colours and spacing match the live pages.
+  CMS.registerPreviewStyle("/css/style.css");
+
+  // Mirrors the small markdown-lite renderer in js/place.js
+  // (renderTextBlock/renderInline) — kept in sync by hand since this runs
+  // in the CMS preview iframe, not on the real site, so it can't just
+  // import that file. If you change one, check the other.
+  function escapeHtmlPreview(str) {
+    var div = document.createElement("div");
+    div.textContent = str;
+    return div.innerHTML;
+  }
+  function renderInlinePreview(text) {
+    text = text.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (match, label, url) {
+      if (/^javascript:/i.test(url)) return label;
+      return '<a href="' + url.replace(/"/g, "&quot;") + '">' + label + "</a>";
+    });
+    text = text.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    text = text.replace(/\*([^*]+)\*/g, "<em>$1</em>");
+    return text;
+  }
+  function renderTextBlockPreview(rawText) {
+    var escaped = escapeHtmlPreview(rawText || "");
+    return escaped.split(/\n{2,}/).map(function (para) {
+      return "<p>" + renderInlinePreview(para).replace(/\n/g, "<br>") + "</p>";
+    }).join("");
+  }
+
+  var PagePreview = createClass({
+    getInitialState: function () {
+      return { photos: [] };
+    },
+    componentDidMount: function () {
+      var self = this;
+      fetch("/data/photos.json").then(function (res) { return res.json(); }).then(function (photos) {
+        self.setState({ photos: photos });
+      }).catch(function () {});
+    },
+    render: function () {
+      var entry = this.props.entry;
+      var title = entry.getIn(["data", "title"]) || "Untitled page";
+      var blocks = entry.getIn(["data", "blocks"]);
+      var photos = this.state.photos;
+
+      return h("div", {},
+        h("section", { className: "page-hero" },
+          h("div", { className: "container" },
+            h("h1", {}, title)
+          )
+        ),
+        h("section", { className: "content-section container" },
+          h("div", { className: "place-content" },
+            blocks ? blocks.map(function (block, i) {
+              var type = block.get("type");
+              if (type === "text") {
+                return h("div", { key: i, dangerouslySetInnerHTML: { __html: renderTextBlockPreview(block.get("text")) } });
+              }
+              if (type === "photo") {
+                var photoId = block.get("photoId");
+                var photo = photos.filter(function (p) { return p.id === photoId; })[0];
+                if (!photo) return h("p", { key: i, style: { color: "#a33" } }, "Photo not found for ID: " + photoId);
+                return h("a", { key: i, className: "place-photo-block" },
+                  h("img", { src: photo.src, alt: photo.caption }),
+                  h("span", { className: "place-photo-caption" }, photo.caption)
+                );
+              }
+              if (type === "document") {
+                return h("a", { key: i, className: "place-doc-block" }, block.get("label") || "View document");
+              }
+              return null;
+            }).toArray() : null
+          )
+        )
+      );
+    }
+  });
+  CMS.registerPreviewTemplate("pages", PagePreview);
+
+  var MapPinsPreview = createClass({
+    render: function () {
+      var pins = this.props.entry.getIn(["data", "pins"]);
+      return h("div", { className: "container", style: { padding: "20px" } },
+        pins ? pins.map(function (pin, i) {
+          return h("div", {
+            key: i,
+            className: "map-popup",
+            style: { border: "1px solid #ddd", borderRadius: "10px", padding: "14px", margin: "0 0 16px", maxWidth: "300px" }
+          },
+            h("span", { className: "map-popup-cat" }, pin.get("category")),
+            h("h3", {}, pin.get("name") || "Untitled pin"),
+            pin.get("photoSrc") ? h("img", { src: pin.get("photoSrc"), style: { width: "100%", borderRadius: "6px", display: "block", margin: "6px 0" } }) : null,
+            h("p", { className: "map-popup-period" }, pin.get("period")),
+            pin.get("description") ? h("p", {}, pin.get("description")) : null,
+            pin.get("pageSlug") ? h("a", { className: "map-popup-page-link" }, "Read the full story →") : null
+          );
+        }).toArray() : null
+      );
+    }
+  });
+  CMS.registerPreviewTemplate("map_pins", MapPinsPreview);
+</script>
 </body>
 </html>
