@@ -26,6 +26,13 @@ document.addEventListener("DOMContentLoaded", function () {
   var markers = {};
   var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "all";
 
+  // MAP_DATA is the hand-curated list (richer, written descriptions).
+  // mapItems extends it with a pin for every OTHER geotagged photo in
+  // data/photos.json — via the "@lat,lng" filename trick or a recognised
+  // place subfolder — so a located photo shows up on the map without
+  // anyone needing to also add it to map-data.js by hand.
+  var mapItems = MAP_DATA.slice();
+
   function makeIcon(category) {
     var color = (MAP_CATEGORIES[category] || MAP_CATEGORIES.other).color;
     return L.divIcon({
@@ -43,27 +50,56 @@ document.addEventListener("DOMContentLoaded", function () {
       '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(item.photoId || "") + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
         '<img src="' + item.photoSrc + '" alt="">' +
       '</button>' : "";
+    var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
     return (
       '<div class="map-popup">' +
         '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
         "<h3>" + escapeHtml(item.name) + "</h3>" +
         photo +
         '<p class="map-popup-period">' + escapeHtml(item.period) + "</p>" +
-        "<p>" + escapeHtml(item.description) + "</p>" +
+        desc +
       "</div>"
     );
   }
 
-  MAP_DATA.forEach(function (item) {
-    var marker = L.marker([item.lat, item.lng], { icon: makeIcon(item.category) })
-      .addTo(map)
-      .bindPopup(popupHtml(item));
-    markers[item.id] = marker;
-  });
+  function addMarkers() {
+    mapItems.forEach(function (item) {
+      var marker = L.marker([item.lat, item.lng], { icon: makeIcon(item.category) })
+        .addTo(map)
+        .bindPopup(popupHtml(item));
+      markers[item.id] = marker;
+    });
+    applyFilter(activeCategory);
+  }
+
+  if (typeof PHOTOS_DATA_PROMISE !== "undefined") {
+    PHOTOS_DATA_PROMISE.then(function (photos) {
+      var curatedPhotoIds = {};
+      MAP_DATA.forEach(function (item) { if (item.photoId) curatedPhotoIds[item.photoId] = true; });
+      photos.forEach(function (photo) {
+        if (typeof photo.lat !== "number" || typeof photo.lng !== "number") return;
+        if (curatedPhotoIds[photo.id]) return;
+        mapItems.push({
+          id: "photo-" + photo.id,
+          name: photo.caption,
+          category: photo.category,
+          lat: photo.lat,
+          lng: photo.lng,
+          period: photo.date,
+          description: photo.credit && photo.credit !== "—" ? "Credit: " + photo.credit : "",
+          photoSrc: photo.src,
+          photoId: photo.id
+        });
+      });
+      addMarkers();
+    }).catch(addMarkers);
+  } else {
+    addMarkers();
+  }
 
   function renderList() {
     listEl.innerHTML = "";
-    var items = MAP_DATA.filter(function (item) {
+    var items = mapItems.filter(function (item) {
       return activeCategory === "all" || item.category === activeCategory;
     });
 
@@ -98,8 +134,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function applyFilter(category) {
     activeCategory = category;
-    MAP_DATA.forEach(function (item) {
+    mapItems.forEach(function (item) {
       var marker = markers[item.id];
+      if (!marker) return;
       var show = category === "all" || item.category === category;
       if (show && !map.hasLayer(marker)) marker.addTo(map);
       if (!show && map.hasLayer(marker)) map.removeLayer(marker);
@@ -119,8 +156,6 @@ document.addEventListener("DOMContentLoaded", function () {
       applyFilter(btn.dataset.category);
     });
   }
-
-  applyFilter(activeCategory);
 
   var photoMarker = null;
   window.flyToPhotoLocation = function (lat, lng, photo) {
