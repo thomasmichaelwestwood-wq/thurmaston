@@ -83,8 +83,11 @@ collections:
                   - { label: "People & Events", value: "people" }
                   - { label: "Nature & Views", value: "nature" }
                   - { label: "Other", value: "other" }
-              - { label: "Latitude", name: "lat", widget: "number", value_type: "float" }
-              - { label: "Longitude", name: "lng", widget: "number", value_type: "float" }
+              - label: "Google Maps coordinates"
+                name: "coords"
+                widget: "string"
+                hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\"."
+                pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
               - { label: "Period / date", name: "period", widget: "string", hint: "e.g. \"Pictured c.1936\" or \"Exact date unknown\"" }
               - label: "Short description"
                 name: "description"

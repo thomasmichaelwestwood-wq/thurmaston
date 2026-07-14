@@ -79,8 +79,21 @@ document.addEventListener("DOMContentLoaded", function () {
   var mapPinsPromise = fetch("data/map-pins.json").then(function (res) { return res.ok ? res.json() : { pins: [] }; }).then(function (data) { return data.pins || []; }).catch(function () { return []; });
   var photosPromise = (typeof PHOTOS_DATA_PROMISE !== "undefined") ? PHOTOS_DATA_PROMISE : Promise.resolve([]);
 
+  // Curated pins store their location as a single "lat, lng" string —
+  // the same format Google Maps gives you when you right-click a spot
+  // and copy the coordinates — rather than two separate number fields.
+  function parseCoords(str) {
+    var match = typeof str === "string" && str.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+    if (!match) return null;
+    return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
+  }
+
   Promise.all([mapPinsPromise, photosPromise]).then(function (results) {
-    var curatedPins = results[0];
+    var curatedPins = results[0].map(function (item) {
+      var coords = parseCoords(item.coords);
+      if (!coords) return null;
+      return Object.assign({}, item, coords);
+    }).filter(Boolean);
     var photos = results[1];
 
     mapItems = curatedPins.slice();
