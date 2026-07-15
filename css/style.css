@@ -457,6 +457,16 @@ h1, h2, h3, h4 {
 }
 .breadcrumb a { color: #e7efe6; }
 
+.place-back-link {
+  display: inline-block;
+  margin-top: 14px;
+  color: #e7efe6;
+  font-size: 0.88rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+.place-back-link:hover { text-decoration: underline; }
+
 .content-section {
   padding-top: 44px;
   padding-bottom: 44px;
@@ -622,15 +632,15 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   overflow: hidden;
   box-shadow: var(--shadow-lg);
 }
-.place-photo-panel.visible { display: flex; }
+.place-photo-panel.visible { display: flex; align-items: flex-start; }
 .place-photo-panel-media {
   flex: 1 1 320px;
   min-width: 240px;
 }
 .place-photo-panel-media img {
   width: 100%;
-  height: 100%;
-  min-height: 220px;
+  height: auto;
+  max-height: 520px;
   object-fit: cover;
   display: block;
 }
@@ -681,6 +691,24 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 @media (max-width: 640px) {
   .place-photo-panel { flex-direction: column; }
 }
+
+/* "Know more about this photo?" — same dark-card treatment as the
+   facts panel above it, but its own full-width section rather than
+   squeezed into that panel's narrow info column (see renderSubmitSection
+   in js/place.js for why). */
+.place-submit {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto 36px;
+  background: var(--green-900);
+  color: #fff;
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  box-shadow: var(--shadow-lg);
+}
+.place-submit.visible { display: block; }
+.place-submit .photo-lightbox-submit { margin-top: 0; padding-top: 0; border-top: none; }
+.place-submit form.stack { max-width: 480px; }
 
 /* Other archive photos sharing the same location as this page's photo
    — only shown when there actually are any (relies on those other

@@ -4,7 +4,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var headingEl = document.getElementById("place-heading");
   var crumbEl = document.getElementById("place-crumb");
   var photoPanelEl = document.getElementById("place-photo-panel");
+  var submitEl = document.getElementById("place-submit");
   var relatedEl = document.getElementById("place-related");
+  var backLinkEl = document.getElementById("place-back-link");
   if (!contentEl) return;
 
   var DOC_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
@@ -47,7 +49,9 @@ document.addEventListener("DOMContentLoaded", function () {
     var primaryPhoto = photoParam ? photoById[photoParam] : null;
     if (primaryPhoto) {
       renderPhotoPanel(primaryPhoto);
+      renderSubmitSection(primaryPhoto);
       renderRelatedPhotos(primaryPhoto, photos);
+      renderBackLink(primaryPhoto);
     }
 
     var html = (page.blocks || []).map(function (block) {
@@ -84,6 +88,57 @@ document.addEventListener("DOMContentLoaded", function () {
       "</div>";
     photoPanelEl.hidden = false;
     photoPanelEl.classList.add("visible");
+  }
+
+  // Kept as its own full-width section rather than squeezed into the
+  // facts panel's narrow info column — the form is long enough that
+  // cramming it in there stretched the photo above it to match.
+  function renderSubmitSection(photo) {
+    if (!submitEl) return;
+    submitEl.innerHTML = renderSubmitForm(photo);
+    submitEl.hidden = false;
+    submitEl.classList.add("visible");
+  }
+
+  // Same static "Know more about this photo?" form as the lightbox
+  // (.photo-lightbox-submit in index.html/category.html) — not wired
+  // to a backend here either, see the note in the form itself.
+  function renderSubmitForm(photo) {
+    return (
+      '<div class="photo-lightbox-submit">' +
+        "<h4>Know more about this photo?</h4>" +
+        "<p>Have a date, a name, a story, or another photo of the same place? Tell us and we'll add it.</p>" +
+        '<form class="stack" action="#" method="post">' +
+          '<input type="hidden" name="photo-id" value="' + escapeAttr(photo.id) + '">' +
+          "<div>" +
+            '<label for="place-submit-name">Your name</label>' +
+            '<input type="text" id="place-submit-name" name="name" required>' +
+          "</div>" +
+          "<div>" +
+            '<label for="place-submit-email">Email (kept private)</label>' +
+            '<input type="email" id="place-submit-email" name="email">' +
+          "</div>" +
+          "<div>" +
+            '<label for="place-submit-message">What do you know, or want to share?</label>' +
+            '<textarea id="place-submit-message" name="message" rows="3" required></textarea>' +
+          "</div>" +
+          "<div>" +
+            '<label for="place-submit-photo">Photo (optional)</label>' +
+            '<input type="file" id="place-submit-photo" name="photo" accept="image/*">' +
+          "</div>" +
+          '<button class="btn btn-primary" type="submit">Submit</button>' +
+          '<p style="font-size:0.75rem;color:#c7d9c9;margin:0">This form isn\'t connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>' +
+        "</form>" +
+      "</div>"
+    );
+  }
+
+  function renderBackLink(photo) {
+    if (!backLinkEl) return;
+    var cat = (typeof MAP_CATEGORIES !== "undefined" && MAP_CATEGORIES[photo.category]) ? MAP_CATEGORIES[photo.category].label : photo.category;
+    backLinkEl.textContent = "← Back to " + cat;
+    backLinkEl.href = "category.html?cat=" + encodeURIComponent(photo.category) + "#photo-" + encodeURIComponent(photo.id);
+    backLinkEl.hidden = false;
   }
 
   // Other photos that share this one's Location text — only meaningful
