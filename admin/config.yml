@@ -62,19 +62,22 @@ collections:
 
   - name: "photos"
     label: "Photos"
-    description: "Every photo in the archive, one entry per photo — added automatically by the Google Drive sync. Edit caption, category, credit, location, and history freely; leave fields marked \"Internal\" alone unless you know what you're doing. New photos still need to come in via Drive (so they get resized and hosted properly), so there's no \"add new\" here, and no delete — ask Tom if a photo needs removing."
+    description: "Every photo in the archive, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, category, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos"
-    create: false
+    create: true
     delete: false
-    slug: "{{fields.id}}"
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
     identifier_field: "caption"
     fields:
-      - { label: "Internal ID", name: "id", widget: "string", hint: "Set automatically by the Drive sync — never shown on the site. Don't change." }
-      - { label: "Internal — image path", name: "src", widget: "string", hint: "Set automatically. Don't change unless you're replacing the image file itself." }
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "images/photos"
+        public_folder: "images/photos"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site." }
-      - { label: "Internal — original reference", name: "ref", widget: "string", required: false, hint: "Dad's original filing name, shown as a small reference tag. Usually best left as-is." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -85,8 +88,13 @@ collections:
           - { label: "Other", value: "other" }
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
-      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
-      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. This is just descriptive text; it doesn't place the photo on the map — use Map Pins for that." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map, separate from the Location text below."
+        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - label: "Document"
         name: "doc"
@@ -104,9 +112,10 @@ collections:
         display_fields: ["title"]
         required: false
         hint: "Optional — pick one of your Story pages to add a \"Read the full story\" button to this photo."
-      - { label: "Internal — latitude", name: "lat", widget: "number", value_type: "float", required: false, hint: "Set automatically from the Drive folder or an \"@lat,lng\" in the filename. Don't hand-edit unless you know the exact coordinates." }
-      - { label: "Internal — longitude", name: "lng", widget: "number", value_type: "float", required: false, hint: "Set automatically — see Latitude above." }
-      - { label: "Internal — added", name: "addedAt", widget: "string", hint: "Controls sort order in the archive (newest first). Don't change." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — today's date is used automatically." }
 
   - name: "map_pins"
     label: "Map pins"

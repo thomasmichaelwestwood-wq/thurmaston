@@ -499,8 +499,12 @@ function appendMetadataEntry(shortId, slug, filename, caption, ref, category, pl
     consentNoted: false
   };
   if (place) {
-    entry.lat = place.lat;
-    entry.lng = place.lng;
+    // Same "lat, lng" string format as data/map-pins.json's curated
+    // pins and the Photos admin collection's "Google Maps coordinates"
+    // field, so a human editing this entry later sees the same thing
+    // they'd type themselves — see rebuild-photos-index.js, which
+    // parses this back into numeric lat/lng for the site to read.
+    entry.coords = place.lat + ", " + place.lng;
   }
   entry.addedAt = Utilities.formatDate(new Date(), "Etc/UTC", "yyyy-MM-dd'T'HH:mm:ss'Z'");
 

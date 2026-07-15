@@ -1,6 +1,9 @@
 # Photo workflow
 
-How photos get from Drive to the live site — fully automated, one-time setup.
+How photos get onto the live site — two ways: drop them into Google Drive
+(fully automated, one-time setup, described below), or add one directly
+through the admin at `/admin` (see "2c," below) when there's no Drive
+involved — a photo someone's just handed you, say.
 
 ## 1. Drop photos into Google Drive
 
@@ -128,12 +131,28 @@ works; the banner just rotates through whatever's in the list. Name
 them the same way as any other photo — the filename becomes the
 caption in the corner of the slide.
 
+## 2c. Adding a photo directly (skip Drive entirely)
+
+Log into `/admin`, open the **Photos** collection, and click "New Photo."
+Upload the image, then fill in what you know — caption, category, date,
+credit, coordinates (paste straight from Google Maps, same as everywhere
+else on the site — right-click the spot, click the coordinates that pop
+up to copy, paste them in), location, history, a linked document, and a
+story page. Save, and it's live within a minute or two, no Drive step
+needed. Leave the "Internal" fields at the bottom alone — they fill
+themselves in.
+
+Good for a one-off (someone hands you a photo, a scan, something from a
+different source than the family archive) — for a batch, or anything
+that should also live in the Drive archive as a backup, Google Drive
+(above) is still the easier way in.
+
 ## 3. Tidying up afterwards (optional, whenever)
 
 The auto-generated caption is the filename with catalog numbers and MOT
 codes stripped out — good enough to publish, but worth improving. To fix
-a caption, date, credit, location, or history, or add/correct a precise
-`lat`/`lng`, log into the admin at `/admin` and open the **Photos**
+a caption, date, credit, location, or history, or add/correct the Google
+Maps coordinates, log into the admin at `/admin` and open the **Photos**
 collection — find the photo by its caption, edit the field, save. No
 need to touch any JSON file by hand. The `ref` field holds the untouched
 original filename (shown as a small tag in the lightbox) — leave it as-is
