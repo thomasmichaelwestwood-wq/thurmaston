@@ -1,0 +1,58 @@
+name: Rebuild photos index
+
+# data/photos/<id>.json (one file per photo) is the real, CMS-editable
+# source of truth. data/photos.json is a generated aggregate - the single
+# fast array the live site actually fetches. Whenever a photo file
+# changes (a Drive upload via the sync script, or an edit through the
+# admin), this rebuilds that aggregate and commits it back. See the
+# "Photos: one file per photo, plus a generated aggregate" section in
+# CLAUDE.md for the full picture.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "data/photos/**"
+
+# Runs queue up one after another rather than racing each other to push
+# (e.g. several photos synced from Drive in the same few minutes).
+concurrency:
+  group: rebuild-photos-index
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-actions[bot]'
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Rebuild data/photos.json from data/photos/*.json
+        run: node scripts/rebuild-photos-index.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/photos.json
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+          git commit -m "Rebuild data/photos.json index"
+          for i in 1 2 3 4 5; do
+            if git pull --rebase origin main && git push origin main; then
+              exit 0
+            fi
+            echo "Push attempt $i failed, retrying..."
+            sleep 3
+          done
+          echo "Failed to push after retries"
+          exit 1

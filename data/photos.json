@@ -6,10 +6,11 @@
     "ref": "014 Garden Centre 1960.jpg",
     "category": "streets",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
+    "credit": "Unknown — needs a credit",
     "consentNoted": false,
     "lat": 52.68,
-    "lng": -1.0973
+    "lng": -1.0973,
+    "addedAt": "2026-07-15T13:39:18Z"
   },
   {
     "id": "14WfqyhV-010-dudley-row-1991",
@@ -18,10 +19,11 @@
     "ref": "010 Dudley Row 1991.jpg",
     "category": "streets",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
+    "credit": "Unknown — needs a credit",
     "consentNoted": false,
     "lat": 52.68,
-    "lng": -1.0973
+    "lng": -1.0973,
+    "addedAt": "2026-07-15T13:38:18Z"
   },
   {
     "id": "1tomHUyG-344-white-hart-mercury-mot-1-11",
@@ -30,11 +32,12 @@
     "ref": "344 White Hart (Mercury) MOT 1 11.jpg",
     "category": "streets",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
+    "credit": "Unknown — needs a credit",
     "consentNoted": false,
+    "doc": "documents/1xUwsOVb-344-white-hart-mercury-mot-1-11.pdf",
     "lat": 52.68,
     "lng": -1.0973,
-    "doc": "documents/1xUwsOVb-344-white-hart-mercury-mot-1-11.pdf"
+    "addedAt": "2026-07-15T13:37:18Z"
   },
   {
     "id": "1RjrLTG9-003-generous-briton-c1936-mot-1-11",
@@ -43,14 +46,15 @@
     "ref": "003 Generous Briton c1936 MOT 1 11.jpg",
     "category": "streets",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
+    "credit": "Unknown — needs a credit",
     "consentNoted": false,
-    "lat": 52.679363200371284,
-    "lng": -1.0979936680376168,
     "location": "Garden Street",
     "history": "The sign reads “The Generous Briton, Sydney Pegg, Dealer in Tobacco” — a pub on Garden Street. If you know more, get in touch or use the form below.",
     "doc": "documents/18rlQ4oK-003-generous-briton-c1936-mot-1-11.pdf",
-    "pageSlug": "generous-briton"
+    "pageSlug": "generous-briton",
+    "lat": 52.679363200371284,
+    "lng": -1.0979936680376168,
+    "addedAt": "2026-07-15T13:36:18Z"
   },
   {
     "id": "11iXuuLi-233-daisy-woodfield-chalice-woodfield-with-cart-at-grange-dairy-older-mot-1-39",
@@ -59,8 +63,9 @@
     "ref": "233 Daisy Woodfield, Chalice Woodfield with cart at Grange Dairy older MOT 1 39.jpg",
     "category": "other",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
-    "consentNoted": false
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "addedAt": "2026-07-15T13:35:18Z"
   },
   {
     "id": "15lCGU8B-336-memorial-hall-mercury-mot-2-33",
@@ -69,8 +74,9 @@
     "ref": "336 Memorial Hall (Mercury) MOT 2 33.jpg",
     "category": "other",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
-    "consentNoted": false
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "addedAt": "2026-07-15T13:34:18Z"
   },
   {
     "id": "1dMVuq4o-501-cemetery-c1900",
@@ -79,8 +85,9 @@
     "ref": "501 Cemetery c1900.jpg",
     "category": "other",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
-    "consentNoted": false
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "addedAt": "2026-07-15T13:33:18Z"
   },
   {
     "id": "1Wsijelu-368-fishing-tackle-pet-supplies-1985",
@@ -89,8 +96,9 @@
     "ref": "368 Fishing Tackle Pet Supplies 1985.jpg",
     "category": "other",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
-    "consentNoted": false
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "addedAt": "2026-07-15T13:32:18Z"
   },
   {
     "id": "1AxRDC3V-218-close-up-of-099-main-street-garden-centre-on-left-pook",
@@ -99,8 +107,9 @@
     "ref": "218 (Close up of 099) Main Street Garden centre on left Pook.jpg",
     "category": "other",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
-    "consentNoted": false
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "addedAt": "2026-07-15T13:31:18Z"
   },
   {
     "id": "1S-ZxlCo-320-melton-road-looking-south-mercury-mot-2-30-cropped-for-facbook",
@@ -109,8 +118,9 @@
     "ref": "320 Melton Road looking south (Mercury) MOT 2 30 cropped for facbook.jpg",
     "category": "other",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
-    "consentNoted": false
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "addedAt": "2026-07-15T13:30:18Z"
   },
   {
     "id": "1w3CZ0o6-manor-hotel",
@@ -118,10 +128,11 @@
     "caption": "Manor hotel",
     "category": "streets",
     "date": "Added July 2026",
-    "credit": "Unknown \u2014 needs a credit",
+    "credit": "Unknown — needs a credit",
     "consentNoted": false,
+    "doc": "documents/1gicc4v2-manor-hotel.pdf",
     "lat": 52.672797650614264,
     "lng": -1.1033455758707467,
-    "doc": "documents/1gicc4v2-manor-hotel.pdf"
+    "addedAt": "2026-07-15T13:29:18Z"
   }
 ]
