@@ -60,6 +60,54 @@ collections:
                 public_folder: "/documents"
                 hint: "Pick an existing PDF already on the site, or upload a new one."
 
+  - name: "photos"
+    label: "Photos"
+    description: "Every photo in the archive, one entry per photo — added automatically by the Google Drive sync. Edit caption, category, credit, location, and history freely; leave fields marked \"Internal\" alone unless you know what you're doing. New photos still need to come in via Drive (so they get resized and hosted properly), so there's no \"add new\" here, and no delete — ask Tom if a photo needs removing."
+    folder: "data/photos"
+    create: false
+    delete: false
+    slug: "{{fields.id}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - { label: "Internal ID", name: "id", widget: "string", hint: "Set automatically by the Drive sync — never shown on the site. Don't change." }
+      - { label: "Internal — image path", name: "src", widget: "string", hint: "Set automatically. Don't change unless you're replacing the image file itself." }
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site." }
+      - { label: "Internal — original reference", name: "ref", widget: "string", required: false, hint: "Dad's original filing name, shown as a small reference tag. Usually best left as-is." }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - { label: "Streets & Buildings", value: "streets" }
+          - { label: "People & Events", value: "people" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. This is just descriptive text; it doesn't place the photo on the map — use Map Pins for that." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - label: "Document"
+        name: "doc"
+        widget: "file"
+        media_folder: "/documents"
+        public_folder: "/documents"
+        required: false
+        hint: "A linked PDF (newspaper clipping, record, etc.), if any. Usually set automatically by the Drive sync when a same-named PDF is uploaded alongside the photo."
+      - label: "Full story page"
+        name: "pageSlug"
+        widget: "relation"
+        collection: "pages"
+        search_fields: ["title"]
+        value_field: "{{slug}}"
+        display_fields: ["title"]
+        required: false
+        hint: "Optional — pick one of your Story pages to add a \"Read the full story\" button to this photo."
+      - { label: "Internal — latitude", name: "lat", widget: "number", value_type: "float", required: false, hint: "Set automatically from the Drive folder or an \"@lat,lng\" in the filename. Don't hand-edit unless you know the exact coordinates." }
+      - { label: "Internal — longitude", name: "lng", widget: "number", value_type: "float", required: false, hint: "Set automatically — see Latitude above." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", hint: "Controls sort order in the archive (newest first). Don't change." }
+
   - name: "map_pins"
     label: "Map pins"
     description: "The hand-picked pins on the historic map. Ordinary located photos already show up on the map automatically and don't need an entry here — this is only for pins with their own name and description."

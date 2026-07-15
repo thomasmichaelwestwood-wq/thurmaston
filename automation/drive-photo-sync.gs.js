@@ -362,32 +362,50 @@ function publishDocument(file, token, owner, repo) {
 }
 
 /**
- * A photo's id is always "<8-char Drive id>-<slug>" (see publishPhoto),
- * so the slug is reliably everything from character 9 onward — no
- * separate lookup table needed. If more than one photo happens to
- * share a slug (the same name reused at different times), the most
- * recently added one wins, since photos.json is newest-first.
+ * A photo's id (and its data/photos/<id>.json filename) is always
+ * "<8-char Drive id>-<slug>" (see publishPhoto), so the slug is
+ * reliably everything from character 9 onward — no separate lookup
+ * table needed. Finds the file by listing data/photos/ rather than
+ * reading one big array, since that's now the CMS-editable source of
+ * truth (see the "Photos: one file per photo" note in CLAUDE.md). If
+ * more than one photo happens to share a slug (the same name reused at
+ * different times), the most recently added one wins.
  */
 function linkDocumentToPhoto(slug, repoPath, rawName, token, owner, repo) {
-  var dataPath = "data/photos.json";
-  var current = ghGet(dataPath, token, owner, repo);
-  var photos = JSON.parse(
-    Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
-  );
-
-  var match = photos.filter(function (p) { return p.id.slice(9) === slug; })[0];
-  if (!match) {
+  var files = listDirFiles("data/photos", token, owner, repo);
+  var candidates = files.filter(function (f) {
+    return /\.json$/i.test(f.name) && f.name.replace(/\.json$/i, "").slice(9) === slug;
+  });
+  if (candidates.length === 0) {
     Logger.log("No matching photo found for document: " + rawName);
     return;
   }
 
-  match.doc = repoPath;
-  var updated = JSON.stringify(photos, null, 2) + "\n";
+  var target = candidates[0];
+  if (candidates.length > 1) {
+    var newestAddedAt = "";
+    candidates.forEach(function (f) {
+      var photo = fetchJsonFile("data/photos/" + f.name, token, owner, repo);
+      if (photo && (photo.addedAt || "") > newestAddedAt) {
+        newestAddedAt = photo.addedAt || "";
+        target = f;
+      }
+    });
+  }
+
+  var dataPath = "data/photos/" + target.name;
+  var current = ghGet(dataPath, token, owner, repo);
+  var photo = JSON.parse(
+    Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
+  );
+
+  photo.doc = repoPath;
+  var updated = JSON.stringify(photo, null, 2) + "\n";
 
   ghPut(
     dataPath,
     Utilities.base64Encode(Utilities.newBlob(updated).getBytes()),
-    "Link document to photo: " + match.caption,
+    "Link document to photo: " + (photo.caption || rawName),
     token, owner, repo, current.sha
   );
 }
@@ -457,15 +475,21 @@ function resizeViaProxy(file, maxDimension) {
   }
 }
 
+/**
+ * Writes the new photo straight to its own data/photos/<id>.json file —
+ * the CMS-editable source of truth — rather than the old read-whole-
+ * array-then-write-it-back approach. A GitHub Actions workflow
+ * (.github/workflows/rebuild-photos-index.yml) regenerates the fast
+ * data/photos.json aggregate the live site reads whenever this changes,
+ * so nothing else here needs to touch that file directly. addedAt
+ * drives that rebuild's newest-first sort order.
+ */
 function appendMetadataEntry(shortId, slug, filename, caption, ref, category, place, token, owner, repo) {
-  var dataPath = "data/photos.json";
-  var current = ghGet(dataPath, token, owner, repo);
-  var photos = JSON.parse(
-    Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString()
-  );
+  var id = shortId + "-" + slug;
+  var dataPath = "data/photos/" + id + ".json";
 
   var entry = {
-    id: shortId + "-" + slug,
+    id: id,
     src: "images/photos/" + filename,
     caption: caption,
     ref: ref,
@@ -478,15 +502,15 @@ function appendMetadataEntry(shortId, slug, filename, caption, ref, category, pl
     entry.lat = place.lat;
     entry.lng = place.lng;
   }
+  entry.addedAt = Utilities.formatDate(new Date(), "Etc/UTC", "yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-  photos.unshift(entry);
-  var updated = JSON.stringify(photos, null, 2) + "\n";
+  var updated = JSON.stringify(entry, null, 2) + "\n";
 
   ghPut(
     dataPath,
     Utilities.base64Encode(Utilities.newBlob(updated).getBytes()),
-    "Add metadata entry for " + filename,
-    token, owner, repo, current.sha
+    "Add photo entry: " + filename,
+    token, owner, repo
   );
 }
 

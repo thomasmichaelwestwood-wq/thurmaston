@@ -126,6 +126,38 @@
   });
   CMS.registerPreviewTemplate("map_pins", MapPinsPreview);
 
+  // Mirrors the real photo lightbox (see index.html's #photo-lightbox and
+  // js/photos.js's showPhoto) so editing a photo's caption, location or
+  // history here shows exactly what visitors will see.
+  var PhotosPreview = createClass({
+    render: function () {
+      var data = this.props.entry.get("data");
+      var caption = data.get("caption") || "Untitled photo";
+      var date = data.get("date");
+      var location = data.get("location");
+      var history = data.get("history");
+      var ref = data.get("ref");
+      var credit = data.get("credit");
+      var src = data.get("src");
+
+      return h("div", { className: "photo-lightbox open", style: { position: "static", background: "none" } },
+        h("div", { className: "photo-lightbox-inner" },
+          h("div", { className: "photo-lightbox-media" },
+            src ? h("img", { className: "photo-lightbox-img", src: "/" + src, alt: caption }) : null
+          ),
+          h("div", { className: "photo-lightbox-info" },
+            h("p", { className: "photo-lightbox-caption" }, caption),
+            h("p", { className: "photo-lightbox-datelocation" }, [date, location].filter(Boolean).join(" · ")),
+            credit ? h("p", { className: "photo-lightbox-meta" }, "Credit: " + credit) : null,
+            history ? h("p", { className: "photo-lightbox-history visible" }, history) : null,
+            ref ? h("p", { className: "photo-lightbox-ref visible" }, "Ref: " + ref) : null
+          )
+        )
+      );
+    }
+  });
+  CMS.registerPreviewTemplate("photos", PhotosPreview);
+
   // Edit log — a plain read-only history of changes to the site's
   // content, pulled from GitHub's commit history (every CMS save is a
   // commit, so this is "for free" — no separate log to maintain). Only

@@ -1,18 +1,5 @@
 [
   {
-    "id": "1w3CZ0o6-manor-hotel",
-    "src": "images/photos/1w3CZ0o6-manor-hotel.jpg",
-    "caption": "Manor hotel",
-    "category": "streets",
-    "date": "Added July 2026",
-    "credit": "Unknown — needs a credit",
-    "consentNoted": false,
-    "doc": "documents/1gicc4v2-manor-hotel.pdf",
-    "lat": 52.672797650614264,
-    "lng": -1.1033455758707467,
-    "addedAt": "2026-07-15T14:00:00Z"
-  },
-  {
     "id": "14c3w-fx-014-garden-centre-1960",
     "src": "images/photos/14c3w-fx-014-garden-centre-1960.jpg",
     "caption": "Garden Centre 1960",
@@ -134,5 +121,18 @@
     "credit": "Unknown — needs a credit",
     "consentNoted": false,
     "addedAt": "2026-07-15T13:30:18Z"
+  },
+  {
+    "id": "1w3CZ0o6-manor-hotel",
+    "src": "images/photos/1w3CZ0o6-manor-hotel.jpg",
+    "caption": "Manor hotel",
+    "category": "streets",
+    "date": "Added July 2026",
+    "credit": "Unknown — needs a credit",
+    "consentNoted": false,
+    "doc": "documents/1gicc4v2-manor-hotel.pdf",
+    "lat": 52.672797650614264,
+    "lng": -1.1033455758707467,
+    "addedAt": "2026-07-15T13:29:18Z"
   }
 ]

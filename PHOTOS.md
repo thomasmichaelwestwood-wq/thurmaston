@@ -132,13 +132,14 @@ caption in the corner of the slide.
 
 The auto-generated caption is the filename with catalog numbers and MOT
 codes stripped out — good enough to publish, but worth improving. To fix
-a caption, date, credit, or add/correct a precise `lat`/`lng`, open
-`data/photos.json` and edit that photo's entry directly — it's a plain
-JSON file, safe to hand-edit alongside the automated writes. The
-`ref` field holds the untouched original filename (shown as a small tag
-in the lightbox) — leave it as-is unless it's wrong. The `consentNoted`
-field starts `false` for every auto-synced photo; flip it to `true` once
-you've confirmed it's fine to have public (see "Consent," below).
+a caption, date, credit, location, or history, or add/correct a precise
+`lat`/`lng`, log into the admin at `/admin` and open the **Photos**
+collection — find the photo by its caption, edit the field, save. No
+need to touch any JSON file by hand. The `ref` field holds the untouched
+original filename (shown as a small tag in the lightbox) — leave it as-is
+unless it's wrong. The `consentNoted` field starts unticked for every
+auto-synced photo; tick it once you've confirmed it's fine to have public
+(see "Consent," below).
 
 ## Who can upload
 
