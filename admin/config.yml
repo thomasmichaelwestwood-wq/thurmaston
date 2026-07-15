@@ -74,8 +74,8 @@ collections:
       - label: "Photo"
         name: "src"
         widget: "image"
-        media_folder: "images/photos"
-        public_folder: "images/photos"
+        media_folder: "/images/photos"
+        public_folder: "/images/photos"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site." }
       - label: "Category"
