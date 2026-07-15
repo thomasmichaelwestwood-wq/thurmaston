@@ -133,6 +133,30 @@
  * to the archive" and "already synced as a hero slide" separately, so
  * one doesn't block the other.
  * ---------------------------------------------------------------------
+ *
+ * BACKUP TO GOOGLE DRIVE
+ * ---------------------------------------------------------------------
+ * The photos themselves are always safe in Drive — they started there.
+ * What's NOT safe anywhere except GitHub is the editorial work done on
+ * top of them: cleaned captions, locations, written history, map pin
+ * descriptions, story page text. backupToDrive() is a one-way, GitHub →
+ * Drive safety net for exactly that: it reads the live data/photos.json,
+ * data/map-pins.json, and every data/pages/*.json file from the repo,
+ * and writes them into a Google Sheet ("Memories of Thurmaston — site
+ * backup") inside this same Drive folder, overwriting it each run.
+ *
+ * This is a backup, not a second copy to work from — editing the sheet
+ * does nothing to the live site, and the next run overwrites whatever
+ * you typed there. If GitHub ever became unavailable, this sheet is
+ * what you'd read the site's editorial content back from by hand.
+ *
+ * Setup (in addition to the syncPhotos trigger above): Triggers → Add
+ * Trigger → Function: backupToDrive → Event source: Time-driven → Type:
+ * Day timer → pick any time (e.g. 2am–3am). Once a day is plenty for a
+ * backup — no need to match the 5-minute sync cadence. The first run
+ * asks for one more permission (Google Sheets) alongside the Drive/
+ * external-URL ones already granted; approve it the same way.
+ * ---------------------------------------------------------------------
  */
 
 var CATEGORY_FOLDERS = {
@@ -484,4 +508,120 @@ function ghPut(path, base64Content, message, token, owner, repo, sha) {
     headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" },
     payload: JSON.stringify(payload)
   });
+}
+
+/**
+ * One-way GitHub → Drive backup of the site's editorial data. See the
+ * "BACKUP TO GOOGLE DRIVE" comment near the top of this file. Safe to
+ * run as often as you like — each run just overwrites the same sheet
+ * with whatever's currently live on GitHub.
+ */
+function backupToDrive() {
+  var props = PropertiesService.getScriptProperties();
+  var token = props.getProperty("GITHUB_TOKEN");
+  var owner = props.getProperty("GITHUB_OWNER");
+  var repo = props.getProperty("GITHUB_REPO");
+  var folderId = props.getProperty("DRIVE_FOLDER_ID");
+
+  var ss = getOrCreateBackupSheet(props, folderId);
+
+  backupPhotos(ss, token, owner, repo);
+  backupMapPins(ss, token, owner, repo);
+  backupPages(ss, token, owner, repo);
+
+  // Spreadsheets are created with a blank "Sheet1" — drop it once the
+  // real tabs above exist, so the backup only shows meaningful sheets.
+  var defaultSheet = ss.getSheetByName("Sheet1");
+  if (defaultSheet && ss.getSheets().length > 1) ss.deleteSheet(defaultSheet);
+
+  Logger.log("Backup complete: " + ss.getUrl());
+}
+
+function getOrCreateBackupSheet(props, folderId) {
+  var sheetId = props.getProperty("BACKUP_SHEET_ID");
+  if (sheetId) {
+    try {
+      return SpreadsheetApp.openById(sheetId);
+    } catch (e) {
+      Logger.log("Stored backup sheet is no longer accessible, creating a new one: " + e);
+    }
+  }
+
+  var ss = SpreadsheetApp.create("Memories of Thurmaston — site backup");
+  props.setProperty("BACKUP_SHEET_ID", ss.getId());
+
+  if (folderId) {
+    var file = DriveApp.getFileById(ss.getId());
+    DriveApp.getFolderById(folderId).addFile(file);
+    DriveApp.getRootFolder().removeFile(file);
+  }
+
+  return ss;
+}
+
+function backupPhotos(ss, token, owner, repo) {
+  var photos = fetchJsonFile("data/photos.json", token, owner, repo) || [];
+  var headers = ["id", "caption", "category", "date", "credit", "location", "history", "ref", "doc", "pageSlug", "lat", "lng", "consentNoted", "src"];
+  writeSheetRows(ss, "Photos", headers, photos);
+}
+
+function backupMapPins(ss, token, owner, repo) {
+  var data = fetchJsonFile("data/map-pins.json", token, owner, repo);
+  var pins = (data && data.pins) || [];
+  var headers = ["id", "name", "category", "coords", "period", "location", "description", "photoId", "pageSlug"];
+  writeSheetRows(ss, "Map Pins", headers, pins);
+}
+
+function backupPages(ss, token, owner, repo) {
+  var files = listDirFiles("data/pages", token, owner, repo);
+  var rows = files.filter(function (f) { return /\.json$/i.test(f.name); }).map(function (f) {
+    var page = fetchJsonFile("data/pages/" + f.name, token, owner, repo) || {};
+    var slug = f.name.replace(/\.json$/i, "");
+    var content = (page.blocks || []).map(function (b) {
+      if (b.type === "text") return b.text;
+      if (b.type === "photo") return "[Photo: " + b.photoId + "]";
+      if (b.type === "document") return "[Document: " + (b.label || b.file) + "]";
+      return "";
+    }).join("\n\n");
+    return { slug: slug, title: page.title || "", content: content };
+  });
+  var headers = ["slug", "title", "content"];
+  writeSheetRows(ss, "Story Pages", headers, rows);
+}
+
+function writeSheetRows(ss, sheetName, headers, rows) {
+  var sheet = ss.getSheetByName(sheetName);
+  if (!sheet) sheet = ss.insertSheet(sheetName);
+  sheet.clear();
+  sheet.appendRow(headers);
+  rows.forEach(function (row) {
+    sheet.appendRow(headers.map(function (h) {
+      var v = row[h];
+      return v === undefined || v === null ? "" : v;
+    }));
+  });
+  sheet.setFrozenRows(1);
+}
+
+function fetchJsonFile(path, token, owner, repo) {
+  try {
+    var current = ghGet(path, token, owner, repo);
+    return JSON.parse(Utilities.newBlob(Utilities.base64Decode(current.content), "text/plain").getDataAsString());
+  } catch (e) {
+    Logger.log("Backup: couldn't fetch " + path + ": " + e);
+    return null;
+  }
+}
+
+function listDirFiles(path, token, owner, repo) {
+  try {
+    var url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path;
+    var res = UrlFetchApp.fetch(url, {
+      headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" }
+    });
+    return JSON.parse(res.getContentText());
+  } catch (e) {
+    Logger.log("Backup: couldn't list " + path + ": " + e);
+    return [];
+  }
 }
