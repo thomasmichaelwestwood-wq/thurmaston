@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var subtitle = [item.period, item.location].filter(Boolean).join(" · ");
     var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
     var pageLink = item.pageSlug ?
-      '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + '">Read the full story →</a>' : "";
+      '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + (item.photoId ? "&photo=" + encodeURIComponent(item.photoId) : "") + '">Read the full story →</a>' : "";
     return (
       '<div class="map-popup">' +
         '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +

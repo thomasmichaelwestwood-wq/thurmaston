@@ -226,7 +226,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (lightboxViewPage) {
       var hasPage = typeof photo.pageSlug === "string" && photo.pageSlug;
       lightboxViewPage.hidden = !hasPage;
-      if (hasPage) lightboxViewPage.href = "place.html?slug=" + encodeURIComponent(photo.pageSlug);
+      if (hasPage) lightboxViewPage.href = "place.html?slug=" + encodeURIComponent(photo.pageSlug) + "&photo=" + encodeURIComponent(photo.id);
     }
   }
 
