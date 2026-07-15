@@ -1,5 +1,18 @@
 [
   {
+    "consentNoted": false,
+    "src": "images/photos/_132553987_ian_lavender_bbc.jpg",
+    "caption": "Ian lavendar",
+    "category": "people",
+    "date": "July 2026",
+    "credit": "Michael Westwood",
+    "location": "Main street",
+    "history": "played the role of private Pike in Dad's army - famous line 'Uncle Arthur'",
+    "addedAt": "2026-07-15T17:50:34.275Z",
+    "id": "20260715175016-ian-lavendar",
+    "ref": "_132553987_ian_lavender_bbc.jpg"
+  },
+  {
     "id": "14c3w-fx-014-garden-centre-1960",
     "src": "images/photos/14c3w-fx-014-garden-centre-1960.jpg",
     "caption": "Garden Centre 1960",
