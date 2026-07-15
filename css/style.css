@@ -358,20 +358,6 @@ h1, h2, h3, h4 {
   background: linear-gradient(180deg, rgba(20,30,22,0.15) 0%, rgba(17,26,19,0.75) 100%);
 }
 
-.hero-slide-caption {
-  position: absolute;
-  right: 16px;
-  bottom: 16px;
-  font-size: 0.75rem;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(10px) saturate(180%);
-  -webkit-backdrop-filter: blur(10px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.2);
-  padding: 4px 12px;
-  border-radius: var(--radius-pill);
-  z-index: 2;
-}
-
 .hero-content {
   position: relative;
   z-index: 2;
@@ -445,39 +431,6 @@ h1, h2, h3, h4 {
   gap: 8px;
 }
 .footer-fb-link svg { flex-shrink: 0; }
-
-.hero-dots {
-  position: absolute;
-  bottom: 0;
-  left: 4px;
-  z-index: 2;
-  display: flex;
-}
-.hero-dot {
-  /* Visual dot stays 9px, but the actual tap target is 44x44 (WCAG/HIG
-     minimum) via padding + a centered pseudo-element. */
-  width: 44px;
-  height: 44px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  position: relative;
-}
-.hero-dot::after {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 9px;
-  height: 9px;
-  border-radius: 50%;
-  background: rgba(255,255,255,0.45);
-}
-.hero-dot.active::after {
-  background: var(--green-700);
-}
 
 .tiles-lede {
   text-align: center;
