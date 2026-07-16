@@ -59,7 +59,11 @@
     },
     componentDidMount: function () {
       var self = this;
-      fetch("/data/photos.json").then(function (res) { return res.json(); }).then(function (photos) {
+      // no-store: this only fetches once per mount, so a cached response
+      // (from an earlier page load, possibly before a newly-added photo
+      // existed) would otherwise stick around as "Photo not found" for
+      // the rest of the editing session even though the real data is fine.
+      fetch("/data/photos.json", { cache: "no-store" }).then(function (res) { return res.json(); }).then(function (photos) {
         self.setState({ photos: photos });
       }).catch(function () {});
     },
