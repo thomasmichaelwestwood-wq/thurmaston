@@ -1,5 +1,20 @@
 [
   {
+    "src": "/images/photos/008-hardware-rotated-mot-1-67.jpg",
+    "caption": "Hardware",
+    "date": "1966",
+    "history": "Ran by Eileen & Des Hartop",
+    "location": "Melton Road",
+    "consentNoted": false,
+    "credit": "Jeff Hartop",
+    "category": "streets",
+    "addedAt": "2026-07-16T11:48:18.494Z",
+    "id": "20260716114759-hardware",
+    "lat": 52.68092720339042,
+    "lng": -1.0978140190704415,
+    "ref": "008-hardware-rotated-mot-1-67.jpg"
+  },
+  {
     "consentNoted": false,
     "src": "/images/photos/lwlat-confernce-backdrop.png",
     "caption": "Green background",
