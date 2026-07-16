@@ -9,7 +9,7 @@
  * manual step, runs on its own.
  *
  * Optionally, a photo can also be placed on the site's interactive
- * Historic Map: inside a category folder, create a further subfolder
+ * Interactive Map: inside a category folder, create a further subfolder
  * named after a recognised village landmark (see KNOWN_PLACES below)
  * and drop the photo there instead of loose in the category folder.
  * Photos not in a recognised place folder just don't get a map pin —

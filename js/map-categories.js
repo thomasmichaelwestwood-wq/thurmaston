@@ -1,4 +1,4 @@
-/* Historic Map category taxonomy — fixed, not editorial content, so it
+/* Interactive Map category taxonomy — fixed, not editorial content, so it
    stays as plain JS rather than a CMS-editable data file. The actual
    pins (buildings, places) live in data/map-pins.json, editable via the
    admin — see js/map.js, which fetches that file at runtime. */

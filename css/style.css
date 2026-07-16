@@ -532,14 +532,32 @@ h1, h2, h3, h4 {
 
 /* The homepage's map teaser — a deliberately smaller, secondary link
    out to the full interactive map on its own page (map.html), rather
-   than embedding the map itself here. */
+   than embedding the map itself here. A small illustration sits
+   alongside the text so it reads as "a map" at a glance rather than
+   just another text callout — there's no live map on this page for
+   the eye to land on any more. */
 .callout-map {
-  text-align: center;
-  padding: 32px 24px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
 }
+.callout-map-media {
+  flex: 0 0 auto;
+  width: 160px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.callout-map-media img { display: block; width: 100%; height: auto; }
+.callout-map-body { flex: 1 1 auto; }
 .callout-map h3 { font-size: 1.25rem; }
-.callout-map p { max-width: 480px; margin-left: auto; margin-right: auto; }
-.callout-map .btn { margin-top: 6px; }
+.callout-map .btn { margin-top: 10px; }
+
+@media (max-width: 640px) {
+  .callout-map { flex-direction: column; text-align: center; }
+  .callout-map-media { width: 200px; }
+}
 
 .placeholder-photo {
   aspect-ratio: 16/10;

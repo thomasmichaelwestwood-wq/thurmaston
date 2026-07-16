@@ -115,7 +115,7 @@ collections:
 
   - name: "map_pins"
     label: "Map pins"
-    description: "The hand-picked pins on the historic map. Ordinary located photos already show up on the map automatically and don't need an entry here — this is only for pins with their own name and description."
+    description: "The hand-picked pins on the interactive map. Ordinary located photos already show up on the map automatically and don't need an entry here — this is only for pins with their own name and description."
     files:
       - name: "pins"
         label: "Map pins"

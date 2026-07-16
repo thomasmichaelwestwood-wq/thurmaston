@@ -6,7 +6,7 @@ const SITE_SEARCH_INDEX = [
 
   { title: "Share your memory", url: "index.html#share", category: "History",
     excerpt: "Submit a photo, story or memory of Thurmaston to add to the village archive." },
-  { title: "Historic Map", url: "map.html", category: "History",
+  { title: "Interactive Map", url: "map.html", category: "History",
     excerpt: "An interactive map of buildings and places that used to stand in Thurmaston." },
   { title: "Photo Archive", url: "index.html#photos", category: "History",
     excerpt: "Old photographs of the village, organised by streets, people, nature, aerial and more." },
