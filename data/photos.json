@@ -1,5 +1,18 @@
 [
   {
+    "consentNoted": false,
+    "src": "/images/photos/lwlat-confernce-backdrop.png",
+    "caption": "Green background",
+    "category": "other",
+    "date": "July 2026",
+    "credit": "Tom test",
+    "addedAt": "2026-07-16T11:47:53.167Z",
+    "id": "20260716114738-green-background",
+    "lat": 52.680188684401664,
+    "lng": -1.0978459971622994,
+    "ref": "lwlat-confernce-backdrop.png"
+  },
+  {
     "src": "images/photos/_132553987_ian_lavender_bbc.jpg",
     "caption": "Ian Lavendar",
     "date": "July 2026",
