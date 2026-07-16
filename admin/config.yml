@@ -116,10 +116,14 @@ collections:
             name: "photo"
             widget: "object"
             fields:
-              - label: "Photo ID"
+              - label: "Photo"
                 name: "photoId"
-                widget: "string"
-                hint: "Open the photo in the archive and copy the ID from its \"Ref\" tag, or ask Tom if you're not sure."
+                widget: "relation"
+                collection: "photos"
+                search_fields: ["caption", "ref"]
+                value_field: "{{slug}}"
+                display_fields: ["caption"]
+                hint: "Start typing a caption to search the archive and pick the photo this block should show. The preview on the right updates with the actual photo once you pick one."
           - label: "Document"
             name: "document"
             widget: "object"
