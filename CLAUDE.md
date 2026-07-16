@@ -91,6 +91,16 @@ The form itself (`renderSubmitForm` in `js/place.js`) follows the exact same pat
 
 The form's first field, "About this photo" (`name="photo-ref"`), is a real (not hidden) `readonly` input pre-filled with the photo's `ref` — same `photo.ref || photo.caption || photo.id` fallback chain used elsewhere for "something readable to show." Deliberately a genuine named form field, not just a `<p>` — the hidden `photo-id` field alone isn't something a human reads in a notification email once this gets wired up, so this exists purely so whoever receives that email can tell which photo it's about at a glance, without cross-referencing an internal id.
 
+## "Download as PDF" on a photo's page
+
+`#place-download-pdf-btn` (next to the "Know more" button, both inside `#place-actions`) builds a one-click downloadable PDF of the photo's page — the image, caption, facts (date/location, category/credit, ref), History, and any linked Story page's text blocks — using [jsPDF](https://github.com/parallax/jsPDF), vendored locally at `vendor/jspdf/jspdf.umd.min.js` (same no-build-step, download-the-file pattern as `vendor/leaflet`, MIT licensed).
+
+Built by hand with jsPDF's drawing API (`js/place.js`'s `buildPhotoPdf`/`addPdfHeading`/`addPdfParagraph`/`ensureSpace`) rather than rendering the live page to an image (e.g. html2canvas) — deliberately, so the output stays a small, crisp, text-selectable PDF regardless of screen zoom or DPI, instead of a big flattened screenshot. `ensureSpace` adds a new page whenever the next block wouldn't fit, so a photo with a long History or a lengthy Story page still produces a clean multi-page PDF rather than overflowing.
+
+The photo image itself is loaded as a real `Image` element (`loadImageElement`) and handed straight to `doc.addImage` — works because every photo lives on the same origin (no CORS/canvas-taint issue to work around). Text blocks reuse `data/pages/<slug>.json`'s raw text but strip the markdown-lite syntax (`**bold**`, `*italic*`, `[label](url)`) down to plain words rather than trying to reproduce that formatting in the PDF — good enough for a printable reference copy, not a pixel-perfect mirror of the page.
+
+The filename is the photo's caption, slugified (e.g. `garden-centre-1960.pdf`) — not the internal id, which is never shown anywhere else on the site.
+
 ## Display convention: thumbnail/map-sized vs the full photo page
 
 Deliberate split, requested explicitly — don't blur it when adding fields:

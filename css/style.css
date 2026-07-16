@@ -1164,9 +1164,22 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 /* ---------- Know more modal (place.html) ---------- */
 
-.place-know-more-btn {
+.place-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
   margin: 4px 0 20px;
 }
+/* .btn-outline is styled for the dark hero background — this section
+   of the page is light, so the download button gets its own outline
+   style rather than reusing that class here. */
+.place-download-pdf-btn {
+  background: transparent;
+  border-color: var(--green-700);
+  color: var(--green-700);
+}
+.place-download-pdf-btn:hover { background: var(--green-700); color: #fff; }
+.place-download-pdf-btn:disabled { opacity: 0.6; cursor: default; }
 
 .place-know-more-modal {
   position: fixed;

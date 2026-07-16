@@ -5,8 +5,10 @@ document.addEventListener("DOMContentLoaded", function () {
   var crumbEl = document.getElementById("place-crumb");
   var photoPanelEl = document.getElementById("place-photo-panel");
   var historyEl = document.getElementById("place-history");
+  var actionsEl = document.getElementById("place-actions");
   var knowMoreBtn = document.getElementById("place-know-more-btn");
   var knowMoreModal = document.getElementById("place-know-more-modal");
+  var downloadPdfBtn = document.getElementById("place-download-pdf-btn");
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
   if (!contentEl) return;
@@ -65,6 +67,8 @@ document.addEventListener("DOMContentLoaded", function () {
       renderPhotoPanel(primaryPhoto);
       renderHistorySection(primaryPhoto);
       renderKnowMore(primaryPhoto);
+      renderDownloadPdf(primaryPhoto, page);
+      if (actionsEl) actionsEl.hidden = false;
       renderRelatedPhotos(primaryPhoto, photos);
       renderBackLink(primaryPhoto);
     }
@@ -136,6 +140,150 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function closeKnowMore() {
     knowMoreModal.classList.remove("open");
+  }
+
+  // One-click PDF via a locally vendored jsPDF (vendor/jspdf, same
+  // pattern as Leaflet) — builds the file by hand (title, photo, facts,
+  // History, any linked Story page text) rather than rendering the live
+  // DOM to an image, so the result is small, crisp at any zoom, and its
+  // text is actually selectable/searchable in a PDF reader.
+  function renderDownloadPdf(photo, page) {
+    if (!downloadPdfBtn) return;
+    downloadPdfBtn.onclick = function () {
+      downloadPhotoPdf(photo, page, downloadPdfBtn);
+    };
+  }
+
+  function downloadPhotoPdf(photo, page, btn) {
+    if (typeof window.jspdf === "undefined") {
+      alert("Sorry, the PDF tool didn't load. Try refreshing the page.");
+      return;
+    }
+    var originalLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = "Preparing PDF…";
+
+    loadImageElement(photo.src).catch(function () { return null; }).then(function (img) {
+      buildPhotoPdf(photo, page, img).save(pdfFilename(photo) + ".pdf");
+    }).catch(function () {
+      alert("Sorry, something went wrong making that PDF.");
+    }).then(function () {
+      btn.disabled = false;
+      btn.textContent = originalLabel;
+    });
+  }
+
+  function loadImageElement(src) {
+    return new Promise(function (resolve, reject) {
+      var img = new Image();
+      img.onload = function () { resolve(img); };
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function guessImageFormat(src) {
+    var ext = (String(src).split(".").pop() || "").toLowerCase().split(/[?#]/)[0];
+    if (ext === "png") return "PNG";
+    if (ext === "webp") return "WEBP";
+    return "JPEG";
+  }
+
+  function pdfFilename(photo) {
+    var base = (photo.caption || photo.id || "photo").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+    return base || "photo";
+  }
+
+  function buildPhotoPdf(photo, page, img) {
+    var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var margin = 18;
+    var maxWidth = pageWidth - margin * 2;
+    var y = margin;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    var titleLines = doc.splitTextToSize(photo.caption || "Untitled photo", maxWidth);
+    doc.text(titleLines, margin, y);
+    y += titleLines.length * 8 + 4;
+
+    if (img) {
+      var ratio = img.naturalHeight / img.naturalWidth;
+      var imgWidth = maxWidth;
+      var imgHeight = imgWidth * ratio;
+      var maxImgHeight = 120;
+      if (imgHeight > maxImgHeight) {
+        imgHeight = maxImgHeight;
+        imgWidth = imgHeight / ratio;
+      }
+      y = ensureSpace(doc, y, imgHeight, margin);
+      doc.addImage(img, guessImageFormat(photo.src), margin, y, imgWidth, imgHeight);
+      y += imgHeight + 8;
+    }
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    var cat = (typeof MAP_CATEGORIES !== "undefined" && MAP_CATEGORIES[photo.category]) ? MAP_CATEGORIES[photo.category].label : photo.category;
+    var facts = [
+      [photo.date, photo.location].filter(Boolean).join("  ·  "),
+      [cat, photo.credit && photo.credit !== "—" ? "Credit: " + photo.credit : ""].filter(Boolean).join("  ·  "),
+      photo.ref ? "Ref: " + photo.ref : ""
+    ].filter(Boolean);
+    facts.forEach(function (line) {
+      y = ensureSpace(doc, y, 6, margin);
+      doc.text(line, margin, y);
+      y += 6;
+    });
+    y += 4;
+
+    if (photo.history) {
+      y = addPdfHeading(doc, "History", margin, y);
+      y = addPdfParagraph(doc, photo.history, margin, y, maxWidth);
+    }
+
+    if (page && page.blocks) {
+      page.blocks.forEach(function (block) {
+        if (block.type === "text" && block.text) {
+          y = addPdfParagraph(doc, block.text, margin, y, maxWidth);
+        }
+      });
+    }
+
+    var pageHeight = doc.internal.pageSize.getHeight();
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.text("Memories of Thurmaston — memoriesofthurmaston.netlify.app", margin, pageHeight - 10);
+
+    return doc;
+  }
+
+  function ensureSpace(doc, y, needed, margin) {
+    var pageHeight = doc.internal.pageSize.getHeight();
+    if (y + needed > pageHeight - margin) {
+      doc.addPage();
+      return margin;
+    }
+    return y;
+  }
+
+  function addPdfHeading(doc, text, margin, y) {
+    y = ensureSpace(doc, y, 10, margin);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.text(text, margin, y);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    return y + 8;
+  }
+
+  function addPdfParagraph(doc, text, margin, y, maxWidth) {
+    var lines = doc.splitTextToSize(text.replace(/\*\*|\*|\[|\]\([^)]*\)/g, ""), maxWidth);
+    lines.forEach(function (line) {
+      y = ensureSpace(doc, y, 6, margin);
+      doc.text(line, margin, y);
+      y += 6;
+    });
+    return y + 4;
   }
 
   // Same fields as before — just now shown inside a popup instead of

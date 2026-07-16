@@ -41,7 +41,10 @@
   <section class="content-section container">
     <div class="place-photo-panel" id="place-photo-panel" hidden></div>
     <div class="place-history" id="place-history" hidden></div>
-    <button class="btn btn-primary place-know-more-btn" id="place-know-more-btn" type="button" hidden>Know more about this photo?</button>
+    <div class="place-actions" id="place-actions" hidden>
+      <button class="btn btn-primary place-know-more-btn" id="place-know-more-btn" type="button">Know more about this photo?</button>
+      <button class="btn place-download-pdf-btn" id="place-download-pdf-btn" type="button">Download as PDF</button>
+    </div>
     <div class="place-content" id="place-content"></div>
     <div class="place-related" id="place-related" hidden></div>
     <p class="place-not-found" id="place-not-found" hidden>We couldn't find that photo. It may have been renamed or removed — <a href="index.html">back to the homepage</a>.</p>
@@ -98,6 +101,7 @@
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 <script src="js/map-categories.js"></script>
+<script src="vendor/jspdf/jspdf.umd.min.js"></script>
 <script src="js/place.js"></script>
 </body>
 </html>
