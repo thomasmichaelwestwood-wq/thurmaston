@@ -919,6 +919,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   background: none;
   cursor: pointer;
   margin: 6px 0 8px;
+  text-decoration: none;
 }
 .map-popup-photo-btn img {
   width: 100%;
@@ -927,6 +928,13 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   transition: opacity 0.15s ease;
 }
 .map-popup-photo-btn:hover img { opacity: 0.85; }
+.map-popup-photo-hint {
+  display: block;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
 
 @media (max-width: 780px) {
   .map-layout { grid-template-columns: 1fr; }

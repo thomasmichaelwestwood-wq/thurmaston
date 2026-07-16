@@ -43,6 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var photo = item.photoSrc && item.photoId ?
       '<a class="map-popup-photo-btn" href="place.html?photo=' + encodeURIComponent(item.photoId) + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
         '<img src="' + item.photoSrc + '" alt="">' +
+        '<span class="map-popup-photo-hint">Click on picture for more</span>' +
       '</a>' : "";
     var subtitle = [item.period, item.location].filter(Boolean).join(" · ");
     var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
@@ -196,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
           "<h3>" + escapeHtml(photo.caption) + "</h3>" +
           '<a class="map-popup-photo-btn" href="place.html?photo=' + encodeURIComponent(photo.id) + '" aria-label="View photo: ' + escapeHtml(photo.caption) + '">' +
             '<img src="' + photo.src + '" alt="">' +
+            '<span class="map-popup-photo-hint">Click on picture for more</span>' +
           "</a>" +
           (subtitle ? '<p class="map-popup-period">' + escapeHtml(subtitle) + "</p>" : "") +
         "</div>"
