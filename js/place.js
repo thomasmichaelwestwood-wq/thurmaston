@@ -249,10 +249,18 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     }
 
-    var pageHeight = doc.internal.pageSize.getHeight();
-    doc.setFontSize(8);
-    doc.setTextColor(150);
-    doc.text("Memories of Thurmaston — memoriesofthurmaston.netlify.app", margin, pageHeight - 10);
+    // Stamped on every page (not just the last) — ensureSpace() can add
+    // more than one for a photo with a long History or story, and the
+    // contact line should still be there wherever the PDF gets printed
+    // from or how far someone scrolls.
+    var footerText = "Memories of Thurmaston — memoriesofthurmaston.netlify.app  ·  Questions? memories@thurmaston.com";
+    var totalPages = doc.internal.getNumberOfPages();
+    for (var i = 1; i <= totalPages; i++) {
+      doc.setPage(i);
+      doc.setFontSize(8);
+      doc.setTextColor(150);
+      doc.text(footerText, margin, doc.internal.pageSize.getHeight() - 10);
+    }
 
     return doc;
   }
