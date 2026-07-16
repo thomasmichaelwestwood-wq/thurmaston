@@ -1,12 +1,13 @@
 {
-  "id": "14c3w-fx-014-garden-centre-1960",
   "src": "images/photos/14c3w-fx-014-garden-centre-1960.jpg",
   "caption": "Garden Centre 1960",
-  "ref": "014 Garden Centre 1960.jpg",
-  "category": "streets",
   "date": "Added July 2026",
-  "credit": "Unknown — needs a credit",
+  "ref": "014 Garden Centre 1960.jpg",
+  "addedAt": "2026-07-15T13:39:18Z",
+  "location": "600 Melton Road",
   "consentNoted": false,
+  "credit": "Unknown — needs a credit",
+  "id": "14c3w-fx-014-garden-centre-1960",
   "coords": "52.68, -1.0973",
-  "addedAt": "2026-07-15T13:39:18Z"
+  "category": "streets"
 }
