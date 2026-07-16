@@ -598,21 +598,6 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 0.85rem;
 }
 
-.place-doc-block {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 8px 12px 8px 0;
-  background: var(--gold-600);
-  color: #241a06;
-  border-radius: var(--radius-pill);
-  padding: 9px 18px;
-  font-size: 0.88rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-.place-doc-block:hover { background: #d29b46; color: #241a06; }
-
 .place-not-found {
   color: var(--ink-soft);
   text-align: center;
@@ -1071,6 +1056,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 .photo-thumb {
   position: relative;
+  display: block;
   border: 1px solid var(--glass-border);
   border-radius: var(--radius);
   overflow: hidden;
@@ -1130,154 +1116,10 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   white-space: nowrap;
 }
 
-.photo-thumb-docbadge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: rgba(31, 77, 58, 0.65);
-  backdrop-filter: blur(8px) saturate(180%);
-  -webkit-backdrop-filter: blur(8px) saturate(180%);
-  border: 1px solid rgba(255,255,255,0.25);
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.photo-lightbox {
-  position: fixed;
-  inset: 0;
-  background: rgba(20, 26, 22, 0.78);
-  backdrop-filter: blur(16px) saturate(160%);
-  -webkit-backdrop-filter: blur(16px) saturate(160%);
-  z-index: 300;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-}
-.photo-lightbox.open { display: flex; }
-
-.photo-lightbox-inner {
-  display: flex;
-  align-items: flex-start;
-  gap: 28px;
-  max-width: min(1100px, 94vw);
-  max-height: 90vh;
-  text-align: left;
-}
-
-.photo-lightbox-left {
-  flex: 1 1 auto;
-  min-width: 0;
-  max-height: 86vh;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.photo-lightbox-media {
-  display: flex;
-  justify-content: center;
-}
-
-.photo-lightbox-img {
-  max-width: 100%;
-  max-height: 86vh;
-  border-radius: var(--radius);
-  background: #fff;
-  display: block;
-  box-shadow: var(--shadow-lg);
-}
-
-.photo-lightbox-info {
-  flex: 0 0 280px;
-  max-height: 86vh;
-  overflow-y: auto;
-  background: var(--glass-bg-dark);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-dark);
-  border-radius: var(--radius);
-  padding: 18px;
-}
-
-.photo-lightbox-caption {
-  color: #fff;
-  font-family: var(--font-head);
-  font-size: 1.1rem;
-  margin-top: 0;
-}
-.photo-lightbox-datelocation {
-  color: #e7efe6;
-  font-size: 0.88rem;
-  font-weight: 600;
-  margin-top: 4px;
-}
-.photo-lightbox-meta {
-  color: #c7d9c9;
-  font-size: 0.85rem;
-  margin-top: 4px;
-}
-
-.photo-lightbox-history {
-  display: none;
-  color: #e7efe6;
-  font-size: 0.88rem;
-  line-height: 1.55;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.15);
-}
-.photo-lightbox-history.visible { display: block; }
-
-.photo-lightbox-ref {
-  display: none;
-  color: rgba(255,255,255,0.45);
-  font-size: 0.72rem;
-  font-family: ui-monospace, "SF Mono", "Courier New", monospace;
-  margin-top: 6px;
-}
-.photo-lightbox-ref.visible { display: block; }
-
-.photo-lightbox-minimap {
-  display: none;
-  width: 100%;
-  height: 140px;
-  margin: 14px 0 0;
-  border-radius: 10px;
-  overflow: hidden;
-  cursor: pointer;
-  border: 2px solid rgba(255, 255, 255, 0.15);
-}
-.photo-lightbox-minimap.visible { display: block; }
-.photo-lightbox-minimap:hover { border-color: var(--gold-600); }
-.photo-lightbox-minimap .leaflet-control-attribution { font-size: 0.6rem; }
-
-.photo-lightbox-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-/* Floats in its own glass card under the photo, in the lightbox's left
-   column, separate from the facts sidebar (.photo-lightbox-info) — see
-   .photo-lightbox-left below. On the story page it's reused inside
-   .place-submit instead, which already provides that card treatment,
-   so no background/padding is baked in here by default. */
-.photo-lightbox-left .photo-lightbox-submit {
-  background: var(--glass-bg-dark);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  border: 1px solid var(--glass-border-dark);
-  border-radius: var(--radius);
-  padding: 16px 18px;
-}
+/* The form itself, reused inside the "Know more" popup on place.html
+   (.place-know-more-modal below) — kept under this name since it grew
+   up as the lightbox's submit form and every field id/label already
+   refers to it that way; only the outer chrome changed. */
 .photo-lightbox-submit h4 {
   color: #fff;
   font-family: var(--font-head);
@@ -1312,58 +1154,13 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 0.85rem;
 }
 
-@media (max-width: 780px) {
-  .photo-lightbox-inner {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    overflow-y: auto;
-  }
-  .photo-lightbox-left { max-height: none; width: 100%; }
-  .photo-lightbox-info { flex: none; width: 100%; max-height: none; }
-  .photo-lightbox-actions { justify-content: center; }
+/* ---------- Know more modal (place.html) ---------- */
+
+.place-know-more-btn {
+  margin: 4px 0 20px;
 }
 
-.photo-lightbox-viewmap, .photo-lightbox-viewdoc, .photo-lightbox-viewpage {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--gold-600);
-  color: #241a06;
-  border: none;
-  border-radius: var(--radius-pill);
-  padding: 8px 16px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  font-family: var(--font-body);
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-.photo-lightbox-viewmap:hover, .photo-lightbox-viewdoc:hover { background: #d29b46; }
-
-.photo-lightbox-viewpage {
-  background: var(--green-700);
-  color: #fff;
-}
-.photo-lightbox-viewpage:hover { background: var(--green-900); color: #fff; }
-
-.photo-lightbox-close {
-  position: absolute;
-  top: 20px;
-  right: 24px;
-  background: none;
-  border: none;
-  color: #fff;
-  font-size: 2rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-
-/* ---------- Document lightbox ---------- */
-
-.doc-lightbox {
+.place-know-more-modal {
   position: fixed;
   inset: 0;
   background: rgba(10, 13, 11, 0.82);
@@ -1375,76 +1172,29 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   justify-content: center;
   padding: 24px;
 }
-.doc-lightbox.open { display: flex; }
+.place-know-more-modal.open { display: flex; }
 
-.doc-lightbox-inner {
-  width: min(900px, 94vw);
-  height: min(800px, 88vh);
-  background: var(--paper);
+.place-know-more-inner {
+  position: relative;
+  width: min(480px, 94vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  background: var(--green-900);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  padding: 24px;
   box-shadow: var(--shadow-lg);
 }
 
-.doc-lightbox-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  background: rgba(31, 77, 58, 0.85);
-  backdrop-filter: var(--glass-blur);
-  -webkit-backdrop-filter: var(--glass-blur);
-  color: #fff;
-}
-
-.doc-lightbox-title {
-  font-family: var(--font-head);
-  font-weight: 600;
-  font-size: 0.95rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.doc-lightbox-download {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  background: var(--gold-600);
-  color: #241a06;
-  border-radius: var(--radius-pill);
-  padding: 7px 14px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  text-decoration: none;
-}
-.doc-lightbox-download:hover { background: #d29b46; }
-
-.doc-lightbox-frame {
-  flex: 1;
-  width: 100%;
-  border: none;
-  background: #525659;
-}
-
-.doc-lightbox-close {
+.place-know-more-close {
   position: absolute;
-  top: 20px;
-  right: 24px;
+  top: 12px;
+  right: 16px;
   background: none;
   border: none;
   color: #fff;
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
-}
-
-@media (max-width: 600px) {
-  .doc-lightbox-title { display: none; }
 }
 
 /* ---------- Footer ---------- */

@@ -52,26 +52,7 @@ Don't know the exact spot? Just leave this part out — most photos won't
 have one, and that's completely normal. The photo still goes on the site
 fine, just without a map pin.
 
-## 4. Have a document to go with the photo? Add it as a PDF (optional)
-
-If there's something extra for a photo — a newspaper clipping, an old
-programme, a deeds extract — save it as a **PDF with the exact same
-name as the photo** and put it in the same folder:
-
-```
-Manor Hotel.jpg
-Manor Hotel.pdf   <- automatically linked to the photo above
-```
-
-It must be a PDF (not a Word document or another photo) so the site can
-always tell a photo apart from a document. If all you have is a
-photographed page, turn it into a PDF first — most phones have a
-"scan document" option in the camera or notes app that does this in one
-go. The document then shows a small page icon on that photo and a
-"View document" link when it's opened — no extra step needed beyond
-naming it to match.
-
-## 5. That's it
+## 4. That's it
 
 Nothing else to do. Within a few minutes, the photo appears on the
 homepage, searchable by whatever you named it. No need to tell

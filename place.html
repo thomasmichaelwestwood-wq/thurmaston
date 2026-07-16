@@ -40,12 +40,19 @@
   <section class="content-section container">
     <div class="place-photo-panel" id="place-photo-panel" hidden></div>
     <div class="place-history" id="place-history" hidden></div>
-    <div class="place-submit" id="place-submit" hidden></div>
+    <button class="btn btn-primary place-know-more-btn" id="place-know-more-btn" type="button" hidden>Know more about this photo?</button>
     <div class="place-content" id="place-content"></div>
     <div class="place-related" id="place-related" hidden></div>
-    <p class="place-not-found" id="place-not-found" hidden>We couldn't find that page. It may have been renamed or removed — <a href="index.html">back to the homepage</a>.</p>
+    <p class="place-not-found" id="place-not-found" hidden>We couldn't find that photo. It may have been renamed or removed — <a href="index.html">back to the homepage</a>.</p>
   </section>
 </main>
+
+<div class="place-know-more-modal" id="place-know-more-modal">
+  <div class="place-know-more-inner">
+    <div class="place-know-more-body photo-lightbox-submit"></div>
+    <button class="place-know-more-close" type="button" aria-label="Close">×</button>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="container">
@@ -66,6 +73,7 @@
         <ul>
           <li><a href="contact.html">Contact us</a></li>
           <li><a class="footer-fb-link" href="https://www.facebook.com/memoriesofthurmaston/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M14 8h-1.5c-.8 0-1 .3-1 1v1.5H14l-.2 2H11.5V19H9v-6.5H7.5V10H9V8.5C9 6.6 10 5 12.3 5H14v3z" fill="#fff"/></svg>Memories of Thurmaston (Facebook) ↗</a></li>
+          <li><a href="/admin/">Admin</a></li>
         </ul>
       </div>
     </div>

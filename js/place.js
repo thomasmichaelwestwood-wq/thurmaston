@@ -5,96 +5,109 @@ document.addEventListener("DOMContentLoaded", function () {
   var crumbEl = document.getElementById("place-crumb");
   var photoPanelEl = document.getElementById("place-photo-panel");
   var historyEl = document.getElementById("place-history");
-  var submitEl = document.getElementById("place-submit");
+  var knowMoreBtn = document.getElementById("place-know-more-btn");
+  var knowMoreModal = document.getElementById("place-know-more-modal");
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
   if (!contentEl) return;
 
-  var DOC_ICON = '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
-
   var params = new URLSearchParams(location.search);
-  var slug = params.get("slug");
   var photoParam = params.get("photo");
-  if (!slug) {
+  var slugParam = params.get("slug");
+  if (!photoParam && !slugParam) {
     showNotFound();
     return;
   }
 
-  Promise.all([
-    fetch("data/pages/" + encodeURIComponent(slug) + ".json").then(function (res) { return res.ok ? res.json() : null; }).catch(function () { return null; }),
-    fetch("data/photos.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; })
-  ]).then(function (results) {
-    var page = results[0];
-    var photos = results[1];
-    if (!page) {
-      showNotFound();
-      return;
-    }
-    renderPage(page, photos);
-  });
-
-  function showNotFound() {
-    notFoundEl.hidden = false;
-    headingEl.textContent = "Page not found";
-    crumbEl.textContent = "Not found";
-  }
-
-  function renderPage(page, photos) {
-    document.title = page.title + " | Memories of Thurmaston";
-    headingEl.textContent = page.title;
-    crumbEl.textContent = page.title;
-
+  fetch("data/photos.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (photos) {
     var photoById = {};
     photos.forEach(function (p) { photoById[p.id] = p; });
 
     var primaryPhoto = photoParam ? photoById[photoParam] : null;
+    // A story page can be reached two ways: a photo whose own pageSlug
+    // points at one (the normal case now), or an explicit ?slug= for a
+    // page opened without a specific photo in mind. Either can supply
+    // the slug; the photo, when present, is what drives everything else.
+    var slug = slugParam || (primaryPhoto && primaryPhoto.pageSlug) || null;
+
+    if (!primaryPhoto && !slug) {
+      showNotFound();
+      return;
+    }
+
+    if (slug) {
+      fetch("data/pages/" + encodeURIComponent(slug) + ".json").then(function (res) { return res.ok ? res.json() : null; }).catch(function () { return null; }).then(function (page) {
+        renderPage(page, primaryPhoto, photoById, photos);
+      });
+    } else {
+      renderPage(null, primaryPhoto, photoById, photos);
+    }
+  });
+
+  function showNotFound() {
+    notFoundEl.hidden = false;
+    headingEl.textContent = "Photo not found";
+    crumbEl.textContent = "Not found";
+  }
+
+  function renderPage(page, primaryPhoto, photoById, photos) {
+    if (!page && !primaryPhoto) {
+      showNotFound();
+      return;
+    }
+
+    var title = page ? page.title : primaryPhoto.caption;
+    document.title = title + " | Memories of Thurmaston";
+    headingEl.textContent = title;
+    crumbEl.textContent = title;
+
     if (primaryPhoto) {
       renderPhotoPanel(primaryPhoto);
       renderHistorySection(primaryPhoto);
-      renderSubmitSection(primaryPhoto);
+      renderKnowMore(primaryPhoto);
       renderRelatedPhotos(primaryPhoto, photos);
       renderBackLink(primaryPhoto);
     }
 
-    var html = (page.blocks || []).map(function (block) {
+    var html = page ? (page.blocks || []).map(function (block) {
       if (block.type === "text" && block.text) return renderTextBlock(block.text);
       if (block.type === "photo" && block.photoId) return renderPhotoBlock(photoById[block.photoId]);
-      if (block.type === "document" && block.file) return renderDocumentBlock(block);
       return "";
-    }).join("");
+    }).join("") : "";
 
     contentEl.innerHTML = html;
   }
 
-  // Mirrors the photo lightbox's info panel (js/photos.js's showPhoto)
-  // so landing on a story page shows the same facts you'd already seen
-  // there, before the page's own written history goes further.
+  // Every photo's own page now — not just ones with a hand-written
+  // story — so this is the primary way a photo is viewed on the site,
+  // not an add-on to a story page. Mirrors what the old lightbox
+  // showed (caption, date/location, category/credit, ref).
   function renderPhotoPanel(photo) {
     if (!photoPanelEl) return;
     var cat = (typeof MAP_CATEGORIES !== "undefined" && MAP_CATEGORIES[photo.category]) ? MAP_CATEGORIES[photo.category].label : photo.category;
     var metaParts = [cat];
     if (photo.credit && photo.credit !== "—") metaParts.push("Credit: " + photo.credit);
-    var archiveUrl = "category.html?cat=" + encodeURIComponent(photo.category) + "#photo-" + encodeURIComponent(photo.id);
+    var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";
+    var mapUrl = "index.html?photo=" + encodeURIComponent(photo.id) + "#map";
 
     photoPanelEl.innerHTML =
       '<div class="place-photo-panel-media">' +
-        '<a href="' + escapeAttr(archiveUrl) + '"><img src="' + escapeAttr(photo.src) + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy"></a>' +
+        '<img src="' + escapeAttr(photo.src) + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
       "</div>" +
       '<div class="place-photo-panel-info">' +
         '<p class="place-photo-panel-caption">' + escapeHtml(photo.caption) + "</p>" +
         '<p class="place-photo-panel-datelocation">' + escapeHtml([photo.date, photo.location].filter(Boolean).join(" · ")) + "</p>" +
         '<p class="place-photo-panel-meta">' + escapeHtml(metaParts.filter(Boolean).join(" · ")) + "</p>" +
         (photo.ref ? '<p class="place-photo-panel-ref">Ref: ' + escapeHtml(photo.ref) + "</p>" : "") +
-        '<a class="place-photo-panel-link" href="' + escapeAttr(archiveUrl) + '">View in the photo archive →</a>' +
+        (hasLocation ? '<a class="place-photo-panel-link" href="' + escapeAttr(mapUrl) + '">View on map →</a>' : "") +
       "</div>";
     photoPanelEl.hidden = false;
     photoPanelEl.classList.add("visible");
   }
 
-  // History gets its own full-width, light-background section — same
-  // reasoning as the submit form below: easier to read than crammed
-  // into the facts panel's narrow dark info column alongside the
-  // terser caption/date/credit/ref facts.
+  // Its own full-width, light-background section — easier to read a
+  // longer paragraph there than crammed into the facts panel's narrow
+  // dark info column alongside the terser caption/date/credit/ref facts.
   function renderHistorySection(photo) {
     if (!historyEl || !photo.history) return;
     historyEl.innerHTML = "<h2>History</h2><p>" + escapeHtml(photo.history) + "</p>";
@@ -102,50 +115,61 @@ document.addEventListener("DOMContentLoaded", function () {
     historyEl.classList.add("visible");
   }
 
-  // Kept as its own full-width section rather than squeezed into the
-  // facts panel's narrow info column — the form is long enough that
-  // cramming it in there stretched the photo above it to match.
-  function renderSubmitSection(photo) {
-    if (!submitEl) return;
-    submitEl.innerHTML = renderSubmitForm(photo);
-    submitEl.hidden = false;
-    submitEl.classList.add("visible");
+  // "Know more" is a button that opens a small popup with the form,
+  // rather than a form that's always on the page — most visitors are
+  // just here to look, and the always-open form was a lot of the page
+  // before they get to the photo's own story.
+  function renderKnowMore(photo) {
+    if (!knowMoreBtn || !knowMoreModal) return;
+    knowMoreModal.querySelector(".place-know-more-body").innerHTML = renderSubmitForm(photo);
+    knowMoreBtn.hidden = false;
+
+    knowMoreBtn.onclick = function () { knowMoreModal.classList.add("open"); };
+    knowMoreModal.querySelector(".place-know-more-close").onclick = closeKnowMore;
+    knowMoreModal.addEventListener("click", function (e) {
+      if (e.target === knowMoreModal) closeKnowMore();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeKnowMore();
+    });
   }
 
-  // Same static "Know more about this photo?" form as the lightbox
-  // (.photo-lightbox-submit in index.html/category.html) — not wired
-  // to a backend here either, see the note in the form itself.
+  function closeKnowMore() {
+    knowMoreModal.classList.remove("open");
+  }
+
+  // Same fields as before — just now shown inside a popup instead of
+  // always on the page. Still not wired to a backend, see the note in
+  // the form itself.
   function renderSubmitForm(photo) {
     return (
-      '<div class="photo-lightbox-submit">' +
-        "<h4>Know more about this photo?</h4>" +
-        "<p>Have a date, a name, a story, or another photo of the same place? Tell us and we'll add it.</p>" +
-        '<form class="stack" action="#" method="post">' +
-          '<input type="hidden" name="photo-id" value="' + escapeAttr(photo.id) + '">' +
-          "<div>" +
-            '<label for="place-submit-ref">About this photo</label>' +
-            '<input type="text" id="place-submit-ref" name="photo-ref" value="' + escapeAttr(photo.ref || photo.caption || photo.id) + '" readonly>' +
-          "</div>" +
-          "<div>" +
-            '<label for="place-submit-name">Your name</label>' +
-            '<input type="text" id="place-submit-name" name="name" required>' +
-          "</div>" +
-          "<div>" +
-            '<label for="place-submit-email">Email (kept private)</label>' +
-            '<input type="email" id="place-submit-email" name="email">' +
-          "</div>" +
-          "<div>" +
-            '<label for="place-submit-message">What do you know, or want to share?</label>' +
-            '<textarea id="place-submit-message" name="message" rows="3" required></textarea>' +
-          "</div>" +
-          "<div>" +
-            '<label for="place-submit-photo">Photo (optional)</label>' +
-            '<input type="file" id="place-submit-photo" name="photo" accept="image/*">' +
-          "</div>" +
-          '<button class="btn btn-primary" type="submit">Submit</button>' +
-          '<p style="font-size:0.75rem;color:#c7d9c9;margin:0">This form isn\'t connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>' +
-        "</form>" +
-      "</div>"
+      "<h4>Know more about this photo?</h4>" +
+      "<p>Have a date, a name, a story, or another photo of the same place? Tell us and we'll add it.</p>" +
+      '<form class="stack" action="#" method="post">' +
+        '<input type="hidden" name="photo-id" value="' + escapeAttr(photo.id) + '">' +
+        "<div>" +
+          '<label for="place-submit-ref">About this photo</label>' +
+          '<input type="text" id="place-submit-ref" name="photo-ref" value="' + escapeAttr(photo.ref || photo.caption || photo.id) + '" readonly>' +
+        "</div>" +
+        "<div>" +
+          '<label for="place-submit-name">Your name</label>' +
+          '<input type="text" id="place-submit-name" name="name" required>' +
+        "</div>" +
+        "<div>" +
+          '<label for="place-submit-email">Email (kept private)</label>' +
+          '<input type="email" id="place-submit-email" name="email">' +
+        "</div>" +
+        "<div>" +
+          '<label for="place-submit-message">What do you know, or want to share?</label>' +
+          '<textarea id="place-submit-message" name="message" rows="3" required></textarea>' +
+        "</div>" +
+        "<div>" +
+          '<label for="place-submit-photo">Photo (optional)</label>' +
+          '<input type="file" id="place-submit-photo" name="photo" accept="image/*">' +
+        "</div>" +
+        '<button class="btn btn-primary" type="submit">Submit</button>' +
+        '<p style="font-size:0.75rem;color:#c7d9c9;margin:0">This form isn\'t connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>' +
+      "</form>"
     );
   }
 
@@ -153,7 +177,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!backLinkEl) return;
     var cat = (typeof MAP_CATEGORIES !== "undefined" && MAP_CATEGORIES[photo.category]) ? MAP_CATEGORIES[photo.category].label : photo.category;
     backLinkEl.textContent = "← Back to " + cat;
-    backLinkEl.href = "category.html?cat=" + encodeURIComponent(photo.category) + "#photo-" + encodeURIComponent(photo.id);
+    backLinkEl.href = "category.html?cat=" + encodeURIComponent(photo.category);
     backLinkEl.hidden = false;
   }
 
@@ -179,21 +203,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderPhotoBlock(photo) {
     if (!photo) return "";
-    var url = "category.html?cat=" + encodeURIComponent(photo.category) + "#photo-" + encodeURIComponent(photo.id);
+    var url = "place.html?photo=" + encodeURIComponent(photo.id);
     return (
       '<a class="place-photo-block" href="' + url + '">' +
         '<img src="' + photo.src + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
         '<span class="place-photo-caption">' + escapeHtml(photo.caption) + "</span>" +
-      "</a>"
-    );
-  }
-
-  function renderDocumentBlock(block) {
-    var label = block.label ? escapeHtml(block.label) : "View document";
-    return (
-      '<a class="place-doc-block" href="' + escapeAttr(block.file) + '" target="_blank" rel="noopener">' +
-        DOC_ICON +
-        "<span>" + label + "</span>" +
       "</a>"
     );
   }

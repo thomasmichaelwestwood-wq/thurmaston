@@ -67,13 +67,6 @@ collections:
         pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "muted-string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "muted-text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
-      - label: "Document"
-        name: "doc"
-        widget: "file"
-        media_folder: "/documents"
-        public_folder: "/documents"
-        required: false
-        hint: "A linked PDF (newspaper clipping, record, etc.), if any. Usually set automatically by the Drive sync when a same-named PDF is uploaded alongside the photo — you very rarely need to touch this."
       - label: "Full story page"
         name: "pageSlug"
         widget: "relation"
@@ -126,17 +119,6 @@ collections:
                 value_field: "{{slug}}"
                 display_fields: ["caption"]
                 hint: "Start typing a caption to search the archive and pick the photo this block should show. The preview on the right updates with the actual photo once you pick one."
-          - label: "Document"
-            name: "document"
-            widget: "object"
-            fields:
-              - { label: "Label", name: "label", widget: "string", hint: "e.g. \"Photograph record (1936)\"" }
-              - label: "PDF file"
-                name: "file"
-                widget: "file"
-                media_folder: "/documents"
-                public_folder: "/documents"
-                hint: "Pick an existing PDF already on the site, or upload a new one."
 
   - name: "map_pins"
     label: "Map pins"

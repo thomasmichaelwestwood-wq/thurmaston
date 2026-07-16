@@ -2,7 +2,7 @@
 
 How photos get onto the live site — two ways: drop them into Google Drive
 (fully automated, one-time setup, described below), or add one directly
-through the admin at `/admin` (see "2c," below) when there's no Drive
+through the admin at `/admin` (see "2b," below) when there's no Drive
 involved — a photo someone's just handed you, say.
 
 ## 1. Drop photos into Google Drive
@@ -92,41 +92,15 @@ Every run, it:
    dated to when it was synced, plus coordinates if it was in a
    recognised place subfolder (see above).
 5. Netlify redeploys automatically, and the photo appears on the
-   homepage — searchable immediately, both in the photo archive's
-   own search box and in the site-wide search, with a "View on map"
-   link in its lightbox if it has a location, and a "View document"
-   link if a matching PDF was found (see 2a, below).
+   homepage, with its own dedicated page — searchable immediately,
+   both in the photo archive's own search box and in the site-wide
+   search, with a "View on map" link on its page if it has a location.
 
 No approval step in the middle — this is deliberately set up as a
 single-trusted-uploader pipeline (see "Who can upload," below), so
 anything dropped in goes live within a few minutes.
 
-## 2a. Attaching a supporting document to a photo (optional)
-
-Drop a PDF in the same folder as its photo, with the exact same
-filename (just `.pdf` instead of `.jpg`):
-
-```
-Streets & Buildings/
-├── Manor Hotel.jpg
-└── Manor Hotel.pdf   <- linked to the photo above
-```
-
-The sync script matches them by filename (both produce the same slug),
-publishes the PDF to `documents/` in this repo, and adds a `doc` field
-to that photo's entry in `photos.json`. The site then shows a small
-document-icon badge on the thumbnail and a "View document" link in the
-lightbox. Matching is done against the live `photos.json`, not just
-files from the same sync run, so the document can be added before or
-after the photo, in any later run.
-
-PDF only, deliberately — it's the one file type that can't be confused
-with a photo, so the script never has to guess which is which. If two
-different photos ever end up with the same name (unusual, but
-possible over a long archive), the document links to whichever of them
-is more recent.
-
-## 2b. The homepage hero banner
+## 2a. The homepage hero banner
 
 Photos in the **Hero images** folder skip the whole category/map/document
 pipeline — they go straight into `data/hero.json` and become the
@@ -138,16 +112,15 @@ works; the banner just rotates through whatever's in the list. Name
 them the same way as any other photo — the filename becomes the
 caption in the corner of the slide.
 
-## 2c. Adding a photo directly (skip Drive entirely)
+## 2b. Adding a photo directly (skip Drive entirely)
 
 Log into `/admin`, open the **Photos** collection, and click "New Photo."
 Upload the image, then fill in what you know — caption, category, date,
 credit, coordinates (paste straight from Google Maps, same as everywhere
 else on the site — right-click the spot, click the coordinates that pop
-up to copy, paste them in), location, history, a linked document, and a
-story page. Save, and it's live within a minute or two, no Drive step
-needed. Leave the "Internal" fields at the bottom alone — they fill
-themselves in.
+up to copy, paste them in), location, history, and a story page. Save,
+and it's live within a minute or two, no Drive step needed. Leave the
+"Internal" fields at the bottom alone — they fill themselves in.
 
 Good for a one-off (someone hands you a photo, a scan, something from a
 different source than the family archive) — for a batch, or anything
@@ -162,8 +135,8 @@ a caption, date, credit, location, or history, or add/correct the Google
 Maps coordinates, log into the admin at `/admin` and open the **Photos**
 collection — find the photo by its caption, edit the field, save. No
 need to touch any JSON file by hand. The `ref` field holds the untouched
-original filename (shown as a small tag in the lightbox) — leave it as-is
-unless it's wrong. The `consentNoted` field starts unticked for every
+original filename (shown as a small tag on the photo's own page) — leave
+it as-is unless it's wrong. The `consentNoted` field starts unticked for every
 auto-synced photo; tick it once you've confirmed it's fine to have public
 (see "Consent," below).
 

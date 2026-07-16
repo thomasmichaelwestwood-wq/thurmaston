@@ -9,14 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors'
   }).addTo(map);
 
-  mapEl.addEventListener("click", function (e) {
-    var photoBtn = e.target.closest(".map-popup-photo-btn");
-    if (photoBtn) {
-      if (typeof window.openPhotoById === "function") {
-        window.openPhotoById(photoBtn.dataset.photoId, true);
-      }
-      return;
-    }
+  mapEl.addEventListener("click", function () {
     map.scrollWheelZoom.enable();
   });
   mapEl.addEventListener("mouseleave", function () { map.scrollWheelZoom.disable(); });
@@ -47,14 +40,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function popupHtml(item) {
     var cat = MAP_CATEGORIES[item.category] || MAP_CATEGORIES.other;
-    var photo = item.photoSrc ?
-      '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(item.photoId || "") + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
+    var photo = item.photoSrc && item.photoId ?
+      '<a class="map-popup-photo-btn" href="place.html?photo=' + encodeURIComponent(item.photoId) + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
         '<img src="' + item.photoSrc + '" alt="">' +
-      '</button>' : "";
+      '</a>' : "";
     var subtitle = [item.period, item.location].filter(Boolean).join(" · ");
     var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
-    var pageLink = item.pageSlug ?
-      '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + (item.photoId ? "&photo=" + encodeURIComponent(item.photoId) : "") + '">Read the full story →</a>' : "";
+    // Only needed when there's no photo thumbnail to click through on —
+    // if there is one, it already links to place.html?photo=ID, which
+    // pulls in this same story page automatically via the photo's own
+    // pageSlug, so a second link to the same place would be redundant.
+    var pageLink = item.pageSlug && !photo ?
+      '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + '">Read the full story →</a>' : "";
     return (
       '<div class="map-popup">' +
         '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
@@ -197,12 +194,26 @@ document.addEventListener("DOMContentLoaded", function () {
         '<div class="map-popup">' +
           '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
           "<h3>" + escapeHtml(photo.caption) + "</h3>" +
-          '<button type="button" class="map-popup-photo-btn" data-photo-id="' + escapeHtml(photo.id) + '" aria-label="View photo: ' + escapeHtml(photo.caption) + '">' +
+          '<a class="map-popup-photo-btn" href="place.html?photo=' + encodeURIComponent(photo.id) + '" aria-label="View photo: ' + escapeHtml(photo.caption) + '">' +
             '<img src="' + photo.src + '" alt="">' +
-          "</button>" +
+          "</a>" +
           (subtitle ? '<p class="map-popup-period">' + escapeHtml(subtitle) + "</p>" : "") +
         "</div>"
       ).openPopup();
     });
   };
+
+  // A photo's "View on map" link (from place.html) lands here with
+  // ?photo=ID rather than opening the map from inside a modal on the
+  // same page like it used to — this is what makes that link actually
+  // fly to and highlight the right pin once it arrives.
+  var photoFlyParam = new URLSearchParams(location.search).get("photo");
+  if (photoFlyParam) {
+    photosPromise.then(function (photos) {
+      var target = photos.find(function (p) { return p.id === photoFlyParam; });
+      if (target && typeof target.lat === "number" && typeof target.lng === "number") {
+        window.flyToPhotoLocation(target.lat, target.lng, target);
+      }
+    });
+  }
 });
