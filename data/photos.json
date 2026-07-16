@@ -55,17 +55,18 @@
     "lng": -1.0973
   },
   {
-    "id": "14WfqyhV-010-dudley-row-1991",
     "src": "images/photos/14WfqyhV-010-dudley-row-1991.jpg",
     "caption": "Dudley Row 1991",
-    "ref": "010 Dudley Row 1991.jpg",
-    "category": "streets",
     "date": "Added July 2026",
-    "credit": "Unknown — needs a credit",
-    "consentNoted": false,
+    "ref": "010 Dudley Row 1991.jpg",
     "addedAt": "2026-07-15T13:38:18Z",
-    "lat": 52.68,
-    "lng": -1.0973
+    "location": "Melton Road",
+    "consentNoted": false,
+    "credit": "Unknown — needs a credit",
+    "id": "14WfqyhV-010-dudley-row-1991",
+    "category": "streets",
+    "lat": 52.68130974326725,
+    "lng": -1.0970173053889003
   },
   {
     "id": "1tomHUyG-344-white-hart-mercury-mot-1-11",
