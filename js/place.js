@@ -103,10 +103,58 @@ document.addEventListener("DOMContentLoaded", function () {
         '<p class="place-photo-panel-datelocation">' + escapeHtml([photo.date, photo.location].filter(Boolean).join(" · ")) + "</p>" +
         '<p class="place-photo-panel-meta">' + escapeHtml(metaParts.filter(Boolean).join(" · ")) + "</p>" +
         (photo.ref ? '<p class="place-photo-panel-ref">Ref: ' + escapeHtml(photo.ref) + "</p>" : "") +
-        (hasLocation ? '<a class="place-photo-panel-link" href="' + escapeAttr(mapUrl) + '">View on map →</a>' : "") +
+        (hasLocation ? '<div class="place-mini-map" id="place-mini-map"></div>' : "") +
+        (hasLocation ? '<a class="place-photo-panel-link" href="' + escapeAttr(mapUrl) + '">Explore the full map →</a>' : "") +
       "</div>";
     photoPanelEl.hidden = false;
     photoPanelEl.classList.add("visible");
+
+    if (hasLocation) renderMiniMap(photo, mapUrl);
+  }
+
+  // A small, non-interactive preview map right on the photo's own
+  // page — showing the building's actual location was a feature
+  // people liked on the old homepage map, so rather than only offer a
+  // text link through to map.html, this puts a real (if tiny) map
+  // right here too. Deliberately not pannable/zoomable (dragging,
+  // scroll-zoom and double-click-zoom all off) — it's a preview, not a
+  // navigable map; clicking it goes to map.html?photo=ID for the real
+  // thing, same as the text link below it. Reuses the same
+  // .map-pin/.map-pin-icon marker styling as map.html/category.html so
+  // a pin looks identical wherever it's seen.
+  function renderMiniMap(photo, mapUrl) {
+    var el = document.getElementById("place-mini-map");
+    if (!el || typeof L === "undefined") return;
+
+    var map = L.map(el, {
+      center: [photo.lat, photo.lng],
+      zoom: 16,
+      zoomControl: false,
+      scrollWheelZoom: false,
+      dragging: false,
+      doubleClickZoom: false,
+      attributionControl: false,
+      keyboard: false
+    });
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+
+    var color = (typeof MAP_CATEGORIES !== "undefined" && MAP_CATEGORIES[photo.category]) ? MAP_CATEGORIES[photo.category].color : "#2f6f9e";
+    var icon = L.divIcon({
+      className: "map-pin-icon",
+      html: '<span class="map-pin" style="--pin-color:' + color + '"></span>',
+      iconSize: [26, 34],
+      iconAnchor: [13, 34],
+      popupAnchor: [0, -30]
+    });
+    L.marker([photo.lat, photo.lng], { icon: icon, keyboard: false }).addTo(map);
+
+    el.style.cursor = "pointer";
+    el.setAttribute("role", "link");
+    el.setAttribute("aria-label", "View on the full interactive map");
+    el.addEventListener("click", function () { location.href = mapUrl; });
   }
 
   // Its own full-width, light-background section — easier to read a

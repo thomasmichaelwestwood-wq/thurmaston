@@ -694,6 +694,20 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .place-photo-panel-link:hover { text-decoration: underline; }
 
+/* A small, click-through-only preview map — not meant to be panned or
+   zoomed in place, so the cursor/hover treatment reads as "one big
+   button" rather than "a map you can't quite use." */
+.place-mini-map {
+  height: 160px;
+  width: 100%;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-top: 14px;
+  filter: saturate(0.9);
+  transition: filter 0.15s ease;
+}
+.place-mini-map:hover { filter: saturate(1.1) brightness(1.03); }
+
 @media (max-width: 640px) {
   .place-photo-panel { flex-direction: column; }
 }
