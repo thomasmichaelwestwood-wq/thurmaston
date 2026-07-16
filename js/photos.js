@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var lightboxViewDoc = lightbox.querySelector(".photo-lightbox-viewdoc");
   var lightboxViewPage = lightbox.querySelector(".photo-lightbox-viewpage");
   var lightboxSubmitPhotoId = lightbox.querySelector(".photo-lightbox-submit-photoid");
+  var lightboxSubmitRef = lightbox.querySelector(".photo-lightbox-submit-ref");
   var DOC_ICON = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg>';
   var docLightbox = document.getElementById("doc-lightbox");
   var docLightboxFrame = docLightbox.querySelector(".doc-lightbox-frame");
@@ -202,6 +203,7 @@ document.addEventListener("DOMContentLoaded", function () {
       lightboxRef.textContent = hasRef ? "Ref: " + photo.ref : "";
     }
     if (lightboxSubmitPhotoId) lightboxSubmitPhotoId.value = photo.id;
+    if (lightboxSubmitRef) lightboxSubmitRef.value = photo.ref || photo.caption || photo.id;
     history.replaceState(null, "", "#photo-" + photo.id);
 
     var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";

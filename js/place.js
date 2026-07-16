@@ -123,6 +123,10 @@ document.addEventListener("DOMContentLoaded", function () {
         '<form class="stack" action="#" method="post">' +
           '<input type="hidden" name="photo-id" value="' + escapeAttr(photo.id) + '">' +
           "<div>" +
+            '<label for="place-submit-ref">About this photo</label>' +
+            '<input type="text" id="place-submit-ref" name="photo-ref" value="' + escapeAttr(photo.ref || photo.caption || photo.id) + '" readonly>' +
+          "</div>" +
+          "<div>" +
             '<label for="place-submit-name">Your name</label>' +
             '<input type="text" id="place-submit-name" name="name" required>' +
           "</div>" +

@@ -1301,6 +1301,11 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 0.85rem;
   padding: 8px 10px;
 }
+.photo-lightbox-submit form.stack input[readonly] {
+  background: rgba(255,255,255,0.55);
+  color: #52584c;
+  cursor: default;
+}
 .photo-lightbox-submit .btn-primary {
   align-self: flex-start;
   padding: 9px 18px;
