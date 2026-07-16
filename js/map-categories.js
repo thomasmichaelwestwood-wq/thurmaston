@@ -7,6 +7,7 @@ const MAP_CATEGORIES = {
   people:  { label: "People", color: "#b9822f" },
   events:  { label: "Events", color: "#6b4c8a" },
   nature:  { label: "Nature & Views", color: "#2f7d5b" },
+  aerial:  { label: "Aerial", color: "#3f7ea6" },
   other:   { label: "Other", color: "#7a3b3b" },
   photo:   { label: "Photo", color: "#2f6f9e" }
 };

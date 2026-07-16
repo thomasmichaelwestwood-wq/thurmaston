@@ -3,6 +3,7 @@ const PHOTO_CATEGORIES = {
   people: { label: "People" },
   events: { label: "Events" },
   nature: { label: "Nature & Views" },
+  aerial: { label: "Aerial" },
   other: { label: "Other" }
 };
 

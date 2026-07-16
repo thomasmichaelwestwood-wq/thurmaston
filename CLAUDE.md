@@ -4,7 +4,7 @@ Static HTML/CSS/JS site (no build step) for the "Memories of Thurmaston" communi
 
 ## Site structure
 
-Five pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|events|nature|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), `place.html` (one template, driven primarily by `?photo=ID` — a dedicated page for *every* photo, not just ones with a hand-written story; `?slug=X` is optional/derived, see "Story pages" below), `contact.html`, and `admin/index.html` (the Decap CMS login/editor). There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
+Five pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|events|nature|aerial|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), `place.html` (one template, driven primarily by `?photo=ID` — a dedicated page for *every* photo, not just ones with a hand-written story; `?slug=X` is optional/derived, see "Story pages" below), `contact.html`, and `admin/index.html` (the Decap CMS login/editor). There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
 
 There is no photo lightbox/modal on `index.html`/`category.html` any more — clicking any photo thumbnail (grid, map popup) navigates straight to `place.html?photo=ID`, a real page. The only remaining modal on the site is the small "Know more about this photo?" popup on `place.html` itself (`.place-know-more-modal`, opened by `#place-know-more-btn`) — don't reintroduce a full-photo lightbox; that pattern was deliberately replaced because it was confusing for a non-technical user testing the site.
 
@@ -12,7 +12,7 @@ There is no photo lightbox/modal on `index.html`/`category.html` any more — cl
 
 ## Categorisation rule — always read from the Drive folder structure
 
-A photo's category (`streets`, `people`, `events`, `nature`, `other`) is decided **only** by which Drive subfolder it was uploaded into — that's what `CATEGORY_FOLDERS` in `automation/drive-photo-sync.gs.js` encodes, and it's already correct in `data/photos.json`.
+A photo's category (`streets`, `people`, `events`, `nature`, `aerial`, `other`) is decided **only** by which Drive subfolder it was uploaded into — that's what `CATEGORY_FOLDERS` in `automation/drive-photo-sync.gs.js` encodes, and it's already correct in `data/photos.json`.
 
 **Never recategorise based on what's visually in the photo.** The folder is the only signal that counts, in both directions:
 - A photo uploaded to "Streets & Buildings" stays `streets` even if a person appears in it.

@@ -2,11 +2,11 @@
  * Thurmaston Village — Google Drive → GitHub photo sync
  *
  * Watches the "Memories of Thurmaston Photos" Drive folder. Any image
- * dropped into one of its five category subfolders (Streets &
- * Buildings, People, Events, Nature & Views, Other) is automatically
- * resized down to a sensible web size, committed into the site repo,
- * and added to the photo archive — no chat session, no manual step,
- * runs on its own.
+ * dropped into one of its six category subfolders (Streets &
+ * Buildings, People, Events, Nature & Views, Aerial, Other) is
+ * automatically resized down to a sensible web size, committed into
+ * the site repo, and added to the photo archive — no chat session, no
+ * manual step, runs on its own.
  *
  * Optionally, a photo can also be placed on the site's interactive
  * Historic Map: inside a category folder, create a further subfolder
@@ -41,8 +41,8 @@
  *    property — never into a chat, an email, or committed to the repo.
  *
  * 4. Inside the "Memories of Thurmaston Photos" Drive folder, create
- *    six subfolders, spelled exactly:
- *      "Streets & Buildings", "People", "Events", "Nature & Views", "Other", "Hero images"
+ *    seven subfolders, spelled exactly:
+ *      "Streets & Buildings", "People", "Events", "Nature & Views", "Aerial", "Other", "Hero images"
  *    (If you already have an old "People & Events" folder from before
  *    it was split in two: rename it to "People", then create a new
  *    "Events" folder alongside it for anything more about an
@@ -157,6 +157,7 @@ var CATEGORY_FOLDERS = {
   "People": "people",
   "Events": "events",
   "Nature & Views": "nature",
+  "Aerial": "aerial",
   "Other": "other"
 };
 

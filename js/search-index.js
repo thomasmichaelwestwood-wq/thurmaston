@@ -9,7 +9,7 @@ const SITE_SEARCH_INDEX = [
   { title: "Historic Map", url: "index.html#map", category: "History",
     excerpt: "An interactive map of buildings and places that used to stand in Thurmaston." },
   { title: "Photo Archive", url: "index.html#photos", category: "History",
-    excerpt: "Old photographs of the village, organised by streets, people, nature and more." },
+    excerpt: "Old photographs of the village, organised by streets, people, nature, aerial and more." },
 
   { title: "Contact & Get Involved", url: "contact.html", category: "Contact",
     excerpt: "Get in touch with the village website team, report an issue, or volunteer." },

@@ -8,7 +8,7 @@ involved — a photo someone's just handed you, say.
 ## 1. Drop photos into Google Drive
 
 Inside the shared **"Memories of Thurmaston Photos"** folder, there are
-six subfolders:
+seven subfolders:
 
 ```
 Memories of Thurmaston Photos/
@@ -16,6 +16,7 @@ Memories of Thurmaston Photos/
 ├── People/
 ├── Events/
 ├── Nature & Views/
+├── Aerial/
 ├── Other/
 └── Hero images/
 ```
