@@ -103,6 +103,76 @@
   });
   CMS.registerPreviewTemplate("pages", PagePreview);
 
+  // Muted/greyed field widgets — for fields on the Photos collection
+  // that are usually fine left as they are (set automatically by the
+  // Drive sync, or rarely worth changing), so the one field that
+  // always needs an active decision (Category) stands out instead of
+  // competing with a form full of equally-weighted boxes. Built as
+  // real widgets via CMS.registerWidget, a core stable part of Decap's
+  // API, rather than trying to reach into and restyle Decap's own
+  // built-in field markup — that's not something Decap exposes a
+  // stable hook for, only custom widgets we write ourselves are ours
+  // to style. Only used for plain text/textarea/checkbox fields; the
+  // Photo and Document fields keep Decap's real upload widgets
+  // untouched rather than risk breaking the upload path over styling.
+  var MUTED_INPUT_STYLE = {
+    background: "#f1efe6",
+    color: "#8c8775",
+    border: "1px solid #e2ddc9"
+  };
+
+  var MutedStringControl = createClass({
+    handleChange: function (e) {
+      this.props.onChange(e.target.value);
+    },
+    render: function () {
+      return h("input", {
+        id: this.props.forID,
+        className: this.props.classNameWrapper,
+        type: "text",
+        value: this.props.value || "",
+        onChange: this.handleChange,
+        style: MUTED_INPUT_STYLE
+      });
+    }
+  });
+  CMS.registerWidget("muted-string", MutedStringControl);
+
+  var MutedTextControl = createClass({
+    handleChange: function (e) {
+      this.props.onChange(e.target.value);
+    },
+    render: function () {
+      return h("textarea", {
+        id: this.props.forID,
+        className: this.props.classNameWrapper,
+        rows: 4,
+        value: this.props.value || "",
+        onChange: this.handleChange,
+        style: MUTED_INPUT_STYLE
+      });
+    }
+  });
+  CMS.registerWidget("muted-text", MutedTextControl);
+
+  var MutedBooleanControl = createClass({
+    handleChange: function (e) {
+      this.props.onChange(e.target.checked);
+    },
+    render: function () {
+      return h("label", { style: { display: "flex", alignItems: "center", gap: "8px" } },
+        h("input", {
+          id: this.props.forID,
+          type: "checkbox",
+          checked: !!this.props.value,
+          onChange: this.handleChange
+        }),
+        h("span", { style: { fontSize: "0.85rem", color: MUTED_INPUT_STYLE.color } }, "Usually fine left as-is")
+      );
+    }
+  });
+  CMS.registerWidget("muted-boolean", MutedBooleanControl);
+
   var MapPinsPreview = createClass({
     render: function () {
       var pins = this.props.entry.getIn(["data", "pins"]);

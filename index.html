@@ -224,20 +224,9 @@
 
 <div class="photo-lightbox" id="photo-lightbox">
   <div class="photo-lightbox-inner">
-    <div class="photo-lightbox-media">
-      <img class="photo-lightbox-img" src="" alt="">
-    </div>
-    <div class="photo-lightbox-info">
-      <p class="photo-lightbox-caption"></p>
-      <p class="photo-lightbox-datelocation"></p>
-      <p class="photo-lightbox-meta"></p>
-      <p class="photo-lightbox-history"></p>
-      <p class="photo-lightbox-ref"></p>
-      <div class="photo-lightbox-minimap" id="photo-lightbox-minimap" title="Click to view on the full map"></div>
-      <div class="photo-lightbox-actions">
-        <button class="photo-lightbox-viewmap" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg> View on map</button>
-        <button class="photo-lightbox-viewdoc" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg> View document</button>
-        <a class="photo-lightbox-viewpage" href="#" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> Read full story</a>
+    <div class="photo-lightbox-left">
+      <div class="photo-lightbox-media">
+        <img class="photo-lightbox-img" src="" alt="">
       </div>
       <div class="photo-lightbox-submit">
         <h4>Know more about this photo?</h4>
@@ -261,8 +250,21 @@
             <input type="file" id="lb-submit-photo" name="photo" accept="image/*">
           </div>
           <button class="btn btn-primary" type="submit">Submit</button>
-          <p style="font-size:0.75rem;color:var(--ink-soft);margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
+          <p style="font-size:0.75rem;color:#c7d9c9;margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
         </form>
+      </div>
+    </div>
+    <div class="photo-lightbox-info">
+      <p class="photo-lightbox-caption"></p>
+      <p class="photo-lightbox-datelocation"></p>
+      <p class="photo-lightbox-meta"></p>
+      <p class="photo-lightbox-history"></p>
+      <p class="photo-lightbox-ref"></p>
+      <div class="photo-lightbox-minimap" id="photo-lightbox-minimap" title="Click to view on the full map"></div>
+      <div class="photo-lightbox-actions">
+        <button class="photo-lightbox-viewmap" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true"><path d="M12 2C7.6 2 4 5.6 4 10c0 6 8 12 8 12s8-6 8-12c0-4.4-3.6-8-8-8zm0 11a3 3 0 110-6 3 3 0 010 6z"/></svg> View on map</button>
+        <button class="photo-lightbox-viewdoc" type="button" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h7l5 5v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v5h5"/></svg> View document</button>
+        <a class="photo-lightbox-viewpage" href="#" hidden><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg> Read full story</a>
       </div>
     </div>
   </div>

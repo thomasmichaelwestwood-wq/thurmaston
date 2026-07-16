@@ -707,7 +707,6 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   box-shadow: var(--shadow-lg);
 }
 .place-submit.visible { display: block; }
-.place-submit .photo-lightbox-submit { margin-top: 0; padding-top: 0; border-top: none; }
 .place-submit form.stack { max-width: 480px; }
 
 /* Other archive photos sharing the same location as this page's photo
@@ -1152,9 +1151,17 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   text-align: left;
 }
 
-.photo-lightbox-media {
+.photo-lightbox-left {
   flex: 1 1 auto;
   min-width: 0;
+  max-height: 86vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.photo-lightbox-media {
   display: flex;
   justify-content: center;
 }
@@ -1239,10 +1246,18 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin-top: 14px;
 }
 
-.photo-lightbox-submit {
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid rgba(255,255,255,0.15);
+/* Floats in its own glass card under the photo, in the lightbox's left
+   column, separate from the facts sidebar (.photo-lightbox-info) — see
+   .photo-lightbox-left below. On the story page it's reused inside
+   .place-submit instead, which already provides that card treatment,
+   so no background/padding is baked in here by default. */
+.photo-lightbox-left .photo-lightbox-submit {
+  background: var(--glass-bg-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-dark);
+  border-radius: var(--radius);
+  padding: 16px 18px;
 }
 .photo-lightbox-submit h4 {
   color: #fff;
@@ -1280,6 +1295,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
     text-align: center;
     overflow-y: auto;
   }
+  .photo-lightbox-left { max-height: none; width: 100%; }
   .photo-lightbox-info { flex: none; width: 100%; max-height: none; }
   .photo-lightbox-actions { justify-content: center; }
 }
