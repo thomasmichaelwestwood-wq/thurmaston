@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var metaParts = [cat];
     if (photo.credit && photo.credit !== "—") metaParts.push("Credit: " + photo.credit);
     var hasLocation = typeof photo.lat === "number" && typeof photo.lng === "number";
-    var mapUrl = "index.html?photo=" + encodeURIComponent(photo.id) + "#map";
+    var mapUrl = "map.html?photo=" + encodeURIComponent(photo.id);
 
     photoPanelEl.innerHTML =
       '<div class="place-photo-panel-media">' +
