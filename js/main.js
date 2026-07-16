@@ -51,7 +51,16 @@ function initSearch() {
           title: p.caption,
           url: "place.html?photo=" + encodeURIComponent(p.id),
           category: "Photo",
-          excerpt: [p.date, p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · ")
+          excerpt: [p.date, p.location, p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · "),
+          // Matched against, but never shown — a photo's location
+          // ("Garden Street"), Dad's original filing reference, and
+          // any written History are all things a visitor might type
+          // that don't otherwise appear in the caption/date/credit
+          // shown as the title/excerpt above, so search would silently
+          // miss a real match (e.g. "garden" finding the caption
+          // "Garden Centre" but not a different photo whose only
+          // mention of "Garden" is its Location field).
+          keywords: [p.location, p.ref, p.history].filter(Boolean).join(" ")
         };
       });
       searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries);
@@ -76,7 +85,8 @@ function initSearch() {
       return (
         item.title.toLowerCase().indexOf(q) !== -1 ||
         item.excerpt.toLowerCase().indexOf(q) !== -1 ||
-        item.category.toLowerCase().indexOf(q) !== -1
+        item.category.toLowerCase().indexOf(q) !== -1 ||
+        (item.keywords && item.keywords.toLowerCase().indexOf(q) !== -1)
       );
     });
 
