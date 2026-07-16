@@ -4,7 +4,8 @@
    admin — see js/map.js, which fetches that file at runtime. */
 const MAP_CATEGORIES = {
   streets: { label: "Streets & Buildings", color: "#2c6b4f" },
-  people:  { label: "People & Events", color: "#b9822f" },
+  people:  { label: "People", color: "#b9822f" },
+  events:  { label: "Events", color: "#6b4c8a" },
   nature:  { label: "Nature & Views", color: "#2f7d5b" },
   other:   { label: "Other", color: "#7a3b3b" },
   photo:   { label: "Photo", color: "#2f6f9e" }

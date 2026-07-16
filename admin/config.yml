@@ -34,7 +34,8 @@ collections:
     # few hundred photos deep, not just searchable by caption text.
     view_filters:
       - { label: "Streets & Buildings", field: category, pattern: "streets" }
-      - { label: "People & Events", field: category, pattern: "people" }
+      - { label: "People", field: category, pattern: "people" }
+      - { label: "Events", field: category, pattern: "events" }
       - { label: "Nature & Views", field: category, pattern: "nature" }
       - { label: "Other", field: category, pattern: "other" }
     view_groups:
@@ -52,7 +53,8 @@ collections:
         widget: "select"
         options:
           - { label: "Streets & Buildings", value: "streets" }
-          - { label: "People & Events", value: "people" }
+          - { label: "People", value: "people" }
+          - { label: "Events", value: "events" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
       - { label: "Date", name: "date", widget: "muted-string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
@@ -156,7 +158,8 @@ collections:
                 widget: "select"
                 options:
                   - { label: "Streets & Buildings", value: "streets" }
-                  - { label: "People & Events", value: "people" }
+                  - { label: "People", value: "people" }
+                  - { label: "Events", value: "events" }
                   - { label: "Nature & Views", value: "nature" }
                   - { label: "Other", value: "other" }
               - label: "Google Maps coordinates"

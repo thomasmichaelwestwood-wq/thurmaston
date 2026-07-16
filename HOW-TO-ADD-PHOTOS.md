@@ -6,10 +6,11 @@ on the site automatically within a few minutes.
 
 ## 1. Pick the right folder
 
-Inside **"Memories of Thurmaston Photos"**, there are four folders:
+Inside **"Memories of Thurmaston Photos"**, there are five folders:
 
 - **Streets & Buildings** — shops, houses, roads, the church, anything built
-- **People & Events** — people, gatherings, celebrations, fetes
+- **People** — portraits, individuals, small groups
+- **Events** — gatherings, celebrations, fetes
 - **Nature & Views** — the park, the river, fields, general scenery
 - **Other** — anything that doesn't fit the above
 

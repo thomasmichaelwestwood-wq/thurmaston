@@ -2,8 +2,8 @@
  * Thurmaston Village — Google Drive → GitHub photo sync
  *
  * Watches the "Memories of Thurmaston Photos" Drive folder. Any image
- * dropped into one of its four category subfolders (Streets &
- * Buildings, People & Events, Nature & Views, Other) is automatically
+ * dropped into one of its five category subfolders (Streets &
+ * Buildings, People, Events, Nature & Views, Other) is automatically
  * resized down to a sensible web size, committed into the site repo,
  * and added to the photo archive — no chat session, no manual step,
  * runs on its own.
@@ -41,8 +41,15 @@
  *    property — never into a chat, an email, or committed to the repo.
  *
  * 4. Inside the "Memories of Thurmaston Photos" Drive folder, create
- *    five subfolders, spelled exactly:
- *      "Streets & Buildings", "People & Events", "Nature & Views", "Other", "Hero images"
+ *    six subfolders, spelled exactly:
+ *      "Streets & Buildings", "People", "Events", "Nature & Views", "Other", "Hero images"
+ *    (If you already have an old "People & Events" folder from before
+ *    it was split in two: rename it to "People", then create a new
+ *    "Events" folder alongside it for anything more about an
+ *    occasion/gathering than a specific person. The sync script still
+ *    understands the old "People & Events" name too, so nothing breaks
+ *    if you haven't got round to the rename yet — but new uploads
+ *    there will keep going into "People" until you do.)
  *    Each subfolder (and the top-level folder itself) needs sharing set
  *    to "Anyone with the link" so the resize step below can fetch the
  *    image — file contents never become public any other way, since
@@ -161,7 +168,13 @@
 
 var CATEGORY_FOLDERS = {
   "Streets & Buildings": "streets",
+  // "People & Events" is being split into two folders, "People" and
+  // "Events" — keeping the old name mapped too so nothing is silently
+  // miscategorised as "Other" in the gap before that Drive folder is
+  // actually renamed/split by hand.
   "People & Events": "people",
+  "People": "people",
+  "Events": "events",
   "Nature & Views": "nature",
   "Other": "other"
 };

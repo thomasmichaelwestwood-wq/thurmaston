@@ -1,6 +1,7 @@
 const PHOTO_CATEGORIES = {
   streets: { label: "Streets & Buildings" },
-  people: { label: "People & Events" },
+  people: { label: "People" },
+  events: { label: "Events" },
   nature: { label: "Nature & Views" },
   other: { label: "Other" }
 };

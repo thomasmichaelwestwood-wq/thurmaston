@@ -4,17 +4,19 @@ Static HTML/CSS/JS site (no build step) for the "Memories of Thurmaston" communi
 
 ## Site structure
 
-Five pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|nature|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), `place.html` (one template driven by `?slug=X`, a dedicated story page for a building/place — see "Story pages" below), `contact.html`, and `admin/index.html` (the Decap CMS login/editor). There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
+Five pages: `index.html` (homepage — hero banner, short intro, photo archive tiles, full historic map with all categories, shared memories, share-a-memory form), `category.html` (one template driven by `?cat=streets|people|events|nature|other`, showing the map and photo grid locked to a single category — linked from the homepage's photo archive tiles), `place.html` (one template driven by `?slug=X`, a dedicated story page for a building/place — see "Story pages" below), `contact.html`, and `admin/index.html` (the Decap CMS login/editor). There used to be a separate `memories.html`; it was merged into `index.html` so the site lands directly on that content instead of a separate homepage. Don't recreate a `memories.html` — anything that used to link there should point at `index.html` (with `#photos`, `#map`, or `#share` anchors as needed).
 
 `js/photos.js` and `js/map.js` are shared by all pages that use them. A page sets `window.LOCKED_CATEGORY = "streets"` (etc.) in an inline `<script>` before loading `photos.js`/`map.js` to lock both to one category; `index.html` doesn't set it, so it shows everything. Don't fork these scripts per-page — extend the shared ones.
 
 ## Categorisation rule — always read from the Drive folder structure
 
-A photo's category (`streets`, `people`, `nature`, `other`) is decided **only** by which Drive subfolder it was uploaded into — that's what `CATEGORY_FOLDERS` in `automation/drive-photo-sync.gs.js` encodes, and it's already correct in `data/photos.json`.
+A photo's category (`streets`, `people`, `events`, `nature`, `other`) is decided **only** by which Drive subfolder it was uploaded into — that's what `CATEGORY_FOLDERS` in `automation/drive-photo-sync.gs.js` encodes, and it's already correct in `data/photos.json`.
 
 **Never recategorise based on what's visually in the photo.** The folder is the only signal that counts, in both directions:
 - A photo uploaded to "Streets & Buildings" stays `streets` even if a person appears in it.
-- A photo uploaded to "People & Events" stays `people` even if a building is visible behind them.
+- A photo uploaded to "People" stays `people` even if a building is visible behind them, and a photo uploaded to "Events" stays `events` even if it's mostly one person's portrait — the split between the two is itself a judgement call made once, at upload time, by whoever's filing it; it isn't something this codebase should try to re-derive later from a caption or a photo's contents.
+
+`people`/`events` started as one Drive folder ("People & Events") and got split into two ("People" and "Events") — `CATEGORY_FOLDERS` still maps the old folder name too, so nothing breaks if that Drive folder hasn't actually been renamed/split yet. Existing photos already categorised `people` were **not** retroactively reclassified into `events` when this split happened — that would mean guessing at photo content, which is exactly the thing this rule exists to prevent. They can be moved by hand later (Category dropdown, Photos collection in the admin) by someone who can actually see what's in them.
 
 When adding or editing anything that assigns a category by hand (e.g. `data/map-pins.json` entries for the Historic Map), copy the category straight from that photo's existing entry in `data/photos.json` rather than guessing from the subject matter.
 

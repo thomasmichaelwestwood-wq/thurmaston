@@ -8,16 +8,23 @@ involved — a photo someone's just handed you, say.
 ## 1. Drop photos into Google Drive
 
 Inside the shared **"Memories of Thurmaston Photos"** folder, there are
-five subfolders:
+six subfolders:
 
 ```
 Memories of Thurmaston Photos/
 ├── Streets & Buildings/
-├── People & Events/
+├── People/
+├── Events/
 ├── Nature & Views/
 ├── Other/
 └── Hero images/
 ```
+
+**People vs Events:** People is for portraits, individuals, and small
+groups; Events is for gatherings, celebrations, fetes, and other
+occasions. If a photo could go either way, go with whichever it's more
+*about* — a photo of the fete committee lined up for a portrait is
+People, a photo of the fete itself in full swing is Events.
 
 Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
@@ -58,7 +65,7 @@ Nature & Views/
 ├── River Soar/
 └── (loose photos)
 
-People & Events/
+Events/
 ├── Elizabeth Park/
 └── (loose photos)
 ```
@@ -73,7 +80,7 @@ A small script (`automation/drive-photo-sync.gs.js` in this repo) runs on
 a 5-minute timer, independent of any chat session or person being online.
 Every run, it:
 
-1. Looks for any image in the four subfolders it hasn't seen before.
+1. Looks for any image in the category subfolders it hasn't seen before.
 2. Resizes it down to a sensible web size (longest edge ~1600px), via
    a free image-resizing service — Apps Script can't resize images
    itself, so it hands the job off rather than publishing full-size
