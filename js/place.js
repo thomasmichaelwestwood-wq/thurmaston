@@ -163,8 +163,11 @@ document.addEventListener("DOMContentLoaded", function () {
     btn.disabled = true;
     btn.textContent = "Preparing PDF…";
 
-    loadImageElement(photo.src).catch(function () { return null; }).then(function (img) {
-      buildPhotoPdf(photo, page, img).save(pdfFilename(photo) + ".pdf");
+    Promise.all([
+      loadImageElement(photo.src).catch(function () { return null; }),
+      buildQrPngDataUrl(photoPageUrl(photo))
+    ]).then(function (results) {
+      buildPhotoPdf(photo, page, results[0], results[1]).save(pdfFilename(photo) + ".pdf");
     }).catch(function () {
       alert("Sorry, something went wrong making that PDF.");
     }).then(function () {
@@ -194,18 +197,78 @@ document.addEventListener("DOMContentLoaded", function () {
     return base || "photo";
   }
 
-  function buildPhotoPdf(photo, page, img) {
+  // Absolute, not relative — this ends up in a QR code someone scans
+  // from a printed page with no browser context to resolve a relative
+  // URL against. Built from location.origin rather than a hardcoded
+  // domain so it's automatically correct on production, a branch
+  // deploy preview, or any future custom domain.
+  function photoPageUrl(photo) {
+    return location.origin + "/place.html?photo=" + encodeURIComponent(photo.id);
+  }
+
+  // qrcode-generator's own createDataURL() actually returns a GIF, not
+  // a PNG despite the name — and PDF has no native GIF image filter, so
+  // handing that straight to jsPDF forces it to silently decode and
+  // re-encode as JPEG to embed it, which risks softening the sharp
+  // module edges a scanner depends on. Redrawing it into an off-DOM
+  // canvas 1:1 (imageSmoothingEnabled off, so no blur is added here
+  // either) and reading it back out as a real PNG keeps the whole path
+  // lossless, matching the crisp black/white a QR code needs.
+  function buildQrPngDataUrl(text) {
+    if (typeof window.qrcode !== "function") return Promise.resolve(null);
+    var gifDataUrl;
+    try {
+      var qr = window.qrcode(0, "M");
+      qr.addData(text);
+      qr.make();
+      gifDataUrl = qr.createDataURL(8, 4);
+    } catch (e) {
+      return Promise.resolve(null);
+    }
+    return new Promise(function (resolve) {
+      var img = new Image();
+      img.onload = function () {
+        var canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        var ctx = canvas.getContext("2d");
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+      };
+      img.onerror = function () { resolve(null); };
+      img.src = gifDataUrl;
+    });
+  }
+
+  function buildPhotoPdf(photo, page, img, qrDataUrl) {
     var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
     var pageWidth = doc.internal.pageSize.getWidth();
     var margin = 18;
     var maxWidth = pageWidth - margin * 2;
     var y = margin;
 
+    // A small QR code in the top-right corner of a printed page, so
+    // someone holding a paper copy can scan straight back to this photo
+    // online — printed on the first page only, same as a letterhead.
+    var qrSize = 26;
+    var titleMaxWidth = maxWidth;
+    if (qrDataUrl) {
+      titleMaxWidth = maxWidth - qrSize - 6;
+      doc.addImage(qrDataUrl, "PNG", pageWidth - margin - qrSize, margin, qrSize, qrSize);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      doc.text("Scan to view online", pageWidth - margin - qrSize / 2, margin + qrSize + 4, { align: "center" });
+      doc.setTextColor(0);
+    }
+
     doc.setFont("helvetica", "bold");
     doc.setFontSize(18);
-    var titleLines = doc.splitTextToSize(photo.caption || "Untitled photo", maxWidth);
+    var titleLines = doc.splitTextToSize(photo.caption || "Untitled photo", titleMaxWidth);
     doc.text(titleLines, margin, y);
     y += titleLines.length * 8 + 4;
+    if (qrDataUrl) y = Math.max(y, margin + qrSize + 10);
 
     if (img) {
       var ratio = img.naturalHeight / img.naturalWidth;
@@ -252,8 +315,11 @@ document.addEventListener("DOMContentLoaded", function () {
     // Stamped on every page (not just the last) — ensureSpace() can add
     // more than one for a photo with a long History or story, and the
     // contact line should still be there wherever the PDF gets printed
-    // from or how far someone scrolls.
-    var footerText = "Memories of Thurmaston — memoriesofthurmaston.netlify.app  ·  Questions? memories@thurmaston.com";
+    // from or how far someone scrolls. location.host (not a hardcoded
+    // domain) so this is automatically correct on production, a branch
+    // deploy preview, or any future custom domain — same reasoning as
+    // photoPageUrl() above.
+    var footerText = "Memories of Thurmaston — " + location.host + "  ·  Questions? memories@thurmaston.com";
     var totalPages = doc.internal.getNumberOfPages();
     for (var i = 1; i <= totalPages; i++) {
       doc.setPage(i);
