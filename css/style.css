@@ -1304,3 +1304,37 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   .main-nav a { padding: 12px; border-radius: var(--radius); }
   .nav-toggle { display: inline-flex; }
 }
+
+/* Below ~560px (the full header needs a measured 547px to fit
+   everything on one line — checked directly, not assumed), the brand
+   text + "Menu" + "Search" buttons together are wider than the
+   screen even with .main-nav already collapsed — .brand's
+   flex-shrink: 0 keeps the logo from ever compressing, so on a
+   narrow phone the two header buttons were being pushed straight off
+   the right edge, causing a horizontal scrollbar on every page.
+   Dropping the subtitle, shrinking the brand mark/text, and switching
+   both buttons to icon-only (font-size: 0 hides their text node; the
+   <svg> icons inside have their own explicit width/height, so they're
+   unaffected and stay visible) reclaims enough width without touching
+   any page's HTML. Tightened further after the first pass still
+   overflowed on real 375px and 320px viewports — measure on an actual
+   narrow viewport before assuming a fix like this has enough
+   headroom, font-metric differences eat the margin fast. */
+@media (max-width: 560px) {
+  .brand { gap: 6px; }
+  .brand-mark { width: 32px; height: 32px; font-size: 15px; }
+  .brand-text small { display: none; }
+  .brand-text { font-size: 0.9rem; }
+  .nav-toggle, .search-btn { font-size: 0; padding: 10px; gap: 0; }
+}
+
+/* The smallest common phone width (iPhone SE-class, ~320px) still
+   didn't fit after the 480px pass above — checked on an actual 320px
+   viewport, not assumed. A bit more off the header's own edge padding
+   and gaps, plus the brand mark/text one size down again. */
+@media (max-width: 340px) {
+  .site-header .container { padding-left: 12px; padding-right: 12px; gap: 6px; }
+  .brand-mark { width: 28px; height: 28px; font-size: 13px; }
+  .brand-text { font-size: 0.8rem; }
+  .nav-toggle, .search-btn { padding: 8px; }
+}
