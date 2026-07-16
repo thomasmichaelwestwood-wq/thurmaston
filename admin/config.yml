@@ -67,15 +67,6 @@ collections:
         pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "muted-string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "muted-text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
-      - label: "Full story page"
-        name: "pageSlug"
-        widget: "relation"
-        collection: "pages"
-        search_fields: ["title"]
-        value_field: "{{slug}}"
-        display_fields: ["title"]
-        required: false
-        hint: "Optional — pick one of your Story pages to add a \"Read the full story\" button to this photo, AND show this photo's own caption/date/location/category/credit/history at the top of that page automatically (no need to retype any of that into the page itself — its \"Content\" is just for the extra story beyond those facts). Page you want isn't listed yet? Open the \"Story pages\" collection (left sidebar), create it there and save, then come back here and pick it — and don't forget this step, or the page and photo won't show each other's link."
       - { label: "Consent noted", name: "consentNoted", widget: "muted-boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
       - { label: "Internal — reference code", name: "ref", widget: "muted-string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
       - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
@@ -83,7 +74,7 @@ collections:
 
   - name: "pages"
     label: "Story pages"
-    description: "Dedicated pages for buildings or places — linked from a map pin or a photo's \"Read full story\" button. That linked photo's own caption/date/location/category/credit/history already show automatically at the top of the page — no need to retype them here as Content, that's just for the extra story beyond those facts."
+    description: "Dedicated pages for buildings or places, linked from a Map pin's \"Full story page\" field. Every photo already gets its own page automatically (no setup needed here) — this collection is only for extra written content about a place, shown above the automatic facts on that page."
     folder: "data/pages"
     create: true
     delete: true

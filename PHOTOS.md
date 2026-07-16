@@ -118,9 +118,10 @@ Log into `/admin`, open the **Photos** collection, and click "New Photo."
 Upload the image, then fill in what you know — caption, category, date,
 credit, coordinates (paste straight from Google Maps, same as everywhere
 else on the site — right-click the spot, click the coordinates that pop
-up to copy, paste them in), location, history, and a story page. Save,
-and it's live within a minute or two, no Drive step needed. Leave the
-"Internal" fields at the bottom alone — they fill themselves in.
+up to copy, paste them in), location, and history. Save, and it's live
+within a minute or two, no Drive step needed — the photo gets its own
+page automatically, no extra step required. Leave the "Internal" fields
+at the bottom alone — they fill themselves in.
 
 Good for a one-off (someone hands you a photo, a scan, something from a
 different source than the family archive) — for a batch, or anything

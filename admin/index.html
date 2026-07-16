@@ -91,7 +91,7 @@
                 var photo = photos.filter(function (p) { return p.id === photoId; })[0];
                 if (!photo) return h("p", { key: i, style: { color: "#a33" } }, "Photo not found for ID: " + photoId);
                 return h("a", { key: i, className: "place-photo-block" },
-                  h("img", { src: photo.src, alt: photo.caption }),
+                  h("img", { src: "/" + photo.src, alt: photo.caption }),
                   h("span", { className: "place-photo-caption" }, photo.caption)
                 );
               }
@@ -186,7 +186,7 @@
           },
             h("span", { className: "map-popup-cat" }, pin.get("category")),
             h("h3", {}, pin.get("name") || "Untitled pin"),
-            pin.get("photoSrc") ? h("img", { src: pin.get("photoSrc"), style: { width: "100%", borderRadius: "6px", display: "block", margin: "6px 0" } }) : null,
+            pin.get("photoSrc") ? h("img", { src: "/" + pin.get("photoSrc"), style: { width: "100%", borderRadius: "6px", display: "block", margin: "6px 0" } }) : null,
             h("p", { className: "map-popup-period" }, [pin.get("period"), pin.get("location")].filter(Boolean).join(" · ")),
             pin.get("description") ? h("p", {}, pin.get("description")) : null,
             pin.get("pageSlug") ? h("a", { className: "map-popup-page-link" }, "Read the full story →") : null
@@ -216,7 +216,15 @@
       return h("div", { className: "content-section container" },
         h("div", { className: "place-photo-panel visible" },
           h("div", { className: "place-photo-panel-media" },
-            src ? h("img", { src: "/" + src, alt: caption }) : null
+            // getAsset (not a plain "/" + src concatenation) is Decap's
+            // documented way to resolve an image field's preview URL —
+            // it's the only thing that works for BOTH an already-saved
+            // photo (a plain repo path) and one just picked in this same
+            // session but not committed yet (a local blob URL); string-
+            // concatenating the raw field value only ever worked for the
+            // first case, which is why a freshly uploaded photo showed
+            // no preview image until after saving.
+            src ? h("img", { src: this.props.getAsset(src), alt: caption }) : null
           ),
           h("div", { className: "place-photo-panel-info" },
             h("p", { className: "place-photo-panel-caption" }, caption),
