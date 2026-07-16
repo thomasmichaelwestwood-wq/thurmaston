@@ -197,13 +197,25 @@ document.addEventListener("DOMContentLoaded", function () {
     return base || "photo";
   }
 
+  function downloadedDateLabel() {
+    return new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  }
+
+  // Hardcoded rather than derived from location.origin, on purpose:
+  // the site is still on its temporary Netlify address, but this is
+  // where it's moving once the real domain is set up — deliberately
+  // pre-baking the intended permanent address into every PDF now
+  // rather than the here-today address, so PDFs already downloaded and
+  // printed still point somewhere real once that move happens. Update
+  // this one constant when the domain is live (and swap the email in
+  // the footer below too, if that ever changes).
+  var SITE_URL = "https://www.thurmaston.com";
+
   // Absolute, not relative — this ends up in a QR code someone scans
   // from a printed page with no browser context to resolve a relative
-  // URL against. Built from location.origin rather than a hardcoded
-  // domain so it's automatically correct on production, a branch
-  // deploy preview, or any future custom domain.
+  // URL against.
   function photoPageUrl(photo) {
-    return location.origin + "/place.html?photo=" + encodeURIComponent(photo.id);
+    return SITE_URL + "/place.html?photo=" + encodeURIComponent(photo.id);
   }
 
   // qrcode-generator's own createDataURL() actually returns a GIF, not
@@ -259,7 +271,13 @@ document.addEventListener("DOMContentLoaded", function () {
       doc.setFont("helvetica", "normal");
       doc.setFontSize(7);
       doc.setTextColor(120);
-      doc.text("Scan to view online", pageWidth - margin - qrSize / 2, margin + qrSize + 4, { align: "center" });
+      var qrCaptionX = pageWidth - margin - qrSize / 2;
+      doc.text("Scan to view online", qrCaptionX, margin + qrSize + 4, { align: "center" });
+      // The site's content can change after this PDF is downloaded —
+      // this date, next to the "scan for the live version" QR code, is
+      // what tells someone reading a printed copy later that it might
+      // be out of date, and exactly how to check.
+      doc.text("Downloaded " + downloadedDateLabel(), qrCaptionX, margin + qrSize + 8, { align: "center" });
       doc.setTextColor(0);
     }
 
@@ -268,7 +286,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var titleLines = doc.splitTextToSize(photo.caption || "Untitled photo", titleMaxWidth);
     doc.text(titleLines, margin, y);
     y += titleLines.length * 8 + 4;
-    if (qrDataUrl) y = Math.max(y, margin + qrSize + 10);
+    if (qrDataUrl) y = Math.max(y, margin + qrSize + 13);
 
     if (img) {
       var ratio = img.naturalHeight / img.naturalWidth;
@@ -315,11 +333,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Stamped on every page (not just the last) — ensureSpace() can add
     // more than one for a photo with a long History or story, and the
     // contact line should still be there wherever the PDF gets printed
-    // from or how far someone scrolls. location.host (not a hardcoded
-    // domain) so this is automatically correct on production, a branch
-    // deploy preview, or any future custom domain — same reasoning as
-    // photoPageUrl() above.
-    var footerText = "Memories of Thurmaston — " + location.host + "  ·  Questions? memories@thurmaston.com";
+    // from or how far someone scrolls. Uses SITE_URL, the same intended
+    // permanent address as the QR code above, not wherever this PDF
+    // actually happened to be generated from.
+    var footerText = "Memories of Thurmaston — " + SITE_URL.replace(/^https?:\/\//, "") + "  ·  Questions? memories@thurmaston.com";
     var totalPages = doc.internal.getNumberOfPages();
     for (var i = 1; i <= totalPages; i++) {
       doc.setPage(i);
