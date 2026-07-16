@@ -58,16 +58,19 @@
     </div>
   </section>
 
-  <div class="container" style="padding:40px 20px 0">
+  <section class="category-search-bar container" style="padding-top:32px">
+    <label for="home-search-input" class="category-search-label">Search the archive</label>
+    <input type="text" id="home-search-input" class="photo-search-input photo-search-input-wide" placeholder="Search by caption, street, name or date…" autocomplete="off">
+    <ul id="home-search-results" class="home-search-results"></ul>
+  </section>
+
+  <div class="container" style="padding:24px 20px 0">
     <p class="tiles-lede" style="margin:0 auto">A community archive of old photographs, personal stories and local history — built by the people who lived it. Browse the photo archive, explore the interactive map of buildings that used to stand in the village, or share a memory of your own below.</p>
   </div>
 
   <section class="content-section container" id="photos">
     <h2>Photo archive</h2>
-    <p>The latest additions to the archive.</p>
-    <div class="photo-grid" id="recent-photo-grid"></div>
-
-    <h3 style="margin-top:32px">Browse by category</h3>
+    <p>Pick a category to browse its photos.</p>
     <div class="photo-filters" id="photo-filters">
       <a href="category.html?cat=streets" data-category="streets"><span>Streets &amp; Buildings</span></a>
       <a href="category.html?cat=people" data-category="people"><span>People</span></a>

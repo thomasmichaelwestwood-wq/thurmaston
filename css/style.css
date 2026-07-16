@@ -971,6 +971,29 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 .photo-search-input-wide { max-width: none; }
 
+/* Results dropdown for the homepage's own search box — empty (no
+   query yet) renders no box at all via :not(:empty), same idea as the
+   overlay's #site-search-results but inline on the page instead of in
+   a modal, so it needs its own container styling. */
+.home-search-results {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+.home-search-results:not(:empty) {
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  padding: 6px;
+  box-shadow: var(--shadow);
+}
+.home-search-results li { border-top: 1px solid var(--line); }
+.home-search-results li:first-child { border-top: none; }
+.home-search-results a { display: block; padding: 12px 10px; text-decoration: none; }
+.home-search-results a:hover { background: var(--green-100); border-radius: 6px; }
+
 /* ---------- Photo archive ---------- */
 
 .photo-search-input {

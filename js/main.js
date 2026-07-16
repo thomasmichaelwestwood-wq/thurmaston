@@ -34,43 +34,19 @@ function initHero() {
     });
 }
 
+// Two search boxes can exist on one page now — the header's icon-
+// triggered overlay (every page) and, on the homepage only, a second
+// one sitting right under the hero (#home-search-input/-results). Both
+// search the same combined index (SITE_SEARCH_INDEX + every photo), so
+// the index and the matching/rendering logic are built once here and
+// shared, rather than duplicated per box.
 function initSearch() {
-  var openBtns = document.querySelectorAll("[data-search-open]");
-  var overlay = document.querySelector(".search-overlay");
-  if (!overlay) return;
-  var closeBtn = overlay.querySelector(".search-close");
-  var input = overlay.querySelector("#site-search-input");
-  var resultsList = overlay.querySelector("#site-search-results");
+  var searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.slice() : [];
+  var boxes = [];
 
-  openBtns.forEach(function (btn) {
-    btn.addEventListener("click", function () {
-      overlay.classList.add("open");
-      input.value = "";
-      renderResults("");
-      setTimeout(function () { input.focus(); }, 30);
-    });
-  });
-
-  closeBtn.addEventListener("click", closeOverlay);
-  overlay.addEventListener("click", function (e) {
-    if (e.target === overlay) closeOverlay();
-  });
-  document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && overlay.classList.contains("open")) closeOverlay();
-  });
-
-  function closeOverlay() {
-    overlay.classList.remove("open");
-  }
-
-  input.addEventListener("input", function () {
-    renderResults(input.value.trim());
-  });
-
-  var photoSearchEntries = [];
   if (typeof PHOTOS_DATA_PROMISE !== "undefined") {
     PHOTOS_DATA_PROMISE.then(function (photos) {
-      photoSearchEntries = photos.map(function (p) {
+      var photoEntries = photos.map(function (p) {
         return {
           title: p.caption,
           url: "place.html?photo=" + encodeURIComponent(p.id),
@@ -78,24 +54,25 @@ function initSearch() {
           excerpt: [p.date, p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · ")
         };
       });
-      if (input.value.trim()) renderResults(input.value.trim());
+      searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries);
+      boxes.forEach(function (box) { box.refresh(); });
     });
   }
 
-  function renderResults(query) {
+  function renderResultsInto(resultsList, query, emptyHint) {
     resultsList.innerHTML = "";
-    var index = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.concat(photoSearchEntries) : photoSearchEntries;
 
     if (!query) {
+      if (!emptyHint) return;
       var hint = document.createElement("li");
       hint.className = "search-hint";
-      hint.textContent = "Search the village website — try “parish council”, “library” or “events”.";
+      hint.textContent = emptyHint;
       resultsList.appendChild(hint);
       return;
     }
 
     var q = query.toLowerCase();
-    var matches = index.filter(function (item) {
+    var matches = searchIndex.filter(function (item) {
       return (
         item.title.toLowerCase().indexOf(q) !== -1 ||
         item.excerpt.toLowerCase().indexOf(q) !== -1 ||
@@ -123,6 +100,60 @@ function initSearch() {
       resultsList.appendChild(li);
     });
   }
+
+  // Wires one input+results pair up to the shared index, and returns a
+  // handle with .refresh() so callers (the overlay's open button) can
+  // force a re-render — e.g. after the index gains its photo entries,
+  // or when the overlay opens with whatever query was left in it.
+  function wireSearchBox(input, resultsList, emptyHint) {
+    if (!input || !resultsList) return null;
+    var box = { refresh: function () { renderResultsInto(resultsList, input.value.trim(), emptyHint); } };
+    boxes.push(box);
+    input.addEventListener("input", box.refresh);
+    return box;
+  }
+
+  var overlay = document.querySelector(".search-overlay");
+  if (overlay) {
+    var openBtns = document.querySelectorAll("[data-search-open]");
+    var closeBtn = overlay.querySelector(".search-close");
+    var overlayInput = overlay.querySelector("#site-search-input");
+    var overlayBox = wireSearchBox(
+      overlayInput,
+      overlay.querySelector("#site-search-results"),
+      "Search the village website — try “parish council”, “library” or “events”."
+    );
+
+    openBtns.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        overlay.classList.add("open");
+        overlayInput.value = "";
+        if (overlayBox) overlayBox.refresh();
+        setTimeout(function () { overlayInput.focus(); }, 30);
+      });
+    });
+
+    closeBtn.addEventListener("click", closeOverlay);
+    overlay.addEventListener("click", function (e) {
+      if (e.target === overlay) closeOverlay();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && overlay.classList.contains("open")) closeOverlay();
+    });
+  }
+
+  function closeOverlay() {
+    overlay.classList.remove("open");
+  }
+
+  // The homepage's own search box, sitting right under the hero —
+  // present only on index.html, so this is a no-op (wireSearchBox
+  // bails on missing elements) everywhere else.
+  wireSearchBox(
+    document.getElementById("home-search-input"),
+    document.getElementById("home-search-results"),
+    null
+  );
 }
 
 function escapeHtml(str) {
