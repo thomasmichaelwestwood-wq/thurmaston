@@ -5,7 +5,6 @@
 <title>Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="Old photographs, personal stories, shared history and an interactive map of Thurmaston, Leicestershire.">
-<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -54,7 +53,7 @@
       <p>The history of our village</p>
       <div class="hero-cta">
         <a class="btn btn-primary" href="#photos">Browse the photo archive</a>
-        <a class="btn btn-outline" href="#map">See the historic map</a>
+        <a class="btn btn-outline" href="map.html">See the historic map</a>
       </div>
     </div>
   </section>
@@ -65,8 +64,10 @@
 
   <section class="content-section container" id="photos">
     <h2>Photo archive</h2>
-    <p>Pick a category to browse its photos alongside the historic map.</p>
+    <p>The latest additions to the archive.</p>
+    <div class="photo-grid" id="recent-photo-grid"></div>
 
+    <h3 style="margin-top:32px">Browse by category</h3>
     <div class="photo-filters" id="photo-filters">
       <a href="category.html?cat=streets" data-category="streets"><span>Streets &amp; Buildings</span></a>
       <a href="category.html?cat=people" data-category="people"><span>People</span></a>
@@ -78,64 +79,10 @@
   </section>
 
   <section class="content-section container" id="map">
-    <h2>Historic map — where buildings used to be</h2>
-    <p>An interactive map of Thurmaston showing buildings and places that used to stand in the village.</p>
-
-    <div class="callout">
-      <h3>Our interactive map will develop over time</h3>
-      <p style="margin:0">This map only shows buildings and places we can back with a real source — a photo, a resident's account, a map or a directory listing. As more residents come forward, we'll keep adding to it. If you know a building that used to stand here — a name, roughly where it was, roughly when it went — <a href="contact.html">tell us</a> or use the form below.</p>
-    </div>
-
-    <div class="map-layout" style="margin-top:20px">
-      <div class="map-canvas-wrap">
-        <div id="historic-map" role="application" aria-label="Interactive historic map of Thurmaston"></div>
-      </div>
-      <div class="map-sidebar">
-        <div class="map-filters" id="map-filters">
-          <button type="button" data-category="all" class="active">All</button>
-          <button type="button" data-category="streets">Streets &amp; Buildings</button>
-          <button type="button" data-category="people">People</button>
-          <button type="button" data-category="events">Events</button>
-          <button type="button" data-category="nature">Nature &amp; Views</button>
-          <button type="button" data-category="aerial">Aerial</button>
-          <button type="button" data-category="other">Other</button>
-        </div>
-        <ul id="map-list"></ul>
-      </div>
-    </div>
-    <p style="font-size:0.8rem;color:var(--ink-soft);margin-top:10px">Map data © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors. Pin locations for lost buildings are approximate.</p>
-
-    <div style="margin-top:28px">
-      <h3 style="font-size:1.1rem">Know a building that used to stand here?</h3>
-      <p>Tell us what it was, roughly where, and roughly when it disappeared — a photo helps but isn't essential.</p>
-      <form class="stack" action="#" method="post">
-        <div>
-          <label for="map-name">Your name</label>
-          <input type="text" id="map-name" name="name" required>
-        </div>
-        <div>
-          <label for="map-building">What was it called / what was it?</label>
-          <input type="text" id="map-building" name="building" required>
-        </div>
-        <div>
-          <label for="map-location">Roughly where was it?</label>
-          <input type="text" id="map-location" name="location" placeholder="e.g. Melton Road, near the church" required>
-        </div>
-        <div>
-          <label for="map-period">Roughly when did it disappear?</label>
-          <input type="text" id="map-period" name="period" placeholder="e.g. 1960s, or “before my time”">
-        </div>
-        <div>
-          <label for="map-details">What do you remember about it?</label>
-          <textarea id="map-details" name="details" rows="5" required></textarea>
-        </div>
-        <div>
-          <label for="map-photo">Photo (optional)</label>
-          <input type="file" id="map-photo" name="photo" accept="image/*">
-        </div>
-        <button class="btn btn-primary" type="submit" style="align-self:flex-start">Submit building</button>
-        <p style="font-size:0.8rem;color:var(--ink-soft);margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
-      </form>
+    <div class="callout callout-map">
+      <h3>Historic map — where buildings used to be</h3>
+      <p>An interactive map of buildings and places that used to stand in the village, built up from residents' photos and accounts as they come in.</p>
+      <a class="btn btn-primary" href="map.html">Explore the historic map →</a>
     </div>
   </section>
 
@@ -209,7 +156,7 @@
         <h4>Explore</h4>
         <ul>
           <li><a href="#photos">Photo Archive</a></li>
-          <li><a href="#map">Historic Map</a></li>
+          <li><a href="map.html">Historic Map</a></li>
         </ul>
       </div>
       <div>
@@ -241,8 +188,5 @@
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
-<script src="vendor/leaflet/leaflet.js"></script>
-<script src="js/map-categories.js"></script>
-<script src="js/map.js"></script>
 </body>
 </html>

@@ -25,13 +25,30 @@ var PHOTOS_DATA_PROMISE = Promise.all([
   return photos.filter(function (p) { return !heroFilenames[filename(p.src)]; });
 });
 
+// Shared by the category grid and the homepage's "Recently added" strip
+// so a thumbnail looks and behaves identically wherever it shows up.
+function buildPhotoThumb(photo) {
+  var fig = document.createElement("a");
+  fig.className = "photo-thumb";
+  fig.href = "place.html?photo=" + encodeURIComponent(photo.id);
+  fig.setAttribute("aria-label", "View photo: " + photo.caption);
+  var subtitle = [photo.date, photo.location].filter(Boolean).join(" · ");
+  fig.innerHTML =
+    '<img src="' + photo.src + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
+    '<span class="photo-thumb-caption"><strong>' + escapeHtml(photo.caption) + '</strong>' +
+    (subtitle ? '<span>' + escapeHtml(subtitle) + '</span>' : '') + '</span>';
+  return fig;
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   var gridEl = document.getElementById("photo-grid");
   var gridStatusEl = document.getElementById("photo-grid-status");
   var gridFooterEl = document.getElementById("photo-grid-footer");
   var filterEl = document.getElementById("photo-filters");
   var searchInput = document.getElementById("photo-search-input");
+  var recentEl = document.getElementById("recent-photo-grid");
   var PREVIEW_COUNT = 8;
+  var RECENT_COUNT = 8;
   var showingAll = false;
   var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "streets";
   var allPhotos = [];
@@ -41,7 +58,21 @@ document.addEventListener("DOMContentLoaded", function () {
     allPhotos = photos;
     setCategoryTileImages();
     renderGrid();
+    renderRecentStrip(photos);
   });
+
+  // The homepage's "here's the actual archive" strip — the most
+  // recently added photos across every category (allPhotos/photos is
+  // already newest-first), not filtered to one category the way the
+  // main grid is. Only present on pages that have a #recent-photo-grid
+  // element (currently just index.html).
+  function renderRecentStrip(photos) {
+    if (!recentEl) return;
+    recentEl.innerHTML = "";
+    photos.slice(0, RECENT_COUNT).forEach(function (photo) {
+      recentEl.appendChild(buildPhotoThumb(photo));
+    });
+  }
 
   // Each category tab shows its most recently uploaded photo as a
   // background image — allPhotos is newest-first, so the first match
@@ -92,16 +123,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var displayPhotos = capped ? visiblePhotos.slice(0, PREVIEW_COUNT) : visiblePhotos;
 
     displayPhotos.forEach(function (photo) {
-      var fig = document.createElement("a");
-      fig.className = "photo-thumb";
-      fig.href = "place.html?photo=" + encodeURIComponent(photo.id);
-      fig.setAttribute("aria-label", "View photo: " + photo.caption);
-      var subtitle = [photo.date, photo.location].filter(Boolean).join(" · ");
-      fig.innerHTML =
-        '<img src="' + photo.src + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
-        '<span class="photo-thumb-caption"><strong>' + escapeHtml(photo.caption) + '</strong>' +
-        (subtitle ? '<span>' + escapeHtml(subtitle) + '</span>' : '') + '</span>';
-      gridEl.appendChild(fig);
+      gridEl.appendChild(buildPhotoThumb(photo));
     });
 
     setGridStatus(query, visiblePhotos.length, capped);
