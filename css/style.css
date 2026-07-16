@@ -989,14 +989,25 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 .photo-search-input-wide { max-width: none; }
 
+/* The homepage's search box is centred as its own focal point under
+   the hero — category.html's otherwise-identical bar stays
+   left-aligned above its photo grid, so this only touches the
+   homepage's copy via its extra .home-search-section class rather
+   than changing .category-search-bar itself. */
+.home-search-section { text-align: center; }
+.home-search-section .category-search-label { text-align: center; }
+.home-search-section .photo-search-input-wide { max-width: 640px; margin: 0 auto; }
+
 /* Results dropdown for the homepage's own search box — empty (no
    query yet) renders no box at all via :not(:empty), same idea as the
    overlay's #site-search-results but inline on the page instead of in
    a modal, so it needs its own container styling. */
 .home-search-results {
   list-style: none;
-  margin: 10px 0 0;
+  margin: 10px auto 0;
   padding: 0;
+  max-width: 640px;
+  text-align: left;
 }
 .home-search-results:not(:empty) {
   background: var(--glass-bg-strong);
@@ -1220,7 +1231,19 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
-  margin: 4px 0 20px;
+  max-width: 900px;
+  margin: 4px auto 20px;
+}
+/* Side by side, the two buttons are naturally different widths (their
+   labels are different lengths) — fine on a wide screen, but once the
+   row is too narrow to fit them both and they stack instead, two
+   different-width buttons left-aligned above one another reads as
+   lopsided rather than a matched pair. Below that point, make them
+   full-width and equal instead of letting them stack at their own
+   natural sizes. */
+@media (max-width: 480px) {
+  .place-actions { flex-direction: column; }
+  .place-actions .btn { width: 100%; text-align: center; }
 }
 /* .btn-outline is styled for the dark hero background — this section
    of the page is light, so the download button gets its own outline
