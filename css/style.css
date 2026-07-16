@@ -664,14 +664,6 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 0.85rem;
   margin: 0;
 }
-.place-photo-panel-history {
-  color: #e7efe6;
-  font-size: 0.92rem;
-  line-height: 1.6;
-  margin: 14px 0 0;
-  padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.15);
-}
 .place-photo-panel-ref {
   color: rgba(255, 255, 255, 0.45);
   font-size: 0.72rem;
@@ -690,6 +682,33 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 @media (max-width: 640px) {
   .place-photo-panel { flex-direction: column; }
+}
+
+/* History — its own full-width, light, readable section (below the
+   photo, above "Know more") rather than crammed into the facts
+   panel's narrow dark info column next to the terser caption/date/
+   credit/ref facts. */
+.place-history {
+  display: none;
+  max-width: 900px;
+  margin: 0 auto 36px;
+  background: var(--paper);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 24px 26px;
+  box-shadow: var(--shadow);
+}
+.place-history.visible { display: block; }
+.place-history h2 {
+  font-size: 1.05rem;
+  color: var(--green-900);
+  margin: 0 0 10px;
+}
+.place-history p {
+  margin: 0;
+  line-height: 1.7;
+  color: var(--ink);
+  white-space: pre-wrap;
 }
 
 /* "Know more about this photo?" — same dark-card treatment as the

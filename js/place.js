@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var headingEl = document.getElementById("place-heading");
   var crumbEl = document.getElementById("place-crumb");
   var photoPanelEl = document.getElementById("place-photo-panel");
+  var historyEl = document.getElementById("place-history");
   var submitEl = document.getElementById("place-submit");
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
@@ -49,6 +50,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var primaryPhoto = photoParam ? photoById[photoParam] : null;
     if (primaryPhoto) {
       renderPhotoPanel(primaryPhoto);
+      renderHistorySection(primaryPhoto);
       renderSubmitSection(primaryPhoto);
       renderRelatedPhotos(primaryPhoto, photos);
       renderBackLink(primaryPhoto);
@@ -82,12 +84,22 @@ document.addEventListener("DOMContentLoaded", function () {
         '<p class="place-photo-panel-caption">' + escapeHtml(photo.caption) + "</p>" +
         '<p class="place-photo-panel-datelocation">' + escapeHtml([photo.date, photo.location].filter(Boolean).join(" · ")) + "</p>" +
         '<p class="place-photo-panel-meta">' + escapeHtml(metaParts.filter(Boolean).join(" · ")) + "</p>" +
-        (photo.history ? '<p class="place-photo-panel-history">' + escapeHtml(photo.history) + "</p>" : "") +
         (photo.ref ? '<p class="place-photo-panel-ref">Ref: ' + escapeHtml(photo.ref) + "</p>" : "") +
         '<a class="place-photo-panel-link" href="' + escapeAttr(archiveUrl) + '">View in the photo archive →</a>' +
       "</div>";
     photoPanelEl.hidden = false;
     photoPanelEl.classList.add("visible");
+  }
+
+  // History gets its own full-width, light-background section — same
+  // reasoning as the submit form below: easier to read than crammed
+  // into the facts panel's narrow dark info column alongside the
+  // terser caption/date/credit/ref facts.
+  function renderHistorySection(photo) {
+    if (!historyEl || !photo.history) return;
+    historyEl.innerHTML = "<h2>History</h2><p>" + escapeHtml(photo.history) + "</p>";
+    historyEl.hidden = false;
+    historyEl.classList.add("visible");
   }
 
   // Kept as its own full-width section rather than squeezed into the
