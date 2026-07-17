@@ -31,7 +31,7 @@ collections:
     description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos/streets"
     create: true
-    delete: false
+    delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -73,7 +73,7 @@ collections:
     description: "Every photo in the People category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos/people"
     create: true
-    delete: false
+    delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -115,7 +115,7 @@ collections:
     description: "Every photo in the Events category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos/events"
     create: true
-    delete: false
+    delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -157,7 +157,7 @@ collections:
     description: "Every photo in the Nature & Views category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos/nature"
     create: true
-    delete: false
+    delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -199,7 +199,7 @@ collections:
     description: "Every photo in the Aerial category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos/aerial"
     create: true
-    delete: false
+    delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -241,7 +241,7 @@ collections:
     description: "Every photo in the Other category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
     folder: "data/photos/other"
     create: true
-    delete: false
+    delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
