@@ -59,6 +59,19 @@
   </div>
 </div>
 
+<div class="place-zoom-overlay" id="place-zoom-overlay">
+  <button class="place-zoom-close" id="place-zoom-close" type="button" aria-label="Close">×</button>
+  <p class="place-zoom-hint">Scroll or pinch to zoom, drag to pan</p>
+  <div class="place-zoom-stage" id="place-zoom-stage">
+    <img id="place-zoom-image" alt="">
+  </div>
+  <div class="place-zoom-controls">
+    <button class="place-zoom-btn" id="place-zoom-out" type="button" aria-label="Zoom out">−</button>
+    <button class="place-zoom-btn" id="place-zoom-reset" type="button" aria-label="Reset zoom">Reset</button>
+    <button class="place-zoom-btn" id="place-zoom-in" type="button" aria-label="Zoom in">+</button>
+  </div>
+</div>
+
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
@@ -105,6 +118,7 @@
 <script src="js/map-categories.js"></script>
 <script src="vendor/jspdf/jspdf.umd.min.js"></script>
 <script src="vendor/qrcode-generator/qrcode.js"></script>
+<script src="vendor/panzoom/panzoom.min.js"></script>
 <script src="js/place.js"></script>
 </body>
 </html>

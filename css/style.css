@@ -681,6 +681,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   max-height: 520px;
   object-fit: cover;
   display: block;
+  cursor: zoom-in;
 }
 .place-photo-panel-info {
   flex: 1 1 260px;
@@ -1329,6 +1330,104 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 2rem;
   line-height: 1;
   cursor: pointer;
+}
+
+/* Full-screen zoom/pan viewer for a photo's own page — click the main
+   photo to open. Built on vendor/panzoom (vendored the same way as
+   Leaflet/jsPDF/qrcode-generator — a small, no-build-step, MIT library
+   rather than hand-rolling pinch-zoom gesture math), which handles
+   wheel-zoom, drag-to-pan and touch pinch-zoom on whatever element it's
+   given; +/-/Reset buttons exist alongside it since not everyone
+   discovers scroll-to-zoom on their own. Same fixed-overlay/.open
+   pattern as .place-know-more-modal above, just without the backdrop
+   blur (a photo you're trying to examine closely shouldn't sit behind
+   a blurred backdrop) and at a higher z-index so it can be opened from
+   any photo page state.
+   */
+.place-zoom-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 10, 9, 0.94);
+  z-index: 500;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.place-zoom-overlay.open { display: flex; }
+
+.place-zoom-stage {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: none;
+}
+.place-zoom-stage img {
+  max-width: 90vw;
+  max-height: 90vh;
+  width: auto;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.place-zoom-close {
+  position: absolute;
+  top: 16px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  line-height: 1;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+}
+.place-zoom-close:hover { background: rgba(255, 255, 255, 0.22); }
+
+.place-zoom-hint {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.place-zoom-controls {
+  position: absolute;
+  bottom: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+.place-zoom-btn {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 700;
+  min-width: 44px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.place-zoom-btn:hover { background: rgba(255, 255, 255, 0.22); }
+
+@media (max-width: 560px) {
+  /* Cramped next to the close button at this width, and pinch-to-zoom
+     is the natural first thing to try on a touchscreen anyway. */
+  .place-zoom-hint { display: none; }
 }
 
 /* ---------- Footer ---------- */

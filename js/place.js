@@ -11,6 +11,13 @@ document.addEventListener("DOMContentLoaded", function () {
   var downloadPdfBtn = document.getElementById("place-download-pdf-btn");
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
+  var zoomOverlay = document.getElementById("place-zoom-overlay");
+  var zoomStage = document.getElementById("place-zoom-stage");
+  var zoomImage = document.getElementById("place-zoom-image");
+  var zoomCloseBtn = document.getElementById("place-zoom-close");
+  var zoomInBtn = document.getElementById("place-zoom-in");
+  var zoomOutBtn = document.getElementById("place-zoom-out");
+  var zoomResetBtn = document.getElementById("place-zoom-reset");
   if (!contentEl) return;
 
   var params = new URLSearchParams(location.search);
@@ -110,6 +117,90 @@ document.addEventListener("DOMContentLoaded", function () {
     photoPanelEl.classList.add("visible");
 
     if (hasLocation) renderMiniMap(photo, mapUrl);
+    renderZoomableImage(photo);
+  }
+
+  // Click the main photo to open it full-screen with zoom/pan — added
+  // for a high-resolution aerial shot where the detail is worth
+  // examining closely, but wired up for every photo rather than just
+  // that category, since it's generally useful. Built on vendor/panzoom
+  // (see css/style.css's .place-zoom-overlay comment for why a vendored
+  // library rather than hand-rolled pinch-zoom). The panzoom instance
+  // is created once (on first open) and reused on later opens — cheap
+  // to keep around, and avoids leaking a fresh set of drag/wheel/touch
+  // listeners every time the overlay is reopened.
+  var zoomInstance = null;
+  function renderZoomableImage(photo) {
+    var trigger = photoPanelEl.querySelector(".place-photo-panel-media img");
+    if (!trigger || !zoomOverlay || typeof panzoom === "undefined") return;
+
+    trigger.setAttribute("role", "button");
+    trigger.setAttribute("tabindex", "0");
+    trigger.setAttribute("aria-label", "View full-screen, zoomable");
+    trigger.onclick = openZoom;
+    trigger.onkeydown = function (e) {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        openZoom();
+      }
+    };
+
+    function openZoom() {
+      zoomImage.src = photo.src;
+      zoomImage.alt = photo.caption;
+      zoomOverlay.classList.add("open");
+      document.body.style.overflow = "hidden";
+      if (!zoomInstance) {
+        zoomInstance = panzoom(zoomImage, {
+          maxZoom: 6,
+          minZoom: 1,
+          bounds: true,
+          boundsPadding: 0.15,
+          zoomDoubleClickSpeed: 1
+        });
+      } else {
+        zoomInstance.moveTo(0, 0);
+        zoomInstance.zoomAbs(0, 0, 1);
+      }
+    }
+  }
+
+  function closeZoom() {
+    if (!zoomOverlay) return;
+    zoomOverlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  if (zoomOverlay) {
+    zoomCloseBtn.onclick = closeZoom;
+    zoomOverlay.addEventListener("click", function (e) {
+      // .place-zoom-stage fills the whole overlay (it's just a
+      // flex-centering wrapper around the image), so a click on the
+      // empty area around the photo lands on the stage, not the
+      // overlay div itself — treat either as "clicked the backdrop."
+      // panzoom is attached to the <img> itself, not the stage, so a
+      // pan-drag always starts (and, since the image tracks the
+      // cursor, also ends) with the image as the event target — this
+      // only fires for a genuine click on empty space, not a drag
+      // release. Verified directly (Playwright: drag the image, then
+      // release over backdrop space — overlay stays open).
+      if (e.target === zoomOverlay || e.target === zoomStage) closeZoom();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && zoomOverlay.classList.contains("open")) closeZoom();
+    });
+    zoomInBtn.onclick = function () {
+      if (zoomInstance) zoomInstance.smoothZoom(zoomStage.clientWidth / 2, zoomStage.clientHeight / 2, 1.5);
+    };
+    zoomOutBtn.onclick = function () {
+      if (zoomInstance) zoomInstance.smoothZoom(zoomStage.clientWidth / 2, zoomStage.clientHeight / 2, 1 / 1.5);
+    };
+    zoomResetBtn.onclick = function () {
+      if (zoomInstance) {
+        zoomInstance.moveTo(0, 0);
+        zoomInstance.zoomAbs(0, 0, 1);
+      }
+    };
   }
 
   // A small, non-interactive preview map right on the photo's own
