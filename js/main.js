@@ -171,3 +171,30 @@ function escapeHtml(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+// Turns a photo's free-text Location field ("The Harrow Inn, Melton
+// Road") into a stable, URL-safe slug for location.html's ?loc= param.
+// Purely computed at read time from the text itself — no separate id
+// stored anywhere — so two photos with the same Location automatically
+// resolve to the same slug/page with no extra admin step, the same
+// "same text = same place" matching js/place.js's "More photos from
+// this location" grid already relies on (see CLAUDE.md).
+function slugifyLocation(text) {
+  return (text || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+// A History field can be several paragraphs, separated by plain "\n"
+// line breaks in the stored text (that's just how they get typed into
+// the admin's textarea) — rendered as one escapeHtml()'d string inside
+// a single <p>, HTML collapses all of that into one run-on line with
+// no visible break at all. Splits on blank lines into one <p> per
+// paragraph instead (each line individually escaped first, so no
+// unescaped text ever reaches innerHTML).
+function formatMultilineText(str) {
+  return (str || "")
+    .split(/\n+/)
+    .map(function (line) { return line.trim(); })
+    .filter(Boolean)
+    .map(function (line) { return "<p>" + escapeHtml(line) + "</p>"; })
+    .join("");
+}

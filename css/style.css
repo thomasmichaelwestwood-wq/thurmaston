@@ -715,6 +715,105 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   text-align: center;
 }
 
+/* ---------- Location timeline (location.html) ---------- */
+
+.location-subheading {
+  color: var(--ink-soft);
+  font-size: 1.05rem;
+  margin: -8px 0 0;
+}
+
+.location-timeline {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.location-timeline-heading {
+  color: var(--ink-soft);
+  font-size: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin: 32px 0 16px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+
+.location-entry {
+  display: flex;
+  gap: 20px;
+  padding: 24px 0;
+  border-left: 3px solid var(--gold-600);
+  padding-left: 24px;
+  margin-bottom: 4px;
+}
+.location-entry + .location-entry { border-top: 1px solid var(--line); }
+
+.location-entry-media {
+  flex: 0 0 180px;
+  display: block;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.location-entry-media img {
+  width: 100%;
+  height: 130px;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.2s ease;
+}
+.location-entry-media:hover img { transform: scale(1.03); }
+
+.location-entry-body { flex: 1 1 auto; min-width: 0; }
+
+.location-entry-caption {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: 1.15rem;
+  color: var(--green-900);
+  text-decoration: none;
+  margin-bottom: 4px;
+}
+.location-entry-caption:hover { text-decoration: underline; }
+
+.location-entry-meta {
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  margin: 0 0 10px;
+}
+
+.location-entry-history p {
+  margin: 0 0 10px;
+  line-height: 1.6;
+}
+.location-entry-history p:last-child { margin-bottom: 0; }
+
+@media (max-width: 600px) {
+  .location-entry { flex-direction: column; gap: 12px; }
+  .location-entry-media { flex: none; }
+}
+
+/* A prominent nudge to a place's timeline page (location.html) when
+   more than one photo shares this one's Location — see js/place.js's
+   renderLocationBanner. Styled as its own eye-catching callout (not
+   just a text link) specifically because a plain link in this spot
+   was the thing that turned out to go unnoticed before. */
+.place-location-banner {
+  display: block;
+  max-width: 900px;
+  margin: 0 auto 20px;
+  padding: 14px 20px;
+  background: var(--gold-100);
+  border: 1px solid var(--gold-600);
+  border-radius: var(--radius);
+  color: var(--green-900);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+.place-location-banner:hover { background: #efdcb4; }
+.place-location-banner strong { color: var(--green-900); }
+
 /* The "facts" card at the top of a story page — the same information
    the photo's lightbox shows (name, date/location, category/credit,
    history, ref), so the story page doesn't make you go find the photo

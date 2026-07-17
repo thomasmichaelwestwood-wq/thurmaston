@@ -11,6 +11,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var downloadPdfBtn = document.getElementById("place-download-pdf-btn");
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
+  var locationBannerEl = document.getElementById("place-location-banner");
   var zoomOverlay = document.getElementById("place-zoom-overlay");
   var zoomStage = document.getElementById("place-zoom-stage");
   var zoomImage = document.getElementById("place-zoom-image");
@@ -71,6 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
     crumbEl.textContent = title;
 
     if (primaryPhoto) {
+      renderLocationBanner(primaryPhoto, photos);
       renderPhotoPanel(primaryPhoto);
       renderHistorySection(primaryPhoto);
       renderKnowMore(primaryPhoto);
@@ -254,7 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // dark info column alongside the terser caption/date/credit/ref facts.
   function renderHistorySection(photo) {
     if (!historyEl || !photo.history) return;
-    historyEl.innerHTML = "<h2>History</h2><p>" + escapeHtml(photo.history) + "</p>";
+    historyEl.innerHTML = "<h2>History</h2>" + formatMultilineText(photo.history);
     historyEl.hidden = false;
     historyEl.classList.add("visible");
   }
@@ -602,6 +604,34 @@ document.addEventListener("DOMContentLoaded", function () {
     backLinkEl.textContent = "← Back to " + cat;
     backLinkEl.href = "category.html?cat=" + encodeURIComponent(photo.category);
     backLinkEl.hidden = false;
+  }
+
+  // A prominent link near the top of the page to that place's own
+  // timeline (location.html) — added because the "More photos from…"
+  // grid further down the page (renderRelatedPhotos, below) turned out
+  // to be too easy to miss: two real photos of the same building
+  // (the Harrow Inn, 1913 and 2002) were correctly cross-linked by it,
+  // but that wasn't obvious enough to actually be found. Only shown
+  // when there's more than one photo at this exact location — a lone
+  // photo has no timeline to link to. Same exact-match-on-trimmed-
+  // lowercased-text rule as renderRelatedPhotos (see its comment) —
+  // deliberately not deduplicated between the two functions since they
+  // serve different purposes (a quick top-of-page nudge vs the full
+  // list of thumbnails) and would be awkward to share without also
+  // coupling their render timing.
+  function renderLocationBanner(photo, photos) {
+    if (!locationBannerEl || !photo.location) return;
+    var location = photo.location.trim().toLowerCase();
+    var siblings = photos.filter(function (p) {
+      return typeof p.location === "string" && p.location.trim().toLowerCase() === location;
+    });
+    if (siblings.length < 2) return;
+
+    var slug = slugifyLocation(photo.location);
+    locationBannerEl.href = "location.html?loc=" + encodeURIComponent(slug);
+    locationBannerEl.innerHTML =
+      "This is one of " + siblings.length + " photos of <strong>" + escapeHtml(photo.location) + "</strong> — see the full history and timeline →";
+    locationBannerEl.hidden = false;
   }
 
   // Other photos that share this one's Location text — only meaningful
