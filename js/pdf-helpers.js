@@ -155,6 +155,12 @@ function openPdfInViewer(buildDoc, filename, btn, loadingTitle) {
       '<body style="font:15px/1.5 -apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;color:#52584c;padding:40px;text-align:center;">' +
       "Preparing your PDF…</body>"
     );
+    // Some browsers leave the popup's document in an open/loading
+    // state until this is called, which can make the later
+    // location = ... navigation unreliable (seen as the tab just
+    // sitting on "Preparing your PDF…" forever instead of switching to
+    // the finished file).
+    pdfWindow.document.close();
   }
 
   var originalLabel = btn.textContent;
@@ -162,20 +168,26 @@ function openPdfInViewer(buildDoc, filename, btn, loadingTitle) {
   btn.textContent = "Preparing PDF…";
 
   buildDoc().then(function (doc) {
-    if (pdfWindow) {
-      // The blob (and its URL) belong to this page, not the new tab —
-      // fine, since the browser keeps it alive for as long as the tab
-      // holds a reference to it, same as any other blob: URL.
-      pdfWindow.location = doc.output("bloburl");
+    // A tab opened synchronously can still end up blocked or closed
+    // out from under us by the time the async build finishes (some
+    // popup blockers silently close it a tick after opening rather
+    // than returning null from window.open) — re-check right before
+    // navigating, and fall back to a normal download rather than
+    // silently losing the PDF with no way to reach it.
+    if (pdfWindow && !pdfWindow.closed) {
+      try {
+        // The blob (and its URL) belong to this page, not the new tab
+        // — fine, since the browser keeps it alive for as long as the
+        // tab holds a reference to it, same as any other blob: URL.
+        pdfWindow.location = doc.output("bloburl");
+      } catch (e) {
+        doc.save(filename);
+      }
     } else {
-      // Popup blocked despite opening synchronously (can still happen
-      // depending on the visitor's browser settings) — fall back to a
-      // normal download rather than silently losing the PDF with no
-      // way to reach it.
       doc.save(filename);
     }
   }).catch(function () {
-    if (pdfWindow) pdfWindow.close();
+    if (pdfWindow && !pdfWindow.closed) pdfWindow.close();
     alert("Sorry, something went wrong making that PDF.");
   }).then(function () {
     btn.disabled = false;
