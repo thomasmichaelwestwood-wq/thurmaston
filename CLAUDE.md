@@ -39,6 +39,8 @@ A photo's category (`streets`, `people`, `events`, `nature`, `aerial`, `other`) 
 
 When adding or editing anything that assigns a category by hand (e.g. `data/map-pins.json` entries for the Interactive Map), copy the category straight from that photo's existing entry in `data/photos.json` rather than guessing from the subject matter.
 
+**An empty category needs its own message, distinct from "your search found nothing."** `category.html`'s `js/photos.js` (`renderGrid`) used to show "No photos match. Try a different search or category." any time the visible grid was empty — including a category with **zero photos at all**, before anyone had typed a single character into "Looking for something specific?" That reads exactly like a broken search box (reported for real, once Events and Nature & Views both had no photos yet) — the message talks about a search that was never actually attempted. Fixed by checking `allPhotos.some(p => p.category === activeCategory)` first: an empty category now says "No photos in this category yet — check back soon, or explore another category" regardless of the search box, and the old "No photos match" wording is reserved for when there genuinely are photos in the category but a real search term matched none of them.
+
 ## General rule: a photo's Drive folder decides how it's used, full stop
 
 This applies beyond just category. Whatever folder a photo is uploaded into determines its role according to that folder's defined behaviour in `automation/drive-photo-sync.gs.js` — never assume a photo can serve double duty across folder purposes just because the same underlying file happens to sit in two folders.

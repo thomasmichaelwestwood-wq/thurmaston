@@ -95,9 +95,20 @@ document.addEventListener("DOMContentLoaded", function () {
     gridEl.innerHTML = "";
 
     if (visiblePhotos.length === 0) {
+      // Two different reasons to land here, needing two different
+      // messages — a search that matched nothing (there ARE photos in
+      // this category, just not ones matching "xyz") vs a category
+      // that has no photos at all yet, where the search box was never
+      // the problem. Without this split, an empty category always
+      // showed "No photos match" even with nothing typed, which reads
+      // exactly like "the search box doesn't work" — reported for real
+      // once Events/Nature & Views had zero photos in them.
+      var categoryHasAny = allPhotos.some(function (p) { return p.category === activeCategory; });
       var empty = document.createElement("p");
       empty.className = "search-empty";
-      empty.textContent = "No photos match. Try a different search or category.";
+      empty.textContent = (query || categoryHasAny)
+        ? "No photos match. Try a different search or category."
+        : "No photos in this category yet — check back soon, or explore another category.";
       gridEl.appendChild(empty);
       setGridStatus("");
       renderShowAllButton(0, false);
