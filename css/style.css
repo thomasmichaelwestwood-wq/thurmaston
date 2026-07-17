@@ -1184,6 +1184,25 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin-top: 4px;
 }
 
+/* Leaflet tooltip theming — the short hover label shown on a pin
+   before it's clicked (see js/map.js's bindTooltip calls). Kept
+   deliberately plainer/smaller than the popup — it's a quick "what's
+   this" hint, not the full detail. */
+.leaflet-tooltip {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--green-900);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  box-shadow: var(--shadow);
+}
+.leaflet-tooltip-top::before { border-top-color: var(--glass-border); }
+
 @media (max-width: 780px) {
   .map-layout { grid-template-columns: 1fr; }
   #historic-map { height: 400px; }

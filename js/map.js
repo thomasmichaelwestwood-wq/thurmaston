@@ -69,6 +69,10 @@ document.addEventListener("DOMContentLoaded", function () {
     mapItems.forEach(function (item) {
       var marker = L.marker([item.lat, item.lng], { icon: makeIcon(item.category) })
         .addTo(map)
+        // A short hover label — the popup already has the full detail,
+        // but that only opens on click; this lets someone see what a
+        // pin is just by pointing at it, without committing to a click.
+        .bindTooltip(item.name, { direction: "top", offset: [0, -28] })
         .bindPopup(popupHtml(item));
       markers[item.id] = marker;
     });
@@ -189,6 +193,7 @@ document.addEventListener("DOMContentLoaded", function () {
     map.once("moveend", function () {
       if (photoMarker) map.removeLayer(photoMarker);
       photoMarker = L.marker([lat, lng], { icon: makeIcon("photo") }).addTo(map);
+      photoMarker.bindTooltip(photo.caption, { direction: "top", offset: [0, -28] });
       var cat = MAP_CATEGORIES.photo;
       var subtitle = [photo.date, photo.location].filter(Boolean).join(" · ");
       photoMarker.bindPopup(
