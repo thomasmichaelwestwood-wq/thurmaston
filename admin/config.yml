@@ -74,45 +74,6 @@ collections:
       - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
 
-  - name: "pages"
-    label: "Story pages"
-    description: "Dedicated pages for buildings or places, linked from a Map pin's \"Full story page\" field. Every photo already gets its own page automatically (no setup needed here) — this collection is only for extra written content about a place, shown above the automatic facts on that page."
-    folder: "data/pages"
-    create: true
-    delete: true
-    slug: "{{slug}}"
-    extension: "json"
-    format: "json"
-    identifier_field: "title"
-    fields:
-      - { label: "Title", name: "title", widget: "string", hint: "e.g. \"The Generous Briton\"" }
-      - label: "Content"
-        name: "blocks"
-        widget: "list"
-        label_singular: "block"
-        summary: "{{fields.type}}"
-        types:
-          - label: "Text"
-            name: "text"
-            widget: "object"
-            fields:
-              - label: "Text"
-                name: "text"
-                widget: "text"
-                hint: "Leave a blank line between paragraphs. You can use **bold**, *italic*, and [link text](https://example.com) for links to other websites."
-          - label: "Photo (from the archive)"
-            name: "photo"
-            widget: "object"
-            fields:
-              - label: "Photo"
-                name: "photoId"
-                widget: "relation"
-                collection: "photos"
-                search_fields: ["caption", "ref"]
-                value_field: "{{slug}}"
-                display_fields: ["caption"]
-                hint: "Start typing a caption to search the archive and pick the photo this block should show. The preview on the right updates with the actual photo once you pick one."
-
   - name: "map_pins"
     label: "Map pins"
     description: "The hand-picked pins on the interactive map. Ordinary located photos already show up on the map automatically and don't need an entry here — this is only for pins with their own name and description."
@@ -162,10 +123,6 @@ collections:
                 hint: "Must match that photo's ID exactly, so the popup photo links into the archive correctly."
               - label: "Full story page"
                 name: "pageSlug"
-                widget: "relation"
-                collection: "pages"
-                search_fields: ["title"]
-                value_field: "{{slug}}"
-                display_fields: ["title"]
+                widget: "string"
                 required: false
-                hint: "Optional — pick one of your Story pages to add a \"Read the full story\" link to this pin's popup."
+                hint: "Optional, internal — the filename (minus .json) of a page in data/pages/, if this pin should link to one. There's no picker for this any more; leave it blank unless you know the exact filename."
