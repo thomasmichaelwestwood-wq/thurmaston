@@ -341,8 +341,8 @@ h1, h2, h3, h4 {
 }
 
 .hero-content {
-  flex: 0 0 40%;
-  max-width: 40%;
+  flex: 1 1 auto;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -350,10 +350,16 @@ h1, h2, h3, h4 {
   padding: 32px clamp(20px, 4vw, 56px);
 }
 
+/* Sized to the hero photo's own 6:4 (3:2) proportions rather than a
+   fixed percentage of the hero's width — at a fixed hero height, width
+   is derived from that ratio, so background-size:cover on .hero-slide
+   below shows the whole photo with no odd cropping, instead of forcing
+   a 3:2 image into a much wider/flatter box shape. */
 .hero-media {
   position: relative;
-  flex: 0 0 60%;
-  max-width: 60%;
+  flex: 0 0 auto;
+  height: 100%;
+  aspect-ratio: 3 / 2;
   overflow: hidden;
 }
 
@@ -399,8 +405,9 @@ h1, h2, h3, h4 {
   }
   .hero-media {
     flex: none;
-    max-width: 100%;
-    height: 220px;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 2;
   }
 }
 
