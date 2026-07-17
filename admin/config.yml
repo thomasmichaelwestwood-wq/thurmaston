@@ -26,10 +26,10 @@ public_folder: "/images/cms-uploads"
 # Decap opens the first-listed collection by default on login, and it's
 # the largest/most-used category.
 collections:
-  - name: "photos_streets"
-    label: "Streets & Buildings"
-    description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
-    folder: "data/photos/streets"
+  - name: "photos_aerial"
+    label: "Aerial"
+    description: "Every photo in the Aerial category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/aerial"
     create: true
     delete: true
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
@@ -40,56 +40,14 @@ collections:
       - label: "Photo"
         name: "src"
         widget: "image"
-        media_folder: "/images/photos/streets"
-        public_folder: "/images/photos/streets"
+        media_folder: "/images/photos/aerial"
+        public_folder: "/images/photos/aerial"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
         widget: "hidden"
-        default: "streets"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
-      - { label: "Date", name: "date", widget: "muted-string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
-      - { label: "Credit", name: "credit", widget: "muted-string", required: false, hint: "Who took or contributed the photo, if known." }
-      - label: "Google Maps coordinates"
-        name: "coords"
-        widget: "muted-string"
-        required: false
-        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
-      - { label: "Location", name: "location", widget: "muted-string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
-      - { label: "History", name: "history", widget: "muted-text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
-      - { label: "Consent noted", name: "consentNoted", widget: "muted-boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
-      - { label: "Internal — reference code", name: "ref", widget: "muted-string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
-      - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
-      - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
-
-  - name: "photos_people"
-    label: "People"
-    description: "Every photo in the People category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
-    folder: "data/photos/people"
-    create: true
-    delete: true
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
-    extension: "json"
-    format: "json"
-    identifier_field: "caption"
-    fields:
-      - label: "Photo"
-        name: "src"
-        widget: "image"
-        media_folder: "/images/photos/people"
-        public_folder: "/images/photos/people"
-        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
-      - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
-      - label: "Category"
-        name: "category"
-        widget: "hidden"
-        default: "people"
+        default: "aerial"
         # Fixed to match this collection/folder — not shown as a field to
         # fill in, since which collection you're already in decides it.
         # A hidden widget still writes its default into the saved JSON,
@@ -194,48 +152,6 @@ collections:
       - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
 
-  - name: "photos_aerial"
-    label: "Aerial"
-    description: "Every photo in the Aerial category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
-    folder: "data/photos/aerial"
-    create: true
-    delete: true
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
-    extension: "json"
-    format: "json"
-    identifier_field: "caption"
-    fields:
-      - label: "Photo"
-        name: "src"
-        widget: "image"
-        media_folder: "/images/photos/aerial"
-        public_folder: "/images/photos/aerial"
-        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
-      - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
-      - label: "Category"
-        name: "category"
-        widget: "hidden"
-        default: "aerial"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
-      - { label: "Date", name: "date", widget: "muted-string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
-      - { label: "Credit", name: "credit", widget: "muted-string", required: false, hint: "Who took or contributed the photo, if known." }
-      - label: "Google Maps coordinates"
-        name: "coords"
-        widget: "muted-string"
-        required: false
-        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
-      - { label: "Location", name: "location", widget: "muted-string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
-      - { label: "History", name: "history", widget: "muted-text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
-      - { label: "Consent noted", name: "consentNoted", widget: "muted-boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
-      - { label: "Internal — reference code", name: "ref", widget: "muted-string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
-      - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
-      - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
-
   - name: "photos_other"
     label: "Other"
     description: "Every photo in the Other category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
@@ -277,3 +193,87 @@ collections:
       - { label: "Internal — reference code", name: "ref", widget: "muted-string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
       - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+  - name: "photos_people"
+    label: "People"
+    description: "Every photo in the People category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/people"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/people"
+        public_folder: "/images/photos/people"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "people"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "muted-string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "muted-string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "muted-string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "muted-string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "muted-text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "muted-boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "muted-string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
+  - name: "photos_streets"
+    label: "Streets & Buildings"
+    description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/streets"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/streets"
+        public_folder: "/images/photos/streets"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "streets"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "muted-string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "muted-string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "muted-string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "muted-string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "muted-text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "muted-boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "muted-string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
