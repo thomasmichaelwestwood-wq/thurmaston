@@ -672,6 +672,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .place-photo-panel.visible { display: flex; align-items: flex-start; }
 .place-photo-panel-media {
+  position: relative;
   flex: 1 1 320px;
   min-width: 240px;
 }
@@ -682,6 +683,27 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   object-fit: cover;
   display: block;
   cursor: zoom-in;
+}
+/* Visible cue that the photo is clickable to zoom — cursor: zoom-in
+   alone isn't enough, since there's no hover state at all on a
+   touchscreen, which is exactly where zooming into detail is most
+   useful. pointer-events: none so a click on the badge itself still
+   falls through to the image underneath rather than needing its own
+   click handler. */
+.place-photo-panel-zoom-hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  background: rgba(10, 13, 11, 0.7);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 20px;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 .place-photo-panel-info {
   flex: 1 1 260px;

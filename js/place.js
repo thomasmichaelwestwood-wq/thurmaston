@@ -104,6 +104,7 @@ document.addEventListener("DOMContentLoaded", function () {
     photoPanelEl.innerHTML =
       '<div class="place-photo-panel-media">' +
         '<img src="' + escapeAttr(photo.src) + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
+        '<span class="place-photo-panel-zoom-hint">🔍 Click to zoom</span>' +
       "</div>" +
       '<div class="place-photo-panel-info">' +
         '<p class="place-photo-panel-caption">' + escapeHtml(photo.caption) + "</p>" +
