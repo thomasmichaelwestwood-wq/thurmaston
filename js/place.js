@@ -288,148 +288,29 @@ document.addEventListener("DOMContentLoaded", function () {
   // pattern as Leaflet) — builds the file by hand (title, photo, facts,
   // History, any linked Story page text) rather than rendering the live
   // DOM to an image, so the result is small, crisp at any zoom, and its
-  // text is actually selectable/searchable in a PDF reader.
+  // text is actually selectable/searchable in a PDF reader. Opens in a
+  // viewer tab rather than forcing a download — see openPdfInViewer in
+  // js/pdf-helpers.js (shared with location.html's own "View / Print
+  // PDF" for a place's whole timeline) for why and how.
   function renderDownloadPdf(photo, page) {
     if (!downloadPdfBtn) return;
     downloadPdfBtn.onclick = function () {
-      openPhotoPdf(photo, page, downloadPdfBtn);
+      openPdfInViewer(function () {
+        return Promise.all([
+          loadImageElement(photo.src).catch(function () { return null; }),
+          buildQrPngDataUrl(photoPageUrl(photo))
+        ]).then(function (results) {
+          return buildPhotoPdf(photo, page, results[0], results[1]);
+        });
+      }, pdfFilenameBase(photo.caption || photo.id) + ".pdf", downloadPdfBtn, photo.caption);
     };
   }
-
-  // Opens the PDF in a new tab (the browser's own built-in viewer)
-  // rather than forcing an immediate download — the visitor decides
-  // from there whether to save it, print it, or just look and close
-  // the tab, using controls they already know from every other PDF
-  // they've ever opened online, rather than a file just landing in
-  // their downloads folder unasked.
-  //
-  // window.open() has to happen synchronously inside the click handler
-  // — browsers only allow a popup without asking permission if it's
-  // opened directly inside a user gesture's own call stack, and PDF
-  // generation here is async (waiting on the photo's image to load and
-  // the QR code to render), so by the time the PDF is actually ready
-  // it would no longer count as "the click that opened it" and get
-  // blocked. Opening a blank tab immediately, then navigating it to
-  // the finished PDF once ready, keeps the gesture link intact.
-  function openPhotoPdf(photo, page, btn) {
-    if (typeof window.jspdf === "undefined") {
-      alert("Sorry, the PDF tool didn't load. Try refreshing the page.");
-      return;
-    }
-    var pdfWindow = window.open("", "_blank");
-    if (pdfWindow) {
-      pdfWindow.document.write(
-        "<title>" + escapeHtml(photo.caption || "Preparing your PDF…") + "</title>" +
-        '<body style="font:15px/1.5 -apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;color:#52584c;padding:40px;text-align:center;">' +
-        "Preparing your PDF…</body>"
-      );
-    }
-
-    var originalLabel = btn.textContent;
-    btn.disabled = true;
-    btn.textContent = "Preparing PDF…";
-
-    Promise.all([
-      loadImageElement(photo.src).catch(function () { return null; }),
-      buildQrPngDataUrl(photoPageUrl(photo))
-    ]).then(function (results) {
-      var doc = buildPhotoPdf(photo, page, results[0], results[1]);
-      if (pdfWindow) {
-        // The blob (and its URL) belong to this page, not the new tab
-        // — fine, since the browser keeps it alive for as long as the
-        // tab holds a reference to it, same as any other blob: URL.
-        pdfWindow.location = doc.output("bloburl");
-      } else {
-        // Popup blocked despite opening synchronously (can still
-        // happen depending on the visitor's browser settings) — fall
-        // back to a normal download rather than silently losing the
-        // PDF with no way to reach it.
-        doc.save(pdfFilename(photo) + ".pdf");
-      }
-    }).catch(function () {
-      if (pdfWindow) pdfWindow.close();
-      alert("Sorry, something went wrong making that PDF.");
-    }).then(function () {
-      btn.disabled = false;
-      btn.textContent = originalLabel;
-    });
-  }
-
-  function loadImageElement(src) {
-    return new Promise(function (resolve, reject) {
-      var img = new Image();
-      img.onload = function () { resolve(img); };
-      img.onerror = reject;
-      img.src = src;
-    });
-  }
-
-  function guessImageFormat(src) {
-    var ext = (String(src).split(".").pop() || "").toLowerCase().split(/[?#]/)[0];
-    if (ext === "png") return "PNG";
-    if (ext === "webp") return "WEBP";
-    return "JPEG";
-  }
-
-  function pdfFilename(photo) {
-    var base = (photo.caption || photo.id || "photo").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-    return base || "photo";
-  }
-
-  function downloadedDateLabel() {
-    return new Date().toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
-  }
-
-  // Hardcoded rather than derived from location.origin, on purpose:
-  // the site is still on its temporary Netlify address, but this is
-  // where it's moving once the real domain is set up — deliberately
-  // pre-baking the intended permanent address into every PDF now
-  // rather than the here-today address, so PDFs already downloaded and
-  // printed still point somewhere real once that move happens. Update
-  // this one constant when the domain is live (and swap the email in
-  // the footer below too, if that ever changes).
-  var SITE_URL = "https://www.thurmaston.com";
 
   // Absolute, not relative — this ends up in a QR code someone scans
   // from a printed page with no browser context to resolve a relative
   // URL against.
   function photoPageUrl(photo) {
     return SITE_URL + "/place.html?photo=" + encodeURIComponent(photo.id);
-  }
-
-  // qrcode-generator's own createDataURL() actually returns a GIF, not
-  // a PNG despite the name — and PDF has no native GIF image filter, so
-  // handing that straight to jsPDF forces it to silently decode and
-  // re-encode as JPEG to embed it, which risks softening the sharp
-  // module edges a scanner depends on. Redrawing it into an off-DOM
-  // canvas 1:1 (imageSmoothingEnabled off, so no blur is added here
-  // either) and reading it back out as a real PNG keeps the whole path
-  // lossless, matching the crisp black/white a QR code needs.
-  function buildQrPngDataUrl(text) {
-    if (typeof window.qrcode !== "function") return Promise.resolve(null);
-    var gifDataUrl;
-    try {
-      var qr = window.qrcode(0, "M");
-      qr.addData(text);
-      qr.make();
-      gifDataUrl = qr.createDataURL(8, 4);
-    } catch (e) {
-      return Promise.resolve(null);
-    }
-    return new Promise(function (resolve) {
-      var img = new Image();
-      img.onload = function () {
-        var canvas = document.createElement("canvas");
-        canvas.width = img.naturalWidth;
-        canvas.height = img.naturalHeight;
-        var ctx = canvas.getContext("2d");
-        ctx.imageSmoothingEnabled = false;
-        ctx.drawImage(img, 0, 0);
-        resolve(canvas.toDataURL("image/png"));
-      };
-      img.onerror = function () { resolve(null); };
-      img.src = gifDataUrl;
-    });
   }
 
   function buildPhotoPdf(photo, page, img, qrDataUrl) {
@@ -440,7 +321,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // so this is what makes "open in a viewer, let them decide whether
     // to save" (rather than an immediate forced download) still end up
     // with a sensible filename if they do save it.
-    doc.setProperties({ title: photo.caption || pdfFilename(photo) });
+    doc.setProperties({ title: photo.caption || pdfFilenameBase(photo.caption || photo.id) });
     var pageWidth = doc.internal.pageSize.getWidth();
     var margin = 18;
     var maxWidth = pageWidth - margin * 2;
@@ -519,48 +400,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // Stamped on every page (not just the last) — ensureSpace() can add
     // more than one for a photo with a long History or story, and the
     // contact line should still be there wherever the PDF gets printed
-    // from or how far someone scrolls. Uses SITE_URL, the same intended
-    // permanent address as the QR code above, not wherever this PDF
-    // actually happened to be generated from.
-    var footerText = "Memories of Thurmaston — " + SITE_URL.replace(/^https?:\/\//, "") + "  ·  Questions? memories@thurmaston.com";
-    var totalPages = doc.internal.getNumberOfPages();
-    for (var i = 1; i <= totalPages; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(150);
-      doc.text(footerText, margin, doc.internal.pageSize.getHeight() - 10);
-    }
+    // from or how far someone scrolls.
+    stampPdfFooter(doc, margin);
 
     return doc;
-  }
-
-  function ensureSpace(doc, y, needed, margin) {
-    var pageHeight = doc.internal.pageSize.getHeight();
-    if (y + needed > pageHeight - margin) {
-      doc.addPage();
-      return margin;
-    }
-    return y;
-  }
-
-  function addPdfHeading(doc, text, margin, y) {
-    y = ensureSpace(doc, y, 10, margin);
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(13);
-    doc.text(text, margin, y);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(11);
-    return y + 8;
-  }
-
-  function addPdfParagraph(doc, text, margin, y, maxWidth) {
-    var lines = doc.splitTextToSize(text.replace(/\*\*|\*|\[|\]\([^)]*\)/g, ""), maxWidth);
-    lines.forEach(function (line) {
-      y = ensureSpace(doc, y, 6, margin);
-      doc.text(line, margin, y);
-      y += 6;
-    });
-    return y + 4;
   }
 
   // Same fields as before — just now shown inside a popup instead of

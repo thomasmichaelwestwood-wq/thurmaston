@@ -4,6 +4,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var subheadingEl = document.getElementById("location-subheading");
   var timelineEl = document.getElementById("location-timeline");
   var notFoundEl = document.getElementById("location-not-found");
+  var downloadPdfBtn = document.getElementById("location-download-pdf-btn");
   if (!timelineEl || typeof PHOTOS_DATA_PROMISE === "undefined") return;
 
   var params = new URLSearchParams(location.search);
@@ -29,7 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
     subheadingEl.textContent = matches.length + (matches.length === 1 ? " photo" : " photos") + " of this place, from earliest to most recent.";
     subheadingEl.hidden = false;
 
-    renderTimeline(matches);
+    var ordered = orderPhotos(matches);
+    renderTimeline(ordered);
+    renderDownloadPdf(placeName, ordered);
   });
 
   function showNotFound() {
@@ -52,7 +55,11 @@ document.addEventListener("DOMContentLoaded", function () {
     return m ? parseInt(m[0], 10) : null;
   }
 
-  function renderTimeline(photos) {
+  // Shared by both the HTML timeline and the PDF, so the two can never
+  // silently drift into showing photos in a different order — dated
+  // photos oldest first, anything with no real date (see extractYear)
+  // held back into its own group at the end.
+  function orderPhotos(photos) {
     var dated = [];
     var undated = [];
     photos.forEach(function (p) {
@@ -61,11 +68,13 @@ document.addEventListener("DOMContentLoaded", function () {
       else undated.push(p);
     });
     dated.sort(function (a, b) { return a.year - b.year; });
+    return { dated: dated.map(function (entry) { return entry.photo; }), undated: undated };
+  }
 
-    var html = dated.map(function (entry) { return renderEntry(entry.photo); }).join("");
-    if (undated.length > 0) {
-      html += '<h2 class="location-timeline-heading">Date unknown</h2>' +
-        undated.map(function (p) { return renderEntry(p); }).join("");
+  function renderTimeline(ordered) {
+    var html = ordered.dated.map(renderEntry).join("");
+    if (ordered.undated.length > 0) {
+      html += '<h2 class="location-timeline-heading">Date unknown</h2>' + ordered.undated.map(renderEntry).join("");
     }
     timelineEl.innerHTML = html;
   }
@@ -88,4 +97,127 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function escapeAttr(str) { return escapeHtml(str); }
+
+  // Same "open in a viewer tab" pipeline as a single photo's own PDF
+  // (js/place.js, see js/pdf-helpers.js for the shared parts) — one
+  // PDF covering every photo of this place, in the same timeline
+  // order as the page above, each with its own image, date/credit and
+  // full History text.
+  function renderDownloadPdf(placeName, ordered) {
+    if (!downloadPdfBtn) return;
+    downloadPdfBtn.onclick = function () {
+      openPdfInViewer(function () {
+        var allPhotos = ordered.dated.concat(ordered.undated);
+        return Promise.all([
+          Promise.all(allPhotos.map(function (p) {
+            return loadImageElement(p.src).catch(function () { return null; });
+          })),
+          buildQrPngDataUrl(locationPageUrl())
+        ]).then(function (results) {
+          var imagesByPhotoId = {};
+          allPhotos.forEach(function (p, i) { imagesByPhotoId[p.id] = results[0][i]; });
+          return buildLocationPdf(placeName, ordered, imagesByPhotoId, results[1]);
+        });
+      }, pdfFilenameBase(placeName) + ".pdf", downloadPdfBtn, placeName);
+    };
+  }
+
+  // Absolute, not relative — this ends up in a QR code someone scans
+  // from a printed page with no browser context to resolve a relative
+  // URL against. Same SITE_URL (the intended future domain, not
+  // wherever this happens to be generated from) js/place.js's own PDF
+  // QR code uses.
+  function locationPageUrl() {
+    return SITE_URL + "/location.html?loc=" + encodeURIComponent(locParam);
+  }
+
+  function buildLocationPdf(placeName, ordered, imagesByPhotoId, qrDataUrl) {
+    var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    doc.setProperties({ title: placeName });
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var margin = 18;
+    var maxWidth = pageWidth - margin * 2;
+    var y = margin;
+
+    var qrSize = 26;
+    var titleMaxWidth = maxWidth;
+    if (qrDataUrl) {
+      titleMaxWidth = maxWidth - qrSize - 6;
+      doc.addImage(qrDataUrl, "PNG", pageWidth - margin - qrSize, margin, qrSize, qrSize);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      var qrCaptionX = pageWidth - margin - qrSize / 2;
+      doc.text("Scan to view online", qrCaptionX, margin + qrSize + 4, { align: "center" });
+      doc.text("Downloaded " + downloadedDateLabel(), qrCaptionX, margin + qrSize + 8, { align: "center" });
+      doc.setTextColor(0);
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    var titleLines = doc.splitTextToSize(placeName, titleMaxWidth);
+    doc.text(titleLines, margin, y);
+    y += titleLines.length * 8 + 4;
+    if (qrDataUrl) y = Math.max(y, margin + qrSize + 13);
+
+    var total = ordered.dated.length + ordered.undated.length;
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    y = ensureSpace(doc, y, 8, margin);
+    doc.text(total + (total === 1 ? " photo" : " photos") + " of this place, from earliest to most recent.", margin, y);
+    doc.setTextColor(0);
+    y += 10;
+
+    ordered.dated.forEach(function (photo) {
+      y = addLocationPdfEntry(doc, photo, imagesByPhotoId[photo.id], margin, y, maxWidth);
+    });
+    if (ordered.undated.length > 0) {
+      y = addPdfHeading(doc, "Date unknown", margin, y);
+      ordered.undated.forEach(function (photo) {
+        y = addLocationPdfEntry(doc, photo, imagesByPhotoId[photo.id], margin, y, maxWidth);
+      });
+    }
+
+    stampPdfFooter(doc, margin);
+    return doc;
+  }
+
+  function addLocationPdfEntry(doc, photo, img, margin, y, maxWidth) {
+    if (img) {
+      var ratio = img.naturalHeight / img.naturalWidth;
+      var imgWidth = maxWidth;
+      var imgHeight = imgWidth * ratio;
+      var maxImgHeight = 90;
+      if (imgHeight > maxImgHeight) {
+        imgHeight = maxImgHeight;
+        imgWidth = imgHeight / ratio;
+      }
+      y = ensureSpace(doc, y, imgHeight, margin);
+      doc.addImage(img, guessImageFormat(photo.src), margin, y, imgWidth, imgHeight);
+      y += imgHeight + 6;
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(12);
+    y = ensureSpace(doc, y, 7, margin);
+    doc.text(photo.caption || "Untitled photo", margin, y);
+    y += 7;
+
+    var metaParts = [photo.date];
+    if (photo.credit && photo.credit !== "—") metaParts.push("Credit: " + photo.credit);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    y = ensureSpace(doc, y, 6, margin);
+    doc.text(metaParts.filter(Boolean).join("  ·  "), margin, y);
+    doc.setTextColor(0);
+    y += 8;
+
+    doc.setFontSize(11);
+    if (photo.history) {
+      y = addPdfParagraph(doc, photo.history, margin, y, maxWidth);
+    }
+    return y + 8;
+  }
 });

@@ -723,6 +723,14 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin: -8px 0 0;
 }
 
+/* display: table -- a block-level box that still shrinks to fit its
+   content, so margin: 0 auto centers it (like the timeline list below
+   it) without stretching the button itself to the full column width. */
+.location-download-pdf-btn {
+  display: table;
+  margin: 0 auto 20px;
+}
+
 .location-timeline {
   max-width: 800px;
   margin: 0 auto;
