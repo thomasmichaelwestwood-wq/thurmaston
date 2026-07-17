@@ -398,7 +398,7 @@ function appendMetadataEntry(shortId, slug, filename, caption, ref, category, pl
 
   var entry = {
     id: id,
-    src: "images/photos/" + filename,
+    src: "/images/photos/" + filename,
     caption: caption,
     ref: ref,
     category: category,

@@ -28,7 +28,7 @@
     "ref": "lwlat-confernce-backdrop.png"
   },
   {
-    "src": "images/photos/_132553987_ian_lavender_bbc.jpg",
+    "src": "/images/photos/_132553987_ian_lavender_bbc.jpg",
     "caption": "Ian Lavendar",
     "date": "July 2026",
     "addedAt": "2026-07-15T17:50:34.275Z",
@@ -42,7 +42,7 @@
     "ref": "_132553987_ian_lavender_bbc.jpg"
   },
   {
-    "src": "images/photos/14c3w-fx-014-garden-centre-1960.jpg",
+    "src": "/images/photos/14c3w-fx-014-garden-centre-1960.jpg",
     "caption": "Garden Centre, 600 Melton Road 1960",
     "date": "Added July 2026",
     "ref": "014 Garden Centre 1960.jpg",
@@ -57,7 +57,7 @@
     "lng": -1.0973
   },
   {
-    "src": "images/photos/14WfqyhV-010-dudley-row-1991.jpg",
+    "src": "/images/photos/14WfqyhV-010-dudley-row-1991.jpg",
     "caption": "Dudley Row 1991",
     "date": "Added July 2026",
     "ref": "010 Dudley Row 1991.jpg",
@@ -72,7 +72,7 @@
   },
   {
     "id": "1tomHUyG-344-white-hart-mercury-mot-1-11",
-    "src": "images/photos/1tomHUyG-344-white-hart-mercury-mot-1-11.jpg",
+    "src": "/images/photos/1tomHUyG-344-white-hart-mercury-mot-1-11.jpg",
     "caption": "White Hart (Mercury)",
     "ref": "344 White Hart (Mercury) MOT 1 11.jpg",
     "category": "streets",
@@ -85,7 +85,7 @@
   },
   {
     "id": "1RjrLTG9-003-generous-briton-c1936-mot-1-11",
-    "src": "images/photos/1RjrLTG9-003-generous-briton-c1936-mot-1-11.jpg",
+    "src": "/images/photos/1RjrLTG9-003-generous-briton-c1936-mot-1-11.jpg",
     "caption": "Generous Briton c1936",
     "ref": "003 Generous Briton c1936 MOT 1 11.jpg",
     "category": "streets",
@@ -100,7 +100,7 @@
     "lng": -1.0979936680376168
   },
   {
-    "src": "images/photos/11iXuuLi-233-daisy-woodfield-chalice-woodfield-with-cart-at-grange-dairy-older-mot-1-39.jpg",
+    "src": "/images/photos/11iXuuLi-233-daisy-woodfield-chalice-woodfield-with-cart-at-grange-dairy-older-mot-1-39.jpg",
     "caption": "Daisy Woodfield, Chalice Woodfield with cart at Grange Dairy",
     "date": "Added July 2026",
     "ref": "233 Daisy Woodfield, Chalice Woodfield with cart at Grange Dairy older MOT 1 39.jpg",
@@ -113,7 +113,7 @@
   },
   {
     "id": "15lCGU8B-336-memorial-hall-mercury-mot-2-33",
-    "src": "images/photos/15lCGU8B-336-memorial-hall-mercury-mot-2-33.jpg",
+    "src": "/images/photos/15lCGU8B-336-memorial-hall-mercury-mot-2-33.jpg",
     "caption": "Memorial Hall (Mercury)",
     "ref": "336 Memorial Hall (Mercury) MOT 2 33.jpg",
     "category": "other",
@@ -124,7 +124,7 @@
   },
   {
     "id": "1dMVuq4o-501-cemetery-c1900",
-    "src": "images/photos/1dMVuq4o-501-cemetery-c1900.jpg",
+    "src": "/images/photos/1dMVuq4o-501-cemetery-c1900.jpg",
     "caption": "Cemetery c1900",
     "ref": "501 Cemetery c1900.jpg",
     "category": "other",
@@ -135,7 +135,7 @@
   },
   {
     "id": "1Wsijelu-368-fishing-tackle-pet-supplies-1985",
-    "src": "images/photos/1Wsijelu-368-fishing-tackle-pet-supplies-1985.jpg",
+    "src": "/images/photos/1Wsijelu-368-fishing-tackle-pet-supplies-1985.jpg",
     "caption": "Fishing Tackle Pet Supplies 1985",
     "ref": "368 Fishing Tackle Pet Supplies 1985.jpg",
     "category": "other",
@@ -146,7 +146,7 @@
   },
   {
     "id": "1AxRDC3V-218-close-up-of-099-main-street-garden-centre-on-left-pook",
-    "src": "images/photos/1AxRDC3V-218-close-up-of-099-main-street-garden-centre-on-left-pook.jpg",
+    "src": "/images/photos/1AxRDC3V-218-close-up-of-099-main-street-garden-centre-on-left-pook.jpg",
     "caption": "(Close up of 099) Main Street Garden centre on left Pook",
     "ref": "218 (Close up of 099) Main Street Garden centre on left Pook.jpg",
     "category": "other",
@@ -156,7 +156,7 @@
     "addedAt": "2026-07-15T13:31:18Z"
   },
   {
-    "src": "images/photos/1S-ZxlCo-320-melton-road-looking-south-mercury-mot-2-30-cropped-for-facbook.jpg",
+    "src": "/images/photos/1S-ZxlCo-320-melton-road-looking-south-mercury-mot-2-30-cropped-for-facbook.jpg",
     "caption": "Melton Road looking south",
     "date": "Added July 2026",
     "ref": "320 Melton Road looking south (Mercury) MOT 2 30 cropped for facbook.jpg",
@@ -170,7 +170,7 @@
   },
   {
     "id": "1w3CZ0o6-manor-hotel",
-    "src": "images/photos/1w3CZ0o6-manor-hotel.jpg",
+    "src": "/images/photos/1w3CZ0o6-manor-hotel.jpg",
     "caption": "Manor hotel",
     "category": "streets",
     "date": "Added July 2026",

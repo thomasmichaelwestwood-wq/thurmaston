@@ -98,29 +98,6 @@
   });
   CMS.registerWidget("muted-boolean", MutedBooleanControl);
 
-  var MapPinsPreview = createClass({
-    render: function () {
-      var pins = this.props.entry.getIn(["data", "pins"]);
-      return h("div", { className: "container", style: { padding: "20px" } },
-        pins ? pins.map(function (pin, i) {
-          return h("div", {
-            key: i,
-            className: "map-popup",
-            style: { border: "1px solid #ddd", borderRadius: "10px", padding: "14px", margin: "0 0 16px", maxWidth: "300px" }
-          },
-            h("span", { className: "map-popup-cat" }, pin.get("category")),
-            h("h3", {}, pin.get("name") || "Untitled pin"),
-            pin.get("photoSrc") ? h("img", { src: "/" + pin.get("photoSrc"), style: { width: "100%", borderRadius: "6px", display: "block", margin: "6px 0" } }) : null,
-            h("p", { className: "map-popup-period" }, [pin.get("period"), pin.get("location")].filter(Boolean).join(" · ")),
-            pin.get("description") ? h("p", {}, pin.get("description")) : null,
-            pin.get("pageSlug") ? h("a", { className: "map-popup-page-link" }, "Read the full story →") : null
-          );
-        }).toArray() : null
-      );
-    }
-  });
-  CMS.registerPreviewTemplate("map_pins", MapPinsPreview);
-
   // Mirrors the real photo page (see place.html and js/place.js's
   // renderPhotoPanel/renderHistorySection) so editing a photo's caption,
   // location or history here shows exactly what visitors will see.
@@ -176,6 +153,19 @@
   // API — if it's missing in whatever version loads, this just quietly
   // does nothing rather than breaking the rest of the admin.
   if (typeof CMS.registerAdditionalLink === "function") {
+    // A plain link back out to the live homepage — Decap's sidebar has
+    // no such link by default, and once you're logged into the admin
+    // there's otherwise no way back to the actual site without editing
+    // the URL by hand. A string `data` (rather than a component, as
+    // EditLog below uses) tells Decap to render this as a normal link
+    // instead of an internal admin page.
+    CMS.registerAdditionalLink({
+      id: "back-to-site",
+      title: "Back to site",
+      data: "/index.html",
+      options: { icon: "page" }
+    });
+
     var EditLog = createClass({
       getInitialState: function () {
         return { commits: null, error: null };
