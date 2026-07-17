@@ -1,5 +1,20 @@
 [
   {
+    "src": "/images/photos/streets/2002_0504-harrow-inn.jpg",
+    "caption": "Harrow Inn, Melton Road ",
+    "date": "2002",
+    "history": "The Harrow Inn in 2002 following the extension which extended the pub's restaurant.",
+    "location": "The Harrow Inn, 635 Melton Rd, Thurmaston, Leicester LE4 8EB",
+    "consentNoted": true,
+    "credit": "Mick Westwood",
+    "category": "streets",
+    "addedAt": "2026-07-17T14:50:59.021Z",
+    "ref": "2002_0504-harrow-inn.jpg",
+    "id": "20260717145039-harrow-inn-melton-road",
+    "lat": 52.67586468035201,
+    "lng": -1.1016562161853163
+  },
+  {
     "category": "streets",
     "consentNoted": true,
     "src": "/images/photos/streets/007-harrow-inn-c1917-mot-1-9.jpg",
