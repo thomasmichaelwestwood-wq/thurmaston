@@ -1,5 +1,17 @@
 [
   {
+    "category": "streets",
+    "consentNoted": true,
+    "src": "/images/photos/streets/2011_0427-harrow-inn-2-.jpg",
+    "caption": "The Harrow Inn",
+    "date": "2011",
+    "credit": "Mick Westwood",
+    "location": "52.67586468035201, -1.1016884026899212",
+    "addedAt": "2026-07-17T16:36:23.922Z",
+    "ref": "2011_0427-harrow-inn-2-.jpg",
+    "id": "20260717163602-the-harrow-inn"
+  },
+  {
     "src": "/images/photos/streets/2002_0504-harrow-inn.jpg",
     "caption": "The Harrow Inn",
     "date": "2002",
