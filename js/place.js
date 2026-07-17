@@ -290,15 +290,39 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderDownloadPdf(photo, page) {
     if (!downloadPdfBtn) return;
     downloadPdfBtn.onclick = function () {
-      downloadPhotoPdf(photo, page, downloadPdfBtn);
+      openPhotoPdf(photo, page, downloadPdfBtn);
     };
   }
 
-  function downloadPhotoPdf(photo, page, btn) {
+  // Opens the PDF in a new tab (the browser's own built-in viewer)
+  // rather than forcing an immediate download — the visitor decides
+  // from there whether to save it, print it, or just look and close
+  // the tab, using controls they already know from every other PDF
+  // they've ever opened online, rather than a file just landing in
+  // their downloads folder unasked.
+  //
+  // window.open() has to happen synchronously inside the click handler
+  // — browsers only allow a popup without asking permission if it's
+  // opened directly inside a user gesture's own call stack, and PDF
+  // generation here is async (waiting on the photo's image to load and
+  // the QR code to render), so by the time the PDF is actually ready
+  // it would no longer count as "the click that opened it" and get
+  // blocked. Opening a blank tab immediately, then navigating it to
+  // the finished PDF once ready, keeps the gesture link intact.
+  function openPhotoPdf(photo, page, btn) {
     if (typeof window.jspdf === "undefined") {
       alert("Sorry, the PDF tool didn't load. Try refreshing the page.");
       return;
     }
+    var pdfWindow = window.open("", "_blank");
+    if (pdfWindow) {
+      pdfWindow.document.write(
+        "<title>" + escapeHtml(photo.caption || "Preparing your PDF…") + "</title>" +
+        '<body style="font:15px/1.5 -apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;color:#52584c;padding:40px;text-align:center;">' +
+        "Preparing your PDF…</body>"
+      );
+    }
+
     var originalLabel = btn.textContent;
     btn.disabled = true;
     btn.textContent = "Preparing PDF…";
@@ -307,8 +331,21 @@ document.addEventListener("DOMContentLoaded", function () {
       loadImageElement(photo.src).catch(function () { return null; }),
       buildQrPngDataUrl(photoPageUrl(photo))
     ]).then(function (results) {
-      buildPhotoPdf(photo, page, results[0], results[1]).save(pdfFilename(photo) + ".pdf");
+      var doc = buildPhotoPdf(photo, page, results[0], results[1]);
+      if (pdfWindow) {
+        // The blob (and its URL) belong to this page, not the new tab
+        // — fine, since the browser keeps it alive for as long as the
+        // tab holds a reference to it, same as any other blob: URL.
+        pdfWindow.location = doc.output("bloburl");
+      } else {
+        // Popup blocked despite opening synchronously (can still
+        // happen depending on the visitor's browser settings) — fall
+        // back to a normal download rather than silently losing the
+        // PDF with no way to reach it.
+        doc.save(pdfFilename(photo) + ".pdf");
+      }
     }).catch(function () {
+      if (pdfWindow) pdfWindow.close();
       alert("Sorry, something went wrong making that PDF.");
     }).then(function () {
       btn.disabled = false;
@@ -395,6 +432,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function buildPhotoPdf(photo, page, img, qrDataUrl) {
     var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    // A human-readable title, not the slugified filename — Chrome's
+    // built-in PDF viewer uses this for both the browser tab title and
+    // the filename it suggests when someone clicks its own save icon,
+    // so this is what makes "open in a viewer, let them decide whether
+    // to save" (rather than an immediate forced download) still end up
+    // with a sensible filename if they do save it.
+    doc.setProperties({ title: photo.caption || pdfFilename(photo) });
     var pageWidth = doc.internal.pageSize.getWidth();
     var margin = 18;
     var maxWidth = pageWidth - margin * 2;
