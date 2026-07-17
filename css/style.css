@@ -1399,9 +1399,9 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   position: absolute;
   top: 16px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.12);
+  background: #fff;
   border: none;
-  color: #fff;
+  color: var(--green-900);
   font-size: 1.8rem;
   line-height: 1;
   width: 44px;
@@ -1409,8 +1409,9 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   border-radius: 50%;
   cursor: pointer;
   z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
-.place-zoom-close:hover { background: rgba(255, 255, 255, 0.22); }
+.place-zoom-close:hover { background: var(--gold-100); }
 
 .place-zoom-hint {
   position: absolute;
@@ -1434,17 +1435,18 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   z-index: 2;
 }
 .place-zoom-btn {
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: #fff;
+  background: #fff;
+  border: none;
+  color: var(--green-900);
   font-size: 1.1rem;
   font-weight: 700;
   min-width: 44px;
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
-.place-zoom-btn:hover { background: rgba(255, 255, 255, 0.22); }
+.place-zoom-btn:hover { background: var(--gold-100); }
 
 @media (max-width: 560px) {
   /* Cramped next to the close button at this width, and pinch-to-zoom
