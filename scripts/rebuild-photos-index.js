@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 /**
  * Rebuilds data/photos.json (the single fast array the site actually
- * reads) from data/photos/*.json (the CMS-editable source of truth, one
- * file per photo). Run by .github/workflows/rebuild-photos-index.yml on
- * every push that touches data/photos/** — never run by hand as part of
+ * reads) from data/photos/<category>/*.json (the CMS-editable source of
+ * truth, one file per photo, one subfolder per category — matching the
+ * admin's six category collections and the images/photos/<category>/
+ * layout). Run by .github/workflows/rebuild-photos-index.yml on every
+ * push that touches data/photos/** — never run by hand as part of
  * normal editing, this is purely a derived file.
  *
  * Sorted newest-first by addedAt, matching the archive grid's existing
@@ -44,16 +46,31 @@ function parseCoords(str) {
   return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
 }
 
-const files = fs.readdirSync(PHOTOS_DIR).filter((f) => f.endsWith(".json"));
+// One subfolder per category (data/photos/streets/, data/photos/people/,
+// etc) — walked recursively rather than assumed, so an extra level of
+// nesting added later wouldn't silently go unindexed.
+function findJsonFiles(dir) {
+  let results = [];
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      results = results.concat(findJsonFiles(full));
+    } else if (entry.name.endsWith(".json")) {
+      results.push(full);
+    }
+  }
+  return results;
+}
 
-const photos = files.map((file) => {
-  const filePath = path.join(PHOTOS_DIR, file);
+const files = findJsonFiles(PHOTOS_DIR);
+
+const photos = files.map((filePath) => {
   const raw = fs.readFileSync(filePath, "utf8");
   let photo;
   try {
     photo = JSON.parse(raw);
   } catch (e) {
-    throw new Error("Invalid JSON in data/photos/" + file + ": " + e.message);
+    throw new Error("Invalid JSON in " + path.relative(ROOT, filePath) + ": " + e.message);
   }
 
   if (!photo.addedAt) {
@@ -61,7 +78,7 @@ const photos = files.map((file) => {
     fs.writeFileSync(filePath, JSON.stringify(photo, null, 2) + "\n");
   }
 
-  photo.id = file.slice(0, -".json".length);
+  photo.id = path.basename(filePath, ".json");
 
   if (photo.coords) {
     const coords = parseCoords(photo.coords);

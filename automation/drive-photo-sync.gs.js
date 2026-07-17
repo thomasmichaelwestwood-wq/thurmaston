@@ -287,7 +287,7 @@ function publishPhoto(file, category, place, token, owner, repo) {
   var slug = slugify(caption);
   var shortId = file.getId().slice(0, 8);
   var filename = shortId + "-" + slug + ext;
-  var repoPath = "images/photos/" + filename;
+  var repoPath = "images/photos/" + category + "/" + filename;
 
   var blob = resizeViaProxy(file);
   var base64 = Utilities.base64Encode(blob.getBytes());
@@ -384,9 +384,12 @@ function resizeViaProxy(file, maxDimension) {
 }
 
 /**
- * Writes the new photo straight to its own data/photos/<id>.json file —
- * the CMS-editable source of truth — rather than the old read-whole-
- * array-then-write-it-back approach. A GitHub Actions workflow
+ * Writes the new photo straight to its own data/photos/<category>/<id>.json
+ * file — the CMS-editable source of truth — rather than the old read-
+ * whole-array-then-write-it-back approach. One subfolder per category,
+ * matching the admin's six category collections and the
+ * images/photos/<category>/ layout the image itself was just uploaded
+ * to above. A GitHub Actions workflow
  * (.github/workflows/rebuild-photos-index.yml) regenerates the fast
  * data/photos.json aggregate the live site reads whenever this changes,
  * so nothing else here needs to touch that file directly. addedAt
@@ -394,11 +397,11 @@ function resizeViaProxy(file, maxDimension) {
  */
 function appendMetadataEntry(shortId, slug, filename, caption, ref, category, place, token, owner, repo) {
   var id = shortId + "-" + slug;
-  var dataPath = "data/photos/" + id + ".json";
+  var dataPath = "data/photos/" + category + "/" + id + ".json";
 
   var entry = {
     id: id,
-    src: "/images/photos/" + filename,
+    src: "/images/photos/" + category + "/" + filename,
     caption: caption,
     ref: ref,
     category: category,

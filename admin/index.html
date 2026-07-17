@@ -141,7 +141,12 @@
       );
     }
   });
-  CMS.registerPreviewTemplate("photos", PhotosPreview);
+  // Registered once per category collection (photos_streets, photos_people,
+  // etc) — they all share this exact same preview component, since the
+  // only thing that differs between them is which folder they save into.
+  ["streets", "people", "events", "nature", "aerial", "other"].forEach(function (slug) {
+    CMS.registerPreviewTemplate("photos_" + slug, PhotosPreview);
+  });
 
   // Edit log — a plain read-only history of changes to the site's
   // content, pulled from GitHub's commit history (every CMS save is a

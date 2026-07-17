@@ -86,7 +86,7 @@ Every run, it:
    a free image-resizing service — Apps Script can't resize images
    itself, so it hands the job off rather than publishing full-size
    originals.
-3. Commits it into `images/photos/` in this repo.
+3. Commits it into `images/photos/<category>/` in this repo (e.g. `images/photos/streets/`) — the same six category folders the admin's collections use.
 4. Adds a matching entry to `data/photos.json` — category from the
    subfolder, caption auto-generated from the filename (with catalog
    numbers and MOT-style reference codes stripped out, see above),
@@ -115,14 +115,19 @@ caption in the corner of the slide.
 
 ## 2b. Adding a photo directly (skip Drive entirely)
 
-Log into `/admin`, open the **Photos** collection, and click "New Photo."
-Upload the image, then fill in what you know — caption, category, date,
-credit, coordinates (paste straight from Google Maps, same as everywhere
-else on the site — right-click the spot, click the coordinates that pop
-up to copy, paste them in), location, and history. Save, and it's live
-within a minute or two, no Drive step needed — the photo gets its own
-page automatically, no extra step required. Leave the "Internal" fields
-at the bottom alone — they fill themselves in.
+Log into `/admin`, open the collection for whichever category the photo
+belongs in — e.g. **Photos — Streets & Buildings**, **Photos — People**
+— and click "New Photos — …". There's one collection per category
+rather than a single "Photos" list, so the one you pick decides both the
+category (no separate field to set — it's filled in automatically to
+match) and which folder the image and its entry land in. Upload the
+image, then fill in what you know — caption, date, credit, coordinates
+(paste straight from Google Maps, same as everywhere else on the site —
+right-click the spot, click the coordinates that pop up to copy, paste
+them in), location, and history. Save, and it's live within a minute or
+two, no Drive step needed — the photo gets its own page automatically,
+no extra step required. Leave the "Internal" fields at the bottom
+alone — they fill themselves in.
 
 Good for a one-off (someone hands you a photo, a scan, something from a
 different source than the family archive) — for a batch, or anything
@@ -134,9 +139,13 @@ that should also live in the Drive archive as a backup, Google Drive
 The auto-generated caption is the filename with catalog numbers and MOT
 codes stripped out — good enough to publish, but worth improving. To fix
 a caption, date, credit, location, or history, or add/correct the Google
-Maps coordinates, log into the admin at `/admin` and open the **Photos**
-collection — find the photo by its caption, edit the field, save. No
-need to touch any JSON file by hand. The `ref` field holds the untouched
+Maps coordinates, log into the admin at `/admin`, open the collection
+matching the photo's category, find the photo by its caption, edit the
+field, save. No need to touch any JSON file by hand. If you want to
+*change* a photo's category, that's the one thing the admin can't do
+directly (moving it to a different category's collection means moving
+both its files) — ask, or see the "Photos: one collection per category"
+note in `CLAUDE.md`. The `ref` field holds the untouched
 original filename (shown as a small tag on the photo's own page) — leave
 it as-is unless it's wrong. The `consentNoted` field starts unticked for every
 auto-synced photo; tick it once you've confirmed it's fine to have public
