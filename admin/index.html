@@ -72,6 +72,19 @@
   });
   CMS.registerWidget("muted-string", MutedStringControl);
 
+  // Taller than a plain textarea default, and resizable — History can
+  // run to several paragraphs (a real example: the Harrow Inn photo's
+  // history is nine sentences long), and 4 rows made it feel like
+  // typing into a letterbox. resize: vertical adds the browser's own
+  // drag-to-resize handle on top of the bigger default, so a
+  // still-not-enough-room case doesn't need another size bump here —
+  // just drag it further.
+  var MUTED_TEXTAREA_STYLE = Object.assign({}, MUTED_INPUT_STYLE, {
+    resize: "vertical",
+    minHeight: "220px",
+    lineHeight: "1.5"
+  });
+
   var MutedTextControl = createClass({
     handleChange: function (e) {
       this.props.onChange(e.target.value);
@@ -80,10 +93,10 @@
       return h("textarea", {
         id: this.props.forID,
         className: this.props.classNameWrapper,
-        rows: 4,
+        rows: 10,
         value: this.props.value || "",
         onChange: this.handleChange,
-        style: MUTED_INPUT_STYLE
+        style: MUTED_TEXTAREA_STYLE
       });
     }
   });
