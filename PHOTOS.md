@@ -116,8 +116,8 @@ caption in the corner of the slide.
 ## 2b. Adding a photo directly (skip Drive entirely)
 
 Log into `/admin`, open the collection for whichever category the photo
-belongs in — e.g. **Photos — Streets & Buildings**, **Photos — People**
-— and click "New Photos — …". There's one collection per category
+belongs in — e.g. **Streets & Buildings**, **People**
+— and click "New …". There's one collection per category
 rather than a single "Photos" list, so the one you pick decides both the
 category (no separate field to set — it's filled in automatically to
 match) and which folder the image and its entry land in. Upload the
