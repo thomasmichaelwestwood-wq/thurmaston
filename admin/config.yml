@@ -86,6 +86,7 @@ collections:
         public_folder: "/images/photos/events"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Event name", name: "eventName", widget: "muted-string", required: false, hint: "e.g. \"Remembrance Day Parade\" — groups this photo with every other year's photos of the same recurring event, on its own page listing every year it's been held. Use the exact same wording each year so they group together. Leave blank if this photo isn't part of a named, repeating event." }
       - label: "Category"
         name: "category"
         widget: "hidden"

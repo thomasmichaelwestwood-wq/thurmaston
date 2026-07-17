@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   PHOTOS_DATA_PROMISE.then(function (photos) {
     var matches = photos.filter(function (p) {
-      return typeof p.location === "string" && slugifyLocation(p.location) === locParam;
+      return typeof p.location === "string" && slugifyText(p.location) === locParam;
     });
     if (matches.length === 0) {
       showNotFound();
@@ -39,20 +39,6 @@ document.addEventListener("DOMContentLoaded", function () {
     notFoundEl.hidden = false;
     headingEl.textContent = "Place not found";
     crumbEl.textContent = "Not found";
-  }
-
-  // "Added <Month> <Year>" is the auto-filled placeholder used
-  // everywhere on this site for a photo whose real date isn't known
-  // (see automation/drive-photo-sync.gs.js and the Photos admin
-  // form's own hint text for that field) — it's the date it was
-  // *uploaded*, not anything about when the photo was actually taken,
-  // so it must never be read as a real year here. Anything else with a
-  // plain 4-digit number in it ("1913", "c.1936", "2002") is treated
-  // as a genuine year.
-  function extractYear(dateStr) {
-    if (!dateStr || /^added\b/i.test(dateStr.trim())) return null;
-    var m = dateStr.match(/\d{4}/);
-    return m ? parseInt(m[0], 10) : null;
   }
 
   // Shared by both the HTML timeline and the PDF, so the two can never

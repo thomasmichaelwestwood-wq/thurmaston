@@ -470,7 +470,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     if (siblings.length < 2) return;
 
-    var slug = slugifyLocation(photo.location);
+    var slug = slugifyText(photo.location);
     locationBannerEl.href = "location.html?loc=" + encodeURIComponent(slug);
     locationBannerEl.innerHTML =
       "This is one of " + siblings.length + " photos of <strong>" + escapeHtml(photo.location) + "</strong> — see the full history and timeline →";

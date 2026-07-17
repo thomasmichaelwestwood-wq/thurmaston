@@ -27,6 +27,17 @@ occasions. If a photo could go either way, go with whichever it's more
 *about* — a photo of the fete committee lined up for a portrait is
 People, a photo of the fete itself in full swing is Events.
 
+**Naming a recurring event:** if a photo is from something held most
+years — Remembrance Day, the village fete, etc. — give it an "Event
+name" in the admin (see "2b"/"3" below) so it groups with every other
+year's photos of the same occasion on its own page at `/events.html`,
+listing every year it's been held. This isn't set automatically from
+Drive — type the exact same wording each year (e.g. always
+"Remembrance Day Parade", not sometimes "Remembrance Sunday") so they
+land on the same page. Leave it blank for a one-off Events photo that
+isn't part of a named, repeating occasion — it still shows up in the
+Events category as normal.
+
 Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
 

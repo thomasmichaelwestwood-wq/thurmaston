@@ -172,15 +172,33 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// Turns a photo's free-text Location field ("The Harrow Inn, Melton
-// Road") into a stable, URL-safe slug for location.html's ?loc= param.
-// Purely computed at read time from the text itself — no separate id
-// stored anywhere — so two photos with the same Location automatically
-// resolve to the same slug/page with no extra admin step, the same
-// "same text = same place" matching js/place.js's "More photos from
-// this location" grid already relies on (see CLAUDE.md).
-function slugifyLocation(text) {
+// Turns a free-text field into a stable, URL-safe slug — used for both
+// a photo's Location ("The Harrow Inn, Melton Road" -> location.html's
+// ?loc= param) and its Event name ("Remembrance Day Parade" ->
+// event.html's ?event= param). Purely computed at read time from the
+// text itself — no separate id stored anywhere — so two photos with
+// the same text automatically resolve to the same slug/page with no
+// extra admin step, the same "same text = same place" matching
+// js/place.js's "More photos from this location" grid already relies
+// on (see CLAUDE.md).
+function slugifyText(text) {
   return (text || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+// "Added <Month> <Year>" is the auto-filled placeholder used everywhere
+// on this site for a photo whose real date isn't known (see
+// automation/drive-photo-sync.gs.js and the Photos admin form's own
+// hint text for that field) — it's the date it was *uploaded*, not
+// anything about when the photo was actually taken, so it must never
+// be read as a real year here. Anything else with a plain 4-digit
+// number in it ("1913", "c.1936", "2002") is treated as a genuine
+// year. Shared by js/location.js, js/events.js and js/event.js so a
+// photo's year can never be read differently depending which page
+// happens to be looking at it.
+function extractYear(dateStr) {
+  if (!dateStr || /^added\b/i.test(dateStr.trim())) return null;
+  var m = dateStr.match(/\d{4}/);
+  return m ? parseInt(m[0], 10) : null;
 }
 
 // A History field can be several paragraphs, separated by plain "\n"
