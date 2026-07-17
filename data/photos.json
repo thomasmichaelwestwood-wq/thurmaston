@@ -22,10 +22,10 @@
     "consentNoted": false,
     "credit": "Jeff Hartop",
     "category": "streets",
+    "ref": "008-hardware-rotated-mot-1-67.jpg",
     "id": "20260716114759-hardware",
     "lat": 52.68019766945202,
-    "lng": -1.0978456163713783,
-    "ref": "008-hardware-rotated-mot-1-67.jpg"
+    "lng": -1.0978456163713783
   },
   {
     "consentNoted": false,
@@ -35,10 +35,10 @@
     "date": "July 2026",
     "credit": "Tom test",
     "addedAt": "2026-07-16T11:47:53.167Z",
+    "ref": "lwlat-confernce-backdrop.png",
     "id": "20260716114738-green-background",
     "lat": 52.680188684401664,
-    "lng": -1.0978459971622994,
-    "ref": "lwlat-confernce-backdrop.png"
+    "lng": -1.0978459971622994
   },
   {
     "src": "/images/photos/people/_132553987_ian_lavender_bbc.jpg",
@@ -51,8 +51,8 @@
     "credit": "Michael Westwood",
     "pageSlug": "ian-lavendar",
     "category": "people",
-    "id": "20260715175016-ian-lavendar",
-    "ref": "_132553987_ian_lavender_bbc.jpg"
+    "ref": "_132553987_ian_lavender_bbc.jpg",
+    "id": "20260715175016-ian-lavendar"
   },
   {
     "src": "/images/photos/streets/14c3w-fx-014-garden-centre-1960.jpg",
@@ -190,8 +190,8 @@
     "credit": "Unknown — needs a credit",
     "consentNoted": false,
     "addedAt": "2026-07-15T13:29:18Z",
+    "ref": "1w3CZ0o6-manor-hotel.jpg",
     "lat": 52.672797650614264,
-    "lng": -1.1033455758707467,
-    "ref": "1w3CZ0o6-manor-hotel.jpg"
+    "lng": -1.1033455758707467
   }
 ]

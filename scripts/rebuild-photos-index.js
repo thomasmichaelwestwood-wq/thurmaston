@@ -30,8 +30,12 @@
  *    freshly added photo reliably sorts as the newest.
  *  - ref, if left blank (the normal case for a photo added straight
  *    through the CMS rather than synced from Drive), defaults to the
- *    uploaded image's own filename, so there's always something
- *    sensible to show as the "Ref:" tag.
+ *    uploaded image's own filename and is written back to the photo's
+ *    own file, same as addedAt above — so there's always something
+ *    sensible to show as the "Ref:" tag, AND the admin's own
+ *    "Internal — reference code" field shows it next time that photo
+ *    is reopened, instead of looking blank forever until someone
+ *    fills it in by hand.
  */
 const fs = require("fs");
 const path = require("path");
@@ -73,8 +77,30 @@ const photos = files.map((filePath) => {
     throw new Error("Invalid JSON in " + path.relative(ROOT, filePath) + ": " + e.message);
   }
 
+  // Both of these get written back to the photo's own file (not just
+  // the in-memory copy used for the aggregate below) so a value
+  // computed once here shows up next time the photo is opened in the
+  // admin too — otherwise the CMS form's "leave blank, it fills itself
+  // in automatically" hints are only true for the live site, not for
+  // what an editor actually sees when they reopen that entry. Must
+  // happen before the coords -> lat/lng conversion further down, which
+  // is aggregate-only and would corrupt the per-file schema (the CMS's
+  // Coordinates field expects a "lat, lng" string, not split numbers)
+  // if it ever leaked into a write-back.
+  let dirty = false;
   if (!photo.addedAt) {
     photo.addedAt = new Date().toISOString();
+    dirty = true;
+  }
+  if (!photo.ref && photo.src) {
+    try {
+      photo.ref = decodeURIComponent(path.basename(photo.src));
+    } catch (e) {
+      photo.ref = path.basename(photo.src);
+    }
+    dirty = true;
+  }
+  if (dirty) {
     fs.writeFileSync(filePath, JSON.stringify(photo, null, 2) + "\n");
   }
 
@@ -84,14 +110,6 @@ const photos = files.map((filePath) => {
     const coords = parseCoords(photo.coords);
     delete photo.coords;
     if (coords) Object.assign(photo, coords);
-  }
-
-  if (!photo.ref && photo.src) {
-    try {
-      photo.ref = decodeURIComponent(path.basename(photo.src));
-    } catch (e) {
-      photo.ref = path.basename(photo.src);
-    }
   }
 
   return photo;
