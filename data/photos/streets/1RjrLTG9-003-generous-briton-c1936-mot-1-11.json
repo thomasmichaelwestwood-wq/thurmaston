@@ -1,15 +1,15 @@
 {
-  "id": "1RjrLTG9-003-generous-briton-c1936-mot-1-11",
   "src": "/images/photos/streets/1RjrLTG9-003-generous-briton-c1936-mot-1-11.jpg",
-  "caption": "Generous Briton c1936",
+  "caption": "The Generous Briton ",
+  "date": "c1936",
   "ref": "003 Generous Briton c1936 MOT 1 11.jpg",
-  "category": "streets",
-  "date": "Added July 2026",
-  "credit": "Unknown — needs a credit",
-  "consentNoted": false,
-  "location": "Garden Street",
+  "addedAt": "2026-07-15T13:36:18Z",
   "history": "The sign reads “The Generous Briton, Sydney Pegg, Dealer in Tobacco” — a pub on Garden Street. If you know more, get in touch or use the form below.",
+  "location": "Garden Street",
+  "consentNoted": false,
+  "credit": "Unknown — needs a credit",
   "pageSlug": "generous-briton",
+  "id": "1RjrLTG9-003-generous-briton-c1936-mot-1-11",
   "coords": "52.679363200371284, -1.0979936680376168",
-  "addedAt": "2026-07-15T13:36:18Z"
+  "category": "streets"
 }
