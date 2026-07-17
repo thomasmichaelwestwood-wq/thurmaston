@@ -48,25 +48,19 @@
   <section class="hero" data-hero>
     <div class="hero-content">
       <h1>Memories of Thurmaston</h1>
-      <p>The history of our village</p>
+      <p class="hero-subtitle">The history of our village</p>
+      <p class="hero-lede">A community archive of old photographs, personal stories and local history — built by the people who lived it. Browse the photo archive, explore the interactive map of buildings that used to stand in the village, or share a memory of your own below.</p>
+      <div class="hero-search">
+        <input type="text" id="home-search-input" class="hero-search-input" placeholder="Search by caption, street, name or date…" autocomplete="off" aria-label="Search the archive">
+        <ul id="home-search-results" class="home-search-results hero-search-results"></ul>
+      </div>
       <div class="hero-cta">
-        <a class="btn btn-primary" href="#photos">Browse the photo archive</a>
         <a class="btn btn-outline" href="map.html">See the interactive map</a>
       </div>
     </div>
     <div class="hero-media">
       <div class="hero-slide active" style="background-image:url('images/hero/melton-road.svg')"></div>
     </div>
-  </section>
-
-  <div class="container" style="padding:32px 20px 0">
-    <p class="tiles-lede" style="margin:0 auto">A community archive of old photographs, personal stories and local history — built by the people who lived it. Browse the photo archive, explore the interactive map of buildings that used to stand in the village, or share a memory of your own below.</p>
-  </div>
-
-  <section class="category-search-bar home-search-section container" style="padding-top:24px">
-    <label for="home-search-input" class="category-search-label">Search the archive</label>
-    <input type="text" id="home-search-input" class="photo-search-input photo-search-input-wide" placeholder="Search by caption, street, name or date…" autocomplete="off">
-    <ul id="home-search-results" class="home-search-results"></ul>
   </section>
 
   <section class="content-section container" id="photos">
@@ -79,19 +73,6 @@
       <a href="category.html?cat=nature" data-category="nature"><span>Nature &amp; Views</span></a>
       <a href="category.html?cat=aerial" data-category="aerial"><span>Aerial</span></a>
       <a href="category.html?cat=other" data-category="other"><span>Other</span></a>
-    </div>
-  </section>
-
-  <section class="content-section container" id="map">
-    <div class="callout callout-map">
-      <div class="callout-map-media">
-        <img src="images/interactive-map-preview.svg" alt="" loading="lazy">
-      </div>
-      <div class="callout-map-body">
-        <h3>Interactive map — where buildings used to be</h3>
-        <p>An interactive map of buildings and places that used to stand in the village, built up from residents' photos and accounts as they come in.</p>
-        <a class="btn btn-primary" href="map.html">Explore the interactive map →</a>
-      </div>
     </div>
   </section>
 

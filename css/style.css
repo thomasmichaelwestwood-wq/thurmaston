@@ -336,11 +336,17 @@ h1, h2, h3, h4 {
   min-height: 300px;
   max-height: 460px;
   height: 38vh;
-  overflow: hidden;
+  /* Not hidden here — .hero-media below clips its own photo with its
+     own overflow:hidden, so this can stay visible, which the search
+     results dropdown in .hero-search needs (it would otherwise be cut
+     off at the hero's fixed height as soon as it had more than a
+     couple of results). */
+  overflow: visible;
   color: #fff;
 }
 
 .hero-content {
+  position: relative;
   flex: 1 1 auto;
   min-width: 0;
   display: flex;
@@ -380,10 +386,63 @@ h1, h2, h3, h4 {
   margin-bottom: 0.25em;
 }
 
-.hero-content p {
+.hero-subtitle {
   font-size: 1.1rem;
-  margin: 0 0 20px;
+  margin: 0 0 12px;
   color: #f2f0e6;
+}
+
+.hero-lede {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  max-width: 46em;
+  margin: 0 0 18px;
+  color: #d9e6db;
+}
+
+.hero-search {
+  position: relative;
+  max-width: 420px;
+  margin: 0 0 20px;
+}
+
+.hero-search-input {
+  width: 100%;
+  font-size: 0.95rem;
+  padding: 12px 18px;
+  border: 1px solid var(--glass-border-dark);
+  background: var(--glass-bg-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-radius: var(--radius-pill);
+  font-family: var(--font-body);
+  color: #fff;
+  box-shadow: var(--shadow);
+}
+.hero-search-input::placeholder { color: rgba(255, 255, 255, 0.7); }
+.hero-search-input:focus {
+  outline: 2px solid #fff;
+  outline-offset: 1px;
+}
+
+/* Positioned to float below the input regardless of the hero's own
+   fixed height (see .hero's overflow:visible above) — same card look
+   as .home-search-results elsewhere (that class is still applied,
+   just repositioned here), just anchored absolutely since it's
+   floating over the hero photo/green panel rather than sitting inline
+   in the page flow. Targeted by #home-search-results (an ID, not just
+   the .hero-search-results class) so these overrides reliably beat
+   .home-search-results's own margin/max-width regardless of which
+   block happens to come later in this file — class-vs-class specificity
+   ties are order-dependent and easy to accidentally invert later. */
+#home-search-results.hero-search-results {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  max-width: none;
+  margin: 0;
+  z-index: 5;
 }
 
 .hero-cta {

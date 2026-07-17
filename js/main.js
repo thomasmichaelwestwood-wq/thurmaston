@@ -51,7 +51,7 @@ function initSearch() {
           title: p.caption,
           url: "place.html?photo=" + encodeURIComponent(p.id),
           category: "Photo",
-          excerpt: [p.date, p.location, p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · "),
+          excerpt: [p.date, p.location, p.credit && p.credit !== "—" ? "Credit: " + p.credit : null].filter(Boolean).join(" · "),
           // Matched against, but never shown — a photo's location
           // ("Garden Street"), Dad's original filing reference, and
           // any written History are all things a visitor might type
