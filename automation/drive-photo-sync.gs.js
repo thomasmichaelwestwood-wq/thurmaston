@@ -104,6 +104,31 @@
  * that's the normal case for most old photos.
  * ---------------------------------------------------------------------
  *
+ * GROUPING A RECURRING EVENT (Events folder only)
+ * ---------------------------------------------------------------------
+ * Inside the "Events" folder specifically, a subfolder's name is the
+ * event's own name (not a recognised map place like the "2. Approximate"
+ * folders above) — drop photos straight in there for a one-off event
+ * with no year grouping wanted, e.g.:
+ *
+ *   Events/Remembrance Day Parade/photo1.jpg
+ *
+ * To group by year too (so the site's Events pages show one section
+ * per year, in order), add a further subfolder named just the 4-digit
+ * year:
+ *
+ *   Events/Remembrance Day Parade/1975/photo1.jpg
+ *   Events/Remembrance Day Parade/1980/photo2.jpg
+ *
+ * Use the exact same event-folder name every year (spelling and
+ * capitalisation included) so they group together — same idea as
+ * KNOWN_PLACES above, just an exact folder-name match rather than a
+ * fixed list, since an event's name isn't something to hardcode here.
+ * This mirrors the admin's own "Event / Year folder" box on the Events
+ * collection (for photos added directly through the CMS instead of
+ * Drive) — either path ends up grouping the same way on the site.
+ * ---------------------------------------------------------------------
+ *
  * THE HOMEPAGE HERO BANNER
  * ---------------------------------------------------------------------
  * Drop photos into the "Hero images" subfolder and they become the rotating
@@ -198,7 +223,7 @@ function syncPhotos() {
   var newHeroIds = [];
 
   // Root-level photos (no category chosen) default to "other", no place.
-  scanFolder(root, "other", null);
+  scanFolder(root, "other", null, null);
 
   var subfolders = root.getFolders();
   while (subfolders.hasNext()) {
@@ -210,13 +235,33 @@ function syncPhotos() {
     }
 
     var category = CATEGORY_FOLDERS[sub.getName()] || "other";
-    scanFolder(sub, category, null);
+    scanFolder(sub, category, null, null);
 
     var placeFolders = sub.getFolders();
     while (placeFolders.hasNext()) {
       var placeFolder = placeFolders.next();
-      var place = KNOWN_PLACES[placeFolder.getName().toLowerCase().trim()] || null;
-      scanFolder(placeFolder, category, place);
+
+      if (category === "events") {
+        // Inside Events, a subfolder's name IS the event's own name —
+        // not a KNOWN_PLACES lookup (an event isn't a fixed, curated
+        // list of village spots the way a map place is). Photos loose
+        // directly inside it belong to that event with no known year;
+        // a further 4-digit-named subfolder groups them by year too —
+        // see the "GROUPING A RECURRING EVENT" comment near the top.
+        var eventName = placeFolder.getName();
+        scanFolder(placeFolder, category, null, { name: eventName, year: null });
+
+        var yearFolders = placeFolder.getFolders();
+        while (yearFolders.hasNext()) {
+          var yearFolder = yearFolders.next();
+          var yearMatch = yearFolder.getName().trim().match(/^\d{4}$/);
+          var year = yearMatch ? parseInt(yearMatch[0], 10) : null;
+          scanFolder(yearFolder, category, null, { name: eventName, year: year });
+        }
+      } else {
+        var place = KNOWN_PLACES[placeFolder.getName().toLowerCase().trim()] || null;
+        scanFolder(placeFolder, category, place, null);
+      }
     }
   }
 
@@ -241,7 +286,7 @@ function syncPhotos() {
     });
   }
 
-  function scanFolder(folder, category, place) {
+  function scanFolder(folder, category, place, eventInfo) {
     var imageFiles = [];
     var files = folder.getFiles();
     while (files.hasNext()) {
@@ -254,7 +299,7 @@ function syncPhotos() {
 
     imageFiles.forEach(function (file) {
       try {
-        publishPhoto(file, category, place, token, owner, repo);
+        publishPhoto(file, category, place, eventInfo, token, owner, repo);
         newIds.push(file.getId());
       } catch (e) {
         Logger.log("Failed to publish " + file.getName() + ": " + e);
@@ -270,7 +315,7 @@ function syncPhotos() {
   }
 }
 
-function publishPhoto(file, category, place, token, owner, repo) {
+function publishPhoto(file, category, place, eventInfo, token, owner, repo) {
   var rawName = file.getName();
   var ext = ".jpg"; // resized output is always re-encoded as JPEG
   var base = rawName.replace(/\.(jpe?g|png)$/i, "");
@@ -293,7 +338,7 @@ function publishPhoto(file, category, place, token, owner, repo) {
   var base64 = Utilities.base64Encode(blob.getBytes());
 
   ghPut(repoPath, base64, "Add photo: " + rawName, token, owner, repo);
-  appendMetadataEntry(shortId, slug, filename, caption, rawName, category, place, token, owner, repo);
+  appendMetadataEntry(shortId, slug, filename, caption, rawName, category, place, eventInfo, token, owner, repo);
 }
 
 /**
@@ -395,7 +440,7 @@ function resizeViaProxy(file, maxDimension) {
  * so nothing else here needs to touch that file directly. addedAt
  * drives that rebuild's newest-first sort order.
  */
-function appendMetadataEntry(shortId, slug, filename, caption, ref, category, place, token, owner, repo) {
+function appendMetadataEntry(shortId, slug, filename, caption, ref, category, place, eventInfo, token, owner, repo) {
   var id = shortId + "-" + slug;
   var dataPath = "data/photos/" + category + "/" + id + ".json";
 
@@ -416,6 +461,19 @@ function appendMetadataEntry(shortId, slug, filename, caption, ref, category, pl
     // they'd type themselves — see rebuild-photos-index.js, which
     // parses this back into numeric lat/lng for the site to read.
     entry.coords = place.lat + ", " + place.lng;
+  }
+  if (eventInfo && eventInfo.name) {
+    // Unlike a CMS-added Events photo (which gets these derived from
+    // its own nested folder path in the repo, see
+    // rebuild-photos-index.js), a Drive-synced photo's file always
+    // lands at the same flat data/photos/events/<id>.json regardless
+    // of which Drive subfolder it came from — so these are set
+    // directly here instead. rebuild-photos-index.js only recomputes
+    // eventName/eventYear from a file's own path when that path
+    // actually has nested folders; a flat file's pre-set values (from
+    // here) pass through untouched, so both routes end up equivalent.
+    entry.eventName = eventInfo.name;
+    if (eventInfo.year) entry.eventYear = eventInfo.year;
   }
   entry.addedAt = Utilities.formatDate(new Date(), "Etc/UTC", "yyyy-MM-dd'T'HH:mm:ss'Z'");
 

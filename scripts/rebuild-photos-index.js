@@ -38,11 +38,17 @@
  *    fills it in by hand.
  *  - eventName/eventYear (Events category only) are derived from the
  *    photo's own nested folder path (data/photos/events/<event>/<year>/,
- *    filed via the admin's "Event / Year folder" box) — NOT written
- *    back to the file, unlike the two above, since the folder itself
- *    is the source of truth and re-deriving it fresh every rebuild is
- *    what lets moving a photo to a different folder actually change
- *    its grouping on the site.
+ *    filed via the admin's "Event / Year folder" box) whenever that
+ *    path actually has subfolders — NOT written back to the file,
+ *    unlike the two above, since the folder itself is the source of
+ *    truth and re-deriving it fresh every rebuild is what lets moving
+ *    a photo to a different folder actually change its grouping on
+ *    the site. A Drive-synced Events photo has no such subfolder (it
+ *    always lands flat at data/photos/events/<id>.json regardless of
+ *    which Drive folder it came from) — automation/drive-photo-sync.gs.js
+ *    sets eventName/eventYear directly on the file instead, and this
+ *    script leaves them untouched in that case, so both routes end up
+ *    equivalent on the live site.
  */
 const fs = require("fs");
 const path = require("path");

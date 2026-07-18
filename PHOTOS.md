@@ -29,16 +29,27 @@ People, a photo of the fete itself in full swing is Events.
 
 **Naming a recurring event:** if a photo is from something held most
 years — Remembrance Day, the village fete, etc. — file it into an
-event folder in the admin (see "2b"/"3" below: the Events collection's
-"Event / Year folder" box) so it groups with every other year's photos
-of the same occasion on its own page at `/events.html`, listing every
-year it's been held. Type `<Event name>/<year>` — e.g. `Remembrance Day
-Parade/1975` — using the exact same event name each year (spelling and
-capitalisation included) so they land in the same folder and group
-together; just `<Event name>` with no year is fine too if the year
-isn't known yet. This isn't set automatically from Drive. Leave the box
-blank for a one-off Events photo that isn't part of a named, repeating
-occasion — it still shows up in the Events category as normal.
+event folder so it groups with every other year's photos of the same
+occasion on its own page at `/events.html`, listing every year it's
+been held. Two ways in, same result either way:
+
+- **Via Google Drive** (best for a batch of scans): inside the
+  "Events" folder, create a subfolder named after the event, e.g.
+  "Remembrance Day Parade", and drop photos straight in there for a
+  one-off occasion with no year grouping. To group by year too, add a
+  further subfolder inside that one named just the 4-digit year, e.g.
+  "Remembrance Day Parade/1975". Use the exact same event folder name
+  every year (spelling and capitalisation included) so they land
+  together.
+- **Via the admin** (good for a one-off, see "2b"/"3" below): the
+  Events collection's "Event / Year folder" box. Type `<Event
+  name>/<year>` — e.g. `Remembrance Day Parade/1975` — same naming
+  rule as above; just `<Event name>` with no year is fine too if the
+  year isn't known yet.
+
+Leave both blank for a one-off Events photo that isn't part of a
+named, repeating occasion — it still shows up in the Events category
+as normal.
 
 Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
