@@ -1,12 +1,13 @@
 {
-  "id": "1w3CZ0o6-manor-hotel",
   "src": "/images/photos/streets/1w3CZ0o6-manor-hotel.jpg",
   "caption": "Manor hotel",
-  "category": "streets",
   "date": "Added July 2026",
-  "credit": "Unknown — needs a credit",
-  "consentNoted": false,
-  "coords": "52.672797650614264, -1.1033455758707467",
+  "ref": "1w3CZ0o6-manor-hotel.jpg",
   "addedAt": "2026-07-15T13:29:18Z",
-  "ref": "1w3CZ0o6-manor-hotel.jpg"
+  "location": "Melton Road",
+  "consentNoted": false,
+  "credit": "Unknown — needs a credit",
+  "id": "1w3CZ0o6-manor-hotel",
+  "coords": "52.672797650614264, -1.1033455758707467",
+  "category": "streets"
 }
