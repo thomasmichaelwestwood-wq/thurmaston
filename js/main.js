@@ -198,19 +198,32 @@ function slugifyText(text) {
 // A photo's "place identity" for grouping — used by js/place.js's
 // location banner/"More photos from…" grid and js/location.js's
 // timeline page, so all three can never disagree about which photos
-// belong together. GPS coordinates (pasted from Google Maps) take
-// priority over the free-text Location field: two photos of the same
-// physical spot almost always share identical coordinates, but their
-// Location text can vary in wording even when a person can plainly see
-// they're the same place — a real example that motivated this: three
-// Harrow Inn photos all share one exact coordinate, but one reads "The
-// Harrow Inn, Melton Road, Thurmaston" while the other two read "The
-// Harrow Inn, Melton Road" (no ", Thurmaston") — an exact-text match
-// silently left that one out of the group. Falls back to Location text
-// only when coordinates aren't set on a photo. Rounded to 5 decimal
-// places (~1m of precision) rather than compared as raw strings, so
-// two coordinates pasted at slightly different precision still match.
+// belong together. Three tiers, in priority order:
+//  1. Manual override (placeId, the admin's "Internal — manual place
+//     grouping" field) — for the case coordinates+text genuinely can't
+//     bridge on their own: an old photo of a building on a street that
+//     was later renamed (a real example: Melton Road used to be Main
+//     Street), where nobody's pinpointed the old photo's exact
+//     coordinates and its Location text was written using the old
+//     street name, so it would never automatically match a modern
+//     photo of the same building. Two photos with the same placeId
+//     always group together, no matter what their coordinates/Location
+//     say.
+//  2. GPS coordinates (pasted from Google Maps) — two photos of the
+//     same physical spot almost always share identical coordinates,
+//     even when their Location text varies in wording (a real example:
+//     three Harrow Inn photos all share one exact coordinate, but one
+//     read "The Harrow Inn, Melton Road, Thurmaston" while the other
+//     two read "The Harrow Inn, Melton Road" — no ", Thurmaston" — an
+//     exact-text match silently left that one out of the group).
+//     Rounded to 5 decimal places (~1m of precision) rather than
+//     compared as raw strings, so two coordinates pasted at slightly
+//     different precision still match.
+//  3. Location text — only when a photo has neither of the above.
 function placeKey(photo) {
+  if (typeof photo.placeId === "string" && photo.placeId.trim()) {
+    return "manual:" + slugifyText(photo.placeId);
+  }
   if (typeof photo.lat === "number" && typeof photo.lng === "number") {
     return "geo:" + photo.lat.toFixed(5) + "," + photo.lng.toFixed(5);
   }
