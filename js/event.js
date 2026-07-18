@@ -1,9 +1,11 @@
 // Per-event timeline page (event.html?event=<slug>) — every photo of
-// one named, recurring event (see admin/config.yml's Event name field
-// on the Events collection), grouped into one section per year it's
-// been held, oldest year first. The events.html landing page is what
-// links here per event; this page doesn't re-derive the event list
-// itself, just filters straight to the one matching ?event=.
+// one named, recurring event (eventName, derived by
+// scripts/rebuild-photos-index.js from the photo's own nested folder
+// path — see admin/config.yml's photos_events "Event / Year folder"
+// — not a typed field), grouped into one section per year it's been
+// held, oldest year first. The events.html landing page is what links
+// here per event; this page doesn't re-derive the event list itself,
+// just filters straight to the one matching ?event=.
 //
 // Loads js/photos.js purely for PHOTOS_DATA_PROMISE and buildPhotoThumb
 // — its own DOMContentLoaded handler no-ops safely here since none of
@@ -56,11 +58,14 @@ document.addEventListener("DOMContentLoaded", function () {
   // Same "oldest year first, undated held back to its own group at the
   // end" rule js/location.js's orderPhotos uses for a place's timeline
   // — here grouped one level further, by year rather than by photo.
+  // eventYear (the photo's own "<event>/<year>" folder) is authoritative
+  // when set — extractYear(date) only covers a photo filed under this
+  // event with no year subfolder yet.
   function groupByYear(photoList) {
     var byYear = {};
     var undated = [];
     photoList.forEach(function (p) {
-      var year = extractYear(p.date);
+      var year = p.eventYear || extractYear(p.date);
       if (year) {
         if (!byYear[year]) byYear[year] = [];
         byYear[year].push(p);

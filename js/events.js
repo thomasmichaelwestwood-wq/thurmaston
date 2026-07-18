@@ -1,11 +1,12 @@
 // Landing page for the Events category (events.html) — one tile per
-// named, recurring event (grouped by the Event name field, see
-// admin/config.yml's photos_events collection), rather than the usual
-// flat photo grid. Each tile links to event.html?event=<slug>, which
-// shows every year that event has been photographed. Event-category
-// photos with no Event name set still show up in a plain grid further
-// down the page, so nothing added before this feature existed (or
-// without an event name) goes missing.
+// named, recurring event (grouped by eventName, derived by
+// scripts/rebuild-photos-index.js from the photo's own nested folder
+// path — see admin/config.yml's photos_events "Event / Year folder"
+// — not a typed field), rather than the usual flat photo grid. Each
+// tile links to event.html?event=<slug>, which shows every year that
+// event has been photographed. Event-category photos filed loose
+// (no event folder) still show up in a plain grid further down the
+// page, so nothing goes missing.
 //
 // Loads js/photos.js purely for PHOTOS_DATA_PROMISE and buildPhotoThumb
 // — its own DOMContentLoaded handler no-ops safely here since none of
@@ -68,7 +69,11 @@ document.addEventListener("DOMContentLoaded", function () {
   function distinctYears(photoList) {
     var years = {};
     photoList.forEach(function (p) {
-      var y = extractYear(p.date);
+      // eventYear (from the photo's own "<event>/<year>" folder) is
+      // authoritative when set — falling back to the date field's
+      // extractYear only for a photo filed under an event with no
+      // year subfolder yet.
+      var y = p.eventYear || extractYear(p.date);
       if (y) years[y] = true;
     });
     return Object.keys(years).map(Number).sort(function (a, b) { return a - b; });

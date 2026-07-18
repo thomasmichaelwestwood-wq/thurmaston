@@ -70,10 +70,19 @@ collections:
 
   - name: "photos_events"
     label: "Events"
-    description: "Every photo in the Events category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    description: "Every photo in the Events category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. To group a recurring event's photos across years (e.g. Remembrance Day), file it in a folder using the \"Event / Year folder\" box below rather than a typed field — same idea as Streets & Buildings' Melton Road/St Michael's Church subfolders, just one level deeper."
     folder: "data/photos/events"
     create: true
     delete: true
+    nested:
+      depth: 100
+      summary: "{{caption}}"
+    meta:
+      path:
+        widget: "string"
+        label: "Event / Year folder"
+        hint: "Leave blank for a one-off Events photo. To group a recurring event, type \"<Event name>/<year>\" — e.g. \"Remembrance Day Parade/2020\" — using the exact same event name each year (spelling/capitalisation included) so they land in the same folder and group together on the site. Just \"<Event name>\" with no year is fine too if the year isn't known yet."
+        index_file: "index"
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -86,7 +95,6 @@ collections:
         public_folder: "/images/photos/events"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "muted-string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
-      - { label: "Event name", name: "eventName", widget: "muted-string", required: false, hint: "e.g. \"Remembrance Day Parade\" — groups this photo with every other year's photos of the same recurring event, on its own page listing every year it's been held. Use the exact same wording each year so they group together. Leave blank if this photo isn't part of a named, repeating event." }
       - label: "Category"
         name: "category"
         widget: "hidden"

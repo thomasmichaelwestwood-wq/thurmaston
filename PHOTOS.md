@@ -28,15 +28,17 @@ occasions. If a photo could go either way, go with whichever it's more
 People, a photo of the fete itself in full swing is Events.
 
 **Naming a recurring event:** if a photo is from something held most
-years — Remembrance Day, the village fete, etc. — give it an "Event
-name" in the admin (see "2b"/"3" below) so it groups with every other
-year's photos of the same occasion on its own page at `/events.html`,
-listing every year it's been held. This isn't set automatically from
-Drive — type the exact same wording each year (e.g. always
-"Remembrance Day Parade", not sometimes "Remembrance Sunday") so they
-land on the same page. Leave it blank for a one-off Events photo that
-isn't part of a named, repeating occasion — it still shows up in the
-Events category as normal.
+years — Remembrance Day, the village fete, etc. — file it into an
+event folder in the admin (see "2b"/"3" below: the Events collection's
+"Event / Year folder" box) so it groups with every other year's photos
+of the same occasion on its own page at `/events.html`, listing every
+year it's been held. Type `<Event name>/<year>` — e.g. `Remembrance Day
+Parade/1975` — using the exact same event name each year (spelling and
+capitalisation included) so they land in the same folder and group
+together; just `<Event name>` with no year is fine too if the year
+isn't known yet. This isn't set automatically from Drive. Leave the box
+blank for a one-off Events photo that isn't part of a named, repeating
+occasion — it still shows up in the Events category as normal.
 
 Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
@@ -139,6 +141,10 @@ them in), location, and history. Save, and it's live within a minute or
 two, no Drive step needed — the photo gets its own page automatically,
 no extra step required. Leave the "Internal" fields at the bottom
 alone — they fill themselves in.
+
+**In the Events collection only**, there's also an "Event / Year
+folder" box pinned near the top of the form — see "Naming a recurring
+event," above, for what to type there.
 
 Good for a one-off (someone hands you a photo, a scan, something from a
 different source than the family archive) — for a batch, or anything
