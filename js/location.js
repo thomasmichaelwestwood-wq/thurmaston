@@ -15,15 +15,21 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   PHOTOS_DATA_PROMISE.then(function (photos) {
-    var matches = photos.filter(function (p) {
-      return typeof p.location === "string" && slugifyText(p.location) === locParam;
-    });
+    var matches = photos.filter(function (p) { return placeKey(p) === locParam; });
     if (matches.length === 0) {
       showNotFound();
       return;
     }
 
-    var placeName = matches[0].location;
+    // Grouped by placeKey (js/main.js — GPS coordinates first, Location
+    // text as a fallback), so not every match is guaranteed to have its
+    // own Location text (a coordinate-only match can pull in a photo
+    // that never had one typed) — use the first one that does, same
+    // rule js/place.js's placeLabel uses.
+    var placeName = "This place";
+    for (var i = 0; i < matches.length; i++) {
+      if (matches[i].location) { placeName = matches[i].location; break; }
+    }
     document.title = placeName + " | Memories of Thurmaston";
     headingEl.textContent = placeName;
     crumbEl.textContent = placeName;

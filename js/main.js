@@ -184,17 +184,40 @@ function escapeHtml(str) {
   return div.innerHTML;
 }
 
-// Turns a free-text field into a stable, URL-safe slug — used for both
-// a photo's Location ("The Harrow Inn, Melton Road" -> location.html's
-// ?loc= param) and its Event name ("Remembrance Day Parade" ->
-// event.html's ?event= param). Purely computed at read time from the
-// text itself — no separate id stored anywhere — so two photos with
-// the same text automatically resolve to the same slug/page with no
-// extra admin step, the same "same text = same place" matching
-// js/place.js's "More photos from this location" grid already relies
-// on (see CLAUDE.md).
+// Turns a free-text field into a stable, URL-safe slug — used for a
+// photo's Event name ("Remembrance Day Parade" -> event.html's
+// ?event= param). Purely computed at read time from the text itself —
+// no separate id stored anywhere — so two photos with the same text
+// automatically resolve to the same slug/page with no extra admin
+// step (see CLAUDE.md). Location grouping used to use this too; see
+// placeKey below for why that changed.
 function slugifyText(text) {
   return (text || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+}
+
+// A photo's "place identity" for grouping — used by js/place.js's
+// location banner/"More photos from…" grid and js/location.js's
+// timeline page, so all three can never disagree about which photos
+// belong together. GPS coordinates (pasted from Google Maps) take
+// priority over the free-text Location field: two photos of the same
+// physical spot almost always share identical coordinates, but their
+// Location text can vary in wording even when a person can plainly see
+// they're the same place — a real example that motivated this: three
+// Harrow Inn photos all share one exact coordinate, but one reads "The
+// Harrow Inn, Melton Road, Thurmaston" while the other two read "The
+// Harrow Inn, Melton Road" (no ", Thurmaston") — an exact-text match
+// silently left that one out of the group. Falls back to Location text
+// only when coordinates aren't set on a photo. Rounded to 5 decimal
+// places (~1m of precision) rather than compared as raw strings, so
+// two coordinates pasted at slightly different precision still match.
+function placeKey(photo) {
+  if (typeof photo.lat === "number" && typeof photo.lng === "number") {
+    return "geo:" + photo.lat.toFixed(5) + "," + photo.lng.toFixed(5);
+  }
+  if (typeof photo.location === "string" && photo.location.trim()) {
+    return "loc:" + slugifyText(photo.location);
+  }
+  return null;
 }
 
 // "Added <Month> <Year>" is the auto-filled placeholder used everywhere

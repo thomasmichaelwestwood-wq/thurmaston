@@ -455,46 +455,58 @@ document.addEventListener("DOMContentLoaded", function () {
   // to be too easy to miss: two real photos of the same building
   // (the Harrow Inn, 1913 and 2002) were correctly cross-linked by it,
   // but that wasn't obvious enough to actually be found. Only shown
-  // when there's more than one photo at this exact location — a lone
-  // photo has no timeline to link to. Same exact-match-on-trimmed-
-  // lowercased-text rule as renderRelatedPhotos (see its comment) —
+  // when there's more than one photo at this same place — grouped by
+  // placeKey (js/main.js: matching GPS coordinates first, Location
+  // text only as a fallback — see its comment for why) — a lone photo
+  // has no timeline to link to. Same rule as renderRelatedPhotos —
   // deliberately not deduplicated between the two functions since they
   // serve different purposes (a quick top-of-page nudge vs the full
   // list of thumbnails) and would be awkward to share without also
   // coupling their render timing.
   function renderLocationBanner(photo, photos) {
-    if (!locationBannerEl || !photo.location) return;
-    var location = photo.location.trim().toLowerCase();
-    var siblings = photos.filter(function (p) {
-      return typeof p.location === "string" && p.location.trim().toLowerCase() === location;
-    });
+    if (!locationBannerEl) return;
+    var key = placeKey(photo);
+    if (!key) return;
+    var siblings = photos.filter(function (p) { return placeKey(p) === key; });
     if (siblings.length < 2) return;
 
-    var slug = slugifyText(photo.location);
-    locationBannerEl.href = "location.html?loc=" + encodeURIComponent(slug);
+    var label = placeLabel(photo, siblings);
+    locationBannerEl.href = "location.html?loc=" + encodeURIComponent(key);
     locationBannerEl.innerHTML =
-      "This is one of " + siblings.length + " photos of <strong>" + escapeHtml(photo.location) + "</strong> — see the full history and timeline →";
+      "This is one of " + siblings.length + " photos of <strong>" + escapeHtml(label) + "</strong> — see the full history and timeline →";
     locationBannerEl.hidden = false;
   }
 
-  // Other photos that share this one's Location text — only meaningful
-  // when photos have been archived with the same location spelled the
-  // same way (see CLAUDE.md), so this quietly shows nothing rather than
-  // guessing at a fuzzy match.
+  // Other photos at the same place (placeKey, see above) — quietly
+  // shows nothing when this photo has neither coordinates nor a
+  // Location, rather than guessing at a fuzzy match.
   function renderRelatedPhotos(photo, photos) {
-    if (!relatedEl || !photo.location) return;
-    var location = photo.location.trim().toLowerCase();
-    var others = photos.filter(function (p) {
-      return p.id !== photo.id && typeof p.location === "string" && p.location.trim().toLowerCase() === location;
-    });
+    if (!relatedEl) return;
+    var key = placeKey(photo);
+    if (!key) return;
+    var others = photos.filter(function (p) { return p.id !== photo.id && placeKey(p) === key; });
     if (others.length === 0) return;
 
+    var label = placeLabel(photo, others);
     var grid = others.map(function (p) { return renderPhotoBlock(p); }).join("");
     relatedEl.innerHTML =
-      "<h2>More photos from " + escapeHtml(photo.location) + "</h2>" +
+      "<h2>More photos from " + escapeHtml(label) + "</h2>" +
       '<div class="place-related-grid">' + grid + "</div>";
     relatedEl.hidden = false;
     relatedEl.classList.add("visible");
+  }
+
+  // A human-readable name for a place-key group — this photo's own
+  // Location text if it has one, otherwise the first sibling's (a
+  // coordinate-only match can still pull in a photo that has Location
+  // text even when this one doesn't), otherwise a plain fallback for
+  // the rare case where nobody in the group has typed one at all.
+  function placeLabel(photo, group) {
+    if (photo.location) return photo.location;
+    for (var i = 0; i < group.length; i++) {
+      if (group[i].location) return group[i].location;
+    }
+    return "this place";
   }
 
   function renderPhotoBlock(photo) {
