@@ -164,6 +164,18 @@ function initSearch() {
     document.getElementById("home-search-results"),
     null
   );
+
+  // category.html's "Looking for something specific?" box — present
+  // only there. Used to run its own separate filter over just that
+  // page's photo grid (js/photos.js), which visitors reported as not
+  // working; replaced with the exact same shared dropdown mechanism as
+  // the two search boxes above, already known to work correctly,
+  // rather than continuing to debug the bespoke version.
+  wireSearchBox(
+    document.getElementById("photo-search-input"),
+    document.getElementById("photo-search-results"),
+    null
+  );
 }
 
 function escapeHtml(str) {

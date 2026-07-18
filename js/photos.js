@@ -46,7 +46,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var gridStatusEl = document.getElementById("photo-grid-status");
   var gridFooterEl = document.getElementById("photo-grid-footer");
   var filterEl = document.getElementById("photo-filters");
-  var searchInput = document.getElementById("photo-search-input");
   var PREVIEW_COUNT = 8;
   var showingAll = false;
   var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "streets";
@@ -74,64 +73,48 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function matches(photo, query) {
-    if (photo.category !== activeCategory) return false;
-    if (!query) return true;
-    var haystack = (photo.caption + " " + photo.date + " " + photo.credit + " " + (photo.ref || "") +
-      " " + (photo.location || "") + " " + (photo.history || "")).toLowerCase();
-    return haystack.indexOf(query) !== -1;
+  function matches(photo) {
+    return photo.category === activeCategory;
   }
 
   // The grid never dumps the whole archive by default — with hundreds or
   // thousands of photos that's just an endless scroll. Instead it shows the
   // most recent PREVIEW_COUNT (allPhotos is newest-first) and leaves finding
-  // anything older to the search box above or the map's pins, with a "show
-  // all" escape hatch for anyone who really wants to scroll the lot.
+  // a specific one to the search box above (js/main.js's shared dropdown
+  // search, not filtered to this grid — see CLAUDE.md) or the map's pins,
+  // with a "show all" escape hatch for anyone who really wants to scroll
+  // the lot.
   function renderGrid() {
     if (!gridEl) return;
-    var query = searchInput ? searchInput.value.trim().toLowerCase() : "";
-    visiblePhotos = allPhotos.filter(function (p) { return matches(p, query); });
+    visiblePhotos = allPhotos.filter(matches);
 
     gridEl.innerHTML = "";
 
     if (visiblePhotos.length === 0) {
-      // Two different reasons to land here, needing two different
-      // messages — a search that matched nothing (there ARE photos in
-      // this category, just not ones matching "xyz") vs a category
-      // that has no photos at all yet, where the search box was never
-      // the problem. Without this split, an empty category always
-      // showed "No photos match" even with nothing typed, which reads
-      // exactly like "the search box doesn't work" — reported for real
-      // once Events/Nature & Views had zero photos in them.
-      var categoryHasAny = allPhotos.some(function (p) { return p.category === activeCategory; });
       var empty = document.createElement("p");
       empty.className = "search-empty";
-      empty.textContent = (query || categoryHasAny)
-        ? "No photos match. Try a different search or category."
-        : "No photos in this category yet — check back soon, or explore another category.";
+      empty.textContent = "No photos in this category yet — check back soon, or explore another category.";
       gridEl.appendChild(empty);
-      setGridStatus("");
+      setGridStatus(0, false);
       renderShowAllButton(0, false);
       return;
     }
 
-    var capped = !query && !showingAll && visiblePhotos.length > PREVIEW_COUNT;
+    var capped = !showingAll && visiblePhotos.length > PREVIEW_COUNT;
     var displayPhotos = capped ? visiblePhotos.slice(0, PREVIEW_COUNT) : visiblePhotos;
 
     displayPhotos.forEach(function (photo) {
       gridEl.appendChild(buildPhotoThumb(photo));
     });
 
-    setGridStatus(query, visiblePhotos.length, capped);
+    setGridStatus(visiblePhotos.length, capped);
     renderShowAllButton(visiblePhotos.length, capped);
   }
 
-  function setGridStatus(query, total, capped) {
+  function setGridStatus(total, capped) {
     if (!gridStatusEl) return;
-    if (!query && !total) { gridStatusEl.textContent = ""; return; }
-    if (query) {
-      gridStatusEl.textContent = total + (total === 1 ? " photo matches " : " photos match ") + "“" + query + "”.";
-    } else if (capped) {
+    if (!total) { gridStatusEl.textContent = ""; return; }
+    if (capped) {
       gridStatusEl.textContent = "Showing the " + PREVIEW_COUNT + " most recently added photos of " + total + " — search above or use the map to find more.";
     } else {
       gridStatusEl.textContent = "All " + total + (total === 1 ? " photo" : " photos") + " in this category.";
@@ -164,9 +147,5 @@ document.addEventListener("DOMContentLoaded", function () {
       });
       renderGrid();
     });
-  }
-
-  if (searchInput) {
-    searchInput.addEventListener("input", renderGrid);
   }
 });
