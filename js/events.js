@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
       var cover = event.photos && event.photos[0];
       var count = (event.photos || []).length;
       var meta = [event.date, count + (count === 1 ? " photo" : " photos")].filter(Boolean).join(" · ");
-      var bg = cover ? "background-image:url('" + escapeAttr(cover.image) + "')" : "";
+      var bg = cover ? "background-image:url('" + escapeAttr(cover) + "')" : "";
       return (
         '<a href="event.html?event=' + encodeURIComponent(event.id) + '" style="' + bg + '">' +
           "<span>" + escapeHtml(event.name) +

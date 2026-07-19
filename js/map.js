@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
         period: event.date,
         location: event.location || "",
         description: event.description || "",
-        photoSrc: cover ? cover.image : "",
+        photoSrc: cover || "",
         eventId: event.id
       });
     });

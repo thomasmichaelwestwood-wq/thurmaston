@@ -31,14 +31,15 @@ People, a photo of the fete itself in full swing is Events.
 the village fete, etc. — doesn't go through Drive or the ordinary
 Events folder at all. Log into `/admin` and use the **"Event Pages"**
 collection instead: one entry covers the whole occasion — give it a
-name (e.g. "Remembrance Day Parade 1975"), a date, a description, and
-add every photo of it right there in the same entry (each with an
-optional caption of its own). Save once, and it gets its own page at
-`/events.html`, gallery and all — no need to upload photos one at a
-time or juggle folders. The same recurring event in a different year
-is just another Event Pages entry (e.g. "...1980" alongside "...1975")
-— there's no folder or field linking the two together, each occasion
-stands on its own.
+name (e.g. "Remembrance Day Parade 1975") and a description, then click
+"Add photo" under Photos and **select several images at once** in the
+media library (ctrl/cmd-click, or the checkboxes it shows) — every one
+picked is added in one go, not one at a time. Save once, and it gets
+its own page at `/events.html`, gallery and all. There's no caption on
+an individual photo here — the event's own name/date/description covers
+it. The same recurring event in a different year is just another Event
+Pages entry (e.g. "...1980" alongside "...1975") — there's no folder or
+field linking the two together, each occasion stands on its own.
 
 Add Google Maps coordinates on an Event Pages entry (same copy-paste
 method as everywhere else on the site) to also place it on the

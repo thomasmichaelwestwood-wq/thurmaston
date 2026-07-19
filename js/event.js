@@ -1,11 +1,18 @@
 // One Event Page (event.html?event=<id>) — its own description and a
 // gallery of every photo added to it in the admin's "Event Pages"
 // collection (data/events/<id>.json, aggregated into data/events.json
-// by scripts/rebuild-events-index.js). Click a photo to open it
-// full-screen with zoom/pan, same mechanism as place.html's own main
-// photo (vendor/panzoom, .place-zoom-overlay) — reused here since an
-// Event Page's photos don't have individual pages of their own to
-// link out to.
+// by scripts/rebuild-events-index.js). `photos` is a plain array of
+// image paths (strings), not objects — deliberately: Decap's list
+// widget only supports selecting several images at once in the media
+// library and adding one list item per file automatically when the
+// list holds a single plain field (an image), not an object with
+// several sub-fields (which would've meant a caption per photo, but
+// forced one-at-a-time uploads instead of genuine bulk add — asked
+// for explicitly, so bulk-add won over per-photo captions). Click a
+// photo to open it full-screen with zoom/pan, same mechanism as
+// place.html's own main photo (vendor/panzoom, .place-zoom-overlay) —
+// reused here since an Event Page's photos don't have individual pages
+// of their own to link out to.
 document.addEventListener("DOMContentLoaded", function () {
   var headingEl = document.getElementById("event-heading");
   var crumbEl = document.getElementById("event-crumb");
@@ -66,11 +73,10 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  function renderThumb(photo) {
+  function renderThumb(src) {
     return (
-      '<button type="button" class="photo-thumb" style="font:inherit" aria-label="View photo' + (photo.caption ? ": " + escapeHtml(photo.caption) : "") + '">' +
-        '<img src="' + escapeAttr(photo.image) + '" alt="' + escapeHtml(photo.caption || "") + '" loading="lazy">' +
-        (photo.caption ? '<span class="photo-thumb-caption"><strong>' + escapeHtml(photo.caption) + "</strong></span>" : "") +
+      '<button type="button" class="photo-thumb" style="font:inherit" aria-label="View photo">' +
+        '<img src="' + escapeAttr(src) + '" alt="" loading="lazy">' +
       "</button>"
     );
   }
@@ -82,10 +88,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // than hand-rolled pinch-zoom. The instance is created once (on
   // first open) and reused on later opens.
   var zoomInstance = null;
-  function openZoom(photo) {
+  function openZoom(src) {
     if (!zoomOverlay || typeof panzoom === "undefined") return;
-    zoomImage.src = photo.image;
-    zoomImage.alt = photo.caption || "";
+    zoomImage.src = src;
+    zoomImage.alt = "";
     zoomOverlay.classList.add("open");
     document.body.style.overflow = "hidden";
     if (!zoomInstance) {
