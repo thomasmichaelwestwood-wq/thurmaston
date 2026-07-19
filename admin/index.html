@@ -5,242 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Content Manager | Memories of Thurmaston</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-<!-- A plain link back to the live homepage, floated above whatever Decap
-     renders — not built through CMS.registerAdditionalLink, since that
-     turned out to be a no-op with the Decap CMS version this page
-     actually loads (confirmed: neither this nor the Edit log link below
-     ever appeared). A real anchor tag sitting in the page's own DOM,
-     styled with a fixed position and a high z-index, can't be swallowed
-     the same way — Decap mounts its own UI into the page but doesn't
-     wipe out sibling elements that were already there. -->
+<!-- A plain link back to the live homepage, floated above whatever the
+     CMS renders. A real anchor tag sitting in the page's own DOM, styled
+     with a fixed position and a high z-index, can't be swallowed by the
+     CMS mounting its own UI into the page — it doesn't wipe out sibling
+     elements that were already there. -->
 <a href="/index.html" id="back-to-site-link" style="position:fixed;bottom:16px;left:16px;z-index:99999;background:#1f4d3a;color:#fff;padding:8px 16px;border-radius:8px;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.3);">← Back to site</a>
-<script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-<script>
-  if (window.netlifyIdentity) {
-    window.netlifyIdentity.on("init", function (user) {
-      if (!user) {
-        window.netlifyIdentity.on("login", function () {
-          document.location.href = "/admin/";
-        });
-      }
-    });
-  }
-</script>
-
-<script>
-  // Live preview pane, styled to actually look like the real site rather
-  // than a generic form dump — updates as you type, no need to save first.
-  // Loads the site's own stylesheet into the preview iframe so fonts,
-  // colours and spacing match the live pages.
-  CMS.registerPreviewStyle("/css/style.css");
-
-  // Muted/greyed field widgets — for fields on the Photos collection
-  // that are usually fine left as they are (set automatically by the
-  // Drive sync, or rarely worth changing), so the one field that
-  // always needs an active decision (Category) stands out instead of
-  // competing with a form full of equally-weighted boxes. Built as
-  // real widgets via CMS.registerWidget, a core stable part of Decap's
-  // API, rather than trying to reach into and restyle Decap's own
-  // built-in field markup — that's not something Decap exposes a
-  // stable hook for, only custom widgets we write ourselves are ours
-  // to style. Only used for plain text/textarea/checkbox fields; the
-  // Photo and Document fields keep Decap's real upload widgets
-  // untouched rather than risk breaking the upload path over styling.
-  var MUTED_INPUT_STYLE = {
-    background: "#f1efe6",
-    color: "#8c8775",
-    border: "1px solid #e2ddc9"
-  };
-
-  var MutedStringControl = createClass({
-    handleChange: function (e) {
-      this.props.onChange(e.target.value);
-    },
-    render: function () {
-      return h("input", {
-        id: this.props.forID,
-        className: this.props.classNameWrapper,
-        type: "text",
-        value: this.props.value || "",
-        onChange: this.handleChange,
-        style: MUTED_INPUT_STYLE
-      });
-    }
-  });
-  CMS.registerWidget("muted-string", MutedStringControl);
-
-  // Taller than a plain textarea default, and resizable — History can
-  // run to several paragraphs (a real example: the Harrow Inn photo's
-  // history is nine sentences long), and 4 rows made it feel like
-  // typing into a letterbox. resize: vertical adds the browser's own
-  // drag-to-resize handle on top of the bigger default, so a
-  // still-not-enough-room case doesn't need another size bump here —
-  // just drag it further.
-  var MUTED_TEXTAREA_STYLE = Object.assign({}, MUTED_INPUT_STYLE, {
-    resize: "vertical",
-    minHeight: "220px",
-    lineHeight: "1.5"
-  });
-
-  var MutedTextControl = createClass({
-    handleChange: function (e) {
-      this.props.onChange(e.target.value);
-    },
-    render: function () {
-      return h("textarea", {
-        id: this.props.forID,
-        className: this.props.classNameWrapper,
-        rows: 10,
-        value: this.props.value || "",
-        onChange: this.handleChange,
-        style: MUTED_TEXTAREA_STYLE
-      });
-    }
-  });
-  CMS.registerWidget("muted-text", MutedTextControl);
-
-  var MutedBooleanControl = createClass({
-    handleChange: function (e) {
-      this.props.onChange(e.target.checked);
-    },
-    render: function () {
-      return h("label", { style: { display: "flex", alignItems: "center", gap: "8px" } },
-        h("input", {
-          id: this.props.forID,
-          type: "checkbox",
-          checked: !!this.props.value,
-          onChange: this.handleChange
-        }),
-        h("span", { style: { fontSize: "0.85rem", color: MUTED_INPUT_STYLE.color } }, "Usually fine left as-is")
-      );
-    }
-  });
-  CMS.registerWidget("muted-boolean", MutedBooleanControl);
-
-  // Mirrors the real photo page (see place.html and js/place.js's
-  // renderPhotoPanel/renderHistorySection) so editing a photo's caption,
-  // location or history here shows exactly what visitors will see.
-  var PhotosPreview = createClass({
-    render: function () {
-      var data = this.props.entry.get("data");
-      var caption = data.get("caption") || "Untitled photo";
-      var date = data.get("date");
-      var location = data.get("location");
-      var history = data.get("history");
-      var ref = data.get("ref");
-      var credit = data.get("credit");
-      var category = data.get("category");
-      var src = data.get("src");
-      var metaParts = [category, credit && credit !== "—" ? "Credit: " + credit : ""].filter(Boolean);
-
-      return h("div", { className: "content-section container" },
-        h("div", { className: "place-photo-panel visible" },
-          h("div", { className: "place-photo-panel-media" },
-            // getAsset (not a plain "/" + src concatenation) is Decap's
-            // documented way to resolve an image field's preview URL —
-            // it's the only thing that works for BOTH an already-saved
-            // photo (a plain repo path) and one just picked in this same
-            // session but not committed yet (a local blob URL); string-
-            // concatenating the raw field value only ever worked for the
-            // first case, which is why a freshly uploaded photo showed
-            // no preview image until after saving.
-            src ? h("img", { src: this.props.getAsset(src), alt: caption }) : null
-          ),
-          h("div", { className: "place-photo-panel-info" },
-            h("p", { className: "place-photo-panel-caption" }, caption),
-            h("p", { className: "place-photo-panel-datelocation" }, [date, location].filter(Boolean).join(" · ")),
-            metaParts.length ? h("p", { className: "place-photo-panel-meta" }, metaParts.join(" · ")) : null,
-            ref ? h("p", { className: "place-photo-panel-ref" }, "Ref: " + ref) : null
-          )
-        ),
-        history ? h("div", { className: "place-history visible" },
-          h("h2", {}, "History"),
-          h("p", {}, history)
-        ) : null
-      );
-    }
-  });
-  // Registered once per category collection (photos_streets, photos_people,
-  // etc) — they all share this exact same preview component, since the
-  // only thing that differs between them is which folder they save into.
-  ["streets", "people", "events", "nature", "aerial", "other"].forEach(function (slug) {
-    CMS.registerPreviewTemplate("photos_" + slug, PhotosPreview);
-  });
-
-  // Edit log — a plain read-only history of changes to the site's
-  // content, pulled from GitHub's commit history (every CMS save is a
-  // commit, so this is "for free" — no separate log to maintain). Only
-  // reachable from inside this logged-in admin; not linked from
-  // anywhere on the public site and never runs there.
-  //
-  // Wrapped in a feature check because registerAdditionalLink is a
-  // newer, less-documented part of Decap's API — but in practice, on
-  // the Decap CMS version this page actually loads
-  // (unpkg.com/decap-cms@^3.0.0), typeof CMS.registerAdditionalLink is
-  // NOT "function", so this whole block silently never runs. Confirmed
-  // by testing live: neither this nor a "Back to site" link registered
-  // the same way ever appeared anywhere in the admin. That's also why
-  // "Back to site" (above, near the top of <body>) isn't built this
-  // way any more — it's a plain <a> tag instead, which doesn't depend
-  // on this API actually working. This block is left in case a future
-  // Decap upgrade makes registerAdditionalLink work — if the Edit log
-  // still doesn't show up after a Decap version bump, this is why, and
-  // it's due for the same plain-link/plain-page treatment.
-  if (typeof CMS.registerAdditionalLink === "function") {
-    var EditLog = createClass({
-      getInitialState: function () {
-        return { commits: null, error: null };
-      },
-      componentDidMount: function () {
-        var self = this;
-        fetch("https://api.github.com/repos/thomasmichaelwestwood-wq/thurmaston/commits?per_page=50")
-          .then(function (res) {
-            if (!res.ok) throw new Error("GitHub returned " + res.status);
-            return res.json();
-          })
-          .then(function (commits) { self.setState({ commits: commits }); })
-          .catch(function (err) { self.setState({ error: err.message }); });
-      },
-      render: function () {
-        if (this.state.error) {
-          return h("div", { style: { padding: "30px", fontFamily: "sans-serif" } },
-            "Couldn't load the edit log: " + this.state.error);
-        }
-        if (!this.state.commits) {
-          return h("div", { style: { padding: "30px", fontFamily: "sans-serif" } }, "Loading…");
-        }
-        return h("div", { style: { padding: "30px", maxWidth: "760px", fontFamily: "sans-serif" } },
-          h("h1", {}, "Edit log"),
-          h("p", { style: { color: "#666" } },
-            "Every save made here, and every photo synced from Google Drive, shows up as a change below. This page is only visible to logged-in editors — it's never shown on the public site."),
-          h("ul", { style: { listStyle: "none", padding: 0, margin: 0 } },
-            this.state.commits.map(function (c) {
-              var message = c.commit.message.split("\n")[0];
-              var author = (c.commit.author && c.commit.author.name) || "Unknown";
-              var date = c.commit.author ? new Date(c.commit.author.date).toLocaleString() : "";
-              return h("li", { key: c.sha, style: { borderBottom: "1px solid #eee", padding: "12px 0" } },
-                h("div", { style: { fontWeight: 600 } }, message),
-                h("div", { style: { fontSize: "0.85em", color: "#888" } },
-                  author + " · " + date + " · ",
-                  h("a", { href: c.html_url, target: "_blank", rel: "noopener" }, "view on GitHub")
-                )
-              );
-            })
-          )
-        );
-      }
-    });
-
-    CMS.registerAdditionalLink({
-      id: "edit-log",
-      title: "Edit log",
-      data: EditLog,
-      options: { icon: "page" }
-    });
-  }
-</script>
+<!-- Sveltia CMS — switched from Decap CMS specifically because Decap's
+     media library doesn't reliably support selecting/uploading several
+     images at once (confirmed both in testing and in Decap's own open
+     GitHub issues), which Event Pages needs for its Photos field. Same
+     config.yml format as Decap (this migration needed no schema
+     changes), but two real differences worth knowing:
+      - Backend is a direct GitHub OAuth connection now, not Git Gateway/
+        Netlify Identity — Sveltia doesn't support Git Gateway. Login
+        now goes through GitHub instead. See admin/config.yml's backend
+        block comment for the one-time Netlify/GitHub OAuth App setup
+        this needed (an account-level step, not anything in this repo).
+      - The "muted/greyed" styling previously used for fields that don't
+        usually need touching (a custom Decap widget, registered via
+        CMS.registerWidget in this file) has been dropped, along with
+        the custom photo-preview pane and the Edit log page — Sveltia
+        doesn't support custom field types yet (an open feature
+        request, not implemented). Every field is a plain, unstyled
+        input now. This was a deliberate trade accepted for reliable
+        bulk photo upload, not an oversight — the fields themselves
+        (names, hints, what's optional) are all unchanged.
+     No type="module" needed — Sveltia CMS isn't distributed as an ES
+     module — and no separate stylesheet to add, its CSS is bundled
+     into the one script file. -->
+<script src="https://unpkg.com/@sveltia/cms/dist/sveltia-cms.js"></script>
 </body>
 </html>
