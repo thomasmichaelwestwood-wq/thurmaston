@@ -145,11 +145,9 @@ collections:
         widget: "list"
         summary: "{{fields.caption}}"
         hint: "Add every photo of this event here — upload each one, with an optional caption. There's no limit and no need for a separate entry per photo."
-        field:
-          widget: "object"
-          fields:
-            - { label: "Photo", name: "image", widget: "image", media_folder: "/images/events", public_folder: "/images/events" }
-            - { label: "Caption", name: "caption", widget: "string", required: false, hint: "Optional — shown under this photo. Leave blank if the event's own name/date already says enough." }
+        fields:
+          - { label: "Photo", name: "image", widget: "image", media_folder: "/images/events", public_folder: "/images/events" }
+          - { label: "Caption", name: "caption", widget: "string", required: false, hint: "Optional — shown under this photo. Leave blank if the event's own name/date already says enough." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in these photos." }
       - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new event — it's filled in automatically." }
 
