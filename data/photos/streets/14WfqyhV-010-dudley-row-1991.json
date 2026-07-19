@@ -1,13 +1,15 @@
 {
   "src": "/images/photos/streets/14WfqyhV-010-dudley-row-1991.jpg",
   "caption": "Dudley Row 1991",
+  "category": "streets",
   "date": "Added July 2026",
-  "ref": "010 Dudley Row 1991.jpg",
-  "addedAt": "2026-07-15T13:38:18Z",
-  "location": "Melton Road",
-  "consentNoted": false,
   "credit": "Unknown — needs a credit",
-  "id": "14WfqyhV-010-dudley-row-1991",
   "coords": "52.68130974326725, -1.0970173053889003",
-  "category": "streets"
+  "location": "Melton Road",
+  "history": "",
+  "consentNoted": false,
+  "ref": "010 Dudley Row 1991.jpg",
+  "placeId": "",
+  "id": "14WfqyhV-010-dudley-row-1991",
+  "addedAt": "2026-07-15T13:38:18Z"
 }
