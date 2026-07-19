@@ -27,29 +27,27 @@ occasions. If a photo could go either way, go with whichever it's more
 *about* — a photo of the fete committee lined up for a portrait is
 People, a photo of the fete itself in full swing is Events.
 
-**Naming a recurring event:** if a photo is from something held most
-years — Remembrance Day, the village fete, etc. — file it into an
-event folder so it groups with every other year's photos of the same
-occasion on its own page at `/events.html`, listing every year it's
-been held. Two ways in, same result either way:
+**An event with its own story and several photos** — Remembrance Day,
+the village fete, etc. — doesn't go through Drive or the ordinary
+Events folder at all. Log into `/admin` and use the **"Event Pages"**
+collection instead: one entry covers the whole occasion — give it a
+name (e.g. "Remembrance Day Parade 1975"), a date, a description, and
+add every photo of it right there in the same entry (each with an
+optional caption of its own). Save once, and it gets its own page at
+`/events.html`, gallery and all — no need to upload photos one at a
+time or juggle folders. The same recurring event in a different year
+is just another Event Pages entry (e.g. "...1980" alongside "...1975")
+— there's no folder or field linking the two together, each occasion
+stands on its own.
 
-- **Via Google Drive** (best for a batch of scans): inside the
-  "Events" folder, create a subfolder named after the event, e.g.
-  "Remembrance Day Parade", and drop photos straight in there for a
-  one-off occasion with no year grouping. To group by year too, add a
-  further subfolder inside that one named just the 4-digit year, e.g.
-  "Remembrance Day Parade/1975". Use the exact same event folder name
-  every year (spelling and capitalisation included) so they land
-  together.
-- **Via the admin** (good for a one-off, see "2b"/"3" below): the
-  Events collection's "Event / Year folder" box. Type `<Event
-  name>/<year>` — e.g. `Remembrance Day Parade/1975` — same naming
-  rule as above; just `<Event name>` with no year is fine too if the
-  year isn't known yet.
+Add Google Maps coordinates on an Event Pages entry (same copy-paste
+method as everywhere else on the site) to also place it on the
+interactive map.
 
-Leave both blank for a one-off Events photo that isn't part of a
-named, repeating occasion — it still shows up in the Events category
-as normal.
+A single Events photo with no write-up of its own still goes through
+the ordinary **Events** collection (or Google Drive's "Events" folder),
+exactly like any other category — that's for a one-off photo, not a
+whole described occasion.
 
 Drag a photo into whichever folder matches what it shows. A photo dropped
 loose in the top-level folder (not in a subfolder) is filed under "Other."
@@ -153,9 +151,9 @@ two, no Drive step needed — the photo gets its own page automatically,
 no extra step required. Leave the "Internal" fields at the bottom
 alone — they fill themselves in.
 
-**In the Events collection only**, there's also an "Event / Year
-folder" box pinned near the top of the form — see "Naming a recurring
-event," above, for what to type there.
+For an event with its own story and several photos, use the "Event
+Pages" collection instead — see "An event with its own story and
+several photos," above.
 
 Good for a one-off (someone hands you a photo, a scan, something from a
 different source than the family archive) — for a batch, or anything

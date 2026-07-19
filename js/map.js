@@ -38,21 +38,32 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
+  // Where a pin's popup links out to — three kinds of item can share
+  // one pin: an Event Page (own page, every photo of it), a photo
+  // (its own place.html page), or a curated Map pin with a Story page
+  // (place.html?slug=). At most one of these is ever set per item.
+  function itemHref(item) {
+    if (item.eventId) return "event.html?event=" + encodeURIComponent(item.eventId);
+    if (item.photoId) return "place.html?photo=" + encodeURIComponent(item.photoId);
+    if (item.pageSlug) return "place.html?slug=" + encodeURIComponent(item.pageSlug);
+    return null;
+  }
+
   function popupHtml(item) {
     var cat = MAP_CATEGORIES[item.category] || MAP_CATEGORIES.other;
-    var photo = item.photoSrc && item.photoId ?
-      '<a class="map-popup-photo-btn" href="place.html?photo=' + encodeURIComponent(item.photoId) + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
+    var href = itemHref(item);
+    var photo = item.photoSrc && href ?
+      '<a class="map-popup-photo-btn" href="' + href + '" aria-label="View photo: ' + escapeHtml(item.name) + '">' +
         '<img src="' + item.photoSrc + '" alt="">' +
         '<span class="map-popup-photo-hint">Click on picture for more</span>' +
       '</a>' : "";
     var subtitle = [item.period, item.location].filter(Boolean).join(" · ");
     var desc = item.description ? "<p>" + escapeHtml(item.description) + "</p>" : "";
     // Only needed when there's no photo thumbnail to click through on —
-    // if there is one, it already links to place.html?photo=ID, which
-    // pulls in this same story page automatically via the photo's own
-    // pageSlug, so a second link to the same place would be redundant.
-    var pageLink = item.pageSlug && !photo ?
-      '<a class="map-popup-page-link" href="place.html?slug=' + encodeURIComponent(item.pageSlug) + '">Read the full story →</a>' : "";
+    // if there is one, it already links to the same place, so a second
+    // link to it would be redundant.
+    var pageLink = href && !photo ?
+      '<a class="map-popup-page-link" href="' + href + '">' + (item.eventId ? "See the photos →" : "Read the full story →") + "</a>" : "";
     return (
       '<div class="map-popup">' +
         '<span class="map-popup-cat" style="--pin-color:' + cat.color + '">' + cat.label + "</span>" +
@@ -81,6 +92,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var mapPinsPromise = fetch("data/map-pins.json").then(function (res) { return res.ok ? res.json() : { pins: [] }; }).then(function (data) { return data.pins || []; }).catch(function () { return []; });
   var photosPromise = (typeof PHOTOS_DATA_PROMISE !== "undefined") ? PHOTOS_DATA_PROMISE : Promise.resolve([]);
+  var eventsPromise = fetch("data/events.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; });
 
   // Curated pins store their location as a single "lat, lng" string —
   // the same format Google Maps gives you when you right-click a spot
@@ -91,13 +103,14 @@ document.addEventListener("DOMContentLoaded", function () {
     return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
   }
 
-  Promise.all([mapPinsPromise, photosPromise]).then(function (results) {
+  Promise.all([mapPinsPromise, photosPromise, eventsPromise]).then(function (results) {
     var curatedPins = results[0].map(function (item) {
       var coords = parseCoords(item.coords);
       if (!coords) return null;
       return Object.assign({}, item, coords);
     }).filter(Boolean);
     var photos = results[1];
+    var events = results[2];
 
     mapItems = curatedPins.slice();
 
@@ -118,6 +131,27 @@ document.addEventListener("DOMContentLoaded", function () {
         photoSrc: photo.src,
         photoId: photo.id,
         pageSlug: photo.pageSlug || ""
+      });
+    });
+    // An Event Page with coordinates gets a pin the same way a located
+    // photo does — "events" category colour (MAP_CATEGORIES.events),
+    // linking to its own event.html page rather than place.html (see
+    // itemHref above). The popup's photo thumbnail, if any, is the
+    // event's own first photo.
+    events.forEach(function (event) {
+      if (typeof event.lat !== "number" || typeof event.lng !== "number") return;
+      var cover = event.photos && event.photos[0];
+      mapItems.push({
+        id: "event-" + event.id,
+        name: event.name,
+        category: "events",
+        lat: event.lat,
+        lng: event.lng,
+        period: event.date,
+        location: event.location || "",
+        description: event.description || "",
+        photoSrc: cover ? cover.image : "",
+        eventId: event.id
       });
     });
     addMarkers();

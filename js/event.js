@@ -1,53 +1,41 @@
-// Per-event timeline page (event.html?event=<slug>) — every photo of
-// one named, recurring event (eventName, derived by
-// scripts/rebuild-photos-index.js from the photo's own nested folder
-// path — see admin/config.yml's photos_events "Event / Year folder"
-// — not a typed field), grouped into one section per year it's been
-// held, oldest year first. The events.html landing page is what links
-// here per event; this page doesn't re-derive the event list itself,
-// just filters straight to the one matching ?event=.
-//
-// Loads js/photos.js purely for PHOTOS_DATA_PROMISE and buildPhotoThumb
-// — its own DOMContentLoaded handler no-ops safely here since none of
-// #photo-grid/#photo-filters/etc exist on this page.
+// One Event Page (event.html?event=<id>) — its own description and a
+// gallery of every photo added to it in the admin's "Event Pages"
+// collection (data/events/<id>.json, aggregated into data/events.json
+// by scripts/rebuild-events-index.js). Click a photo to open it
+// full-screen with zoom/pan, same mechanism as place.html's own main
+// photo (vendor/panzoom, .place-zoom-overlay) — reused here since an
+// Event Page's photos don't have individual pages of their own to
+// link out to.
 document.addEventListener("DOMContentLoaded", function () {
   var headingEl = document.getElementById("event-heading");
   var crumbEl = document.getElementById("event-crumb");
   var subheadingEl = document.getElementById("event-subheading");
-  var timelineEl = document.getElementById("event-timeline");
+  var descriptionEl = document.getElementById("event-description");
+  var galleryEl = document.getElementById("event-gallery");
   var notFoundEl = document.getElementById("event-not-found");
-  if (!timelineEl || typeof PHOTOS_DATA_PROMISE === "undefined") return;
+  var zoomOverlay = document.getElementById("place-zoom-overlay");
+  var zoomStage = document.getElementById("place-zoom-stage");
+  var zoomImage = document.getElementById("place-zoom-image");
+  var zoomCloseBtn = document.getElementById("place-zoom-close");
+  var zoomInBtn = document.getElementById("place-zoom-in");
+  var zoomOutBtn = document.getElementById("place-zoom-out");
+  var zoomResetBtn = document.getElementById("place-zoom-reset");
+  if (!galleryEl) return;
 
   var params = new URLSearchParams(location.search);
-  var eventParam = params.get("event");
-  if (!eventParam) {
+  var eventId = params.get("event");
+  if (!eventId) {
     showNotFound();
-    return;
-  }
-
-  PHOTOS_DATA_PROMISE.then(function (photos) {
-    var matches = photos.filter(function (p) {
-      return p.category === "events" && typeof p.eventName === "string" && slugifyText(p.eventName) === eventParam;
+  } else {
+    fetch("data/events.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (events) {
+      var event = events.find(function (e) { return e.id === eventId; });
+      if (!event) {
+        showNotFound();
+        return;
+      }
+      renderEvent(event);
     });
-    if (matches.length === 0) {
-      showNotFound();
-      return;
-    }
-
-    var eventName = matches[0].eventName;
-    document.title = eventName + " | Memories of Thurmaston";
-    headingEl.textContent = eventName;
-    crumbEl.textContent = eventName;
-
-    var years = groupByYear(matches);
-    var yearCount = years.dated.length + (years.undated.length > 0 ? 1 : 0);
-    subheadingEl.textContent = matches.length + (matches.length === 1 ? " photo" : " photos") +
-      " across " + years.dated.length + (years.dated.length === 1 ? " year" : " years") +
-      ", from earliest to most recent.";
-    subheadingEl.hidden = false;
-
-    renderTimeline(years);
-  });
+  }
 
   function showNotFound() {
     notFoundEl.hidden = false;
@@ -55,50 +43,87 @@ document.addEventListener("DOMContentLoaded", function () {
     crumbEl.textContent = "Not found";
   }
 
-  // Same "oldest year first, undated held back to its own group at the
-  // end" rule js/location.js's orderPhotos uses for a place's timeline
-  // — here grouped one level further, by year rather than by photo.
-  // eventYear (the photo's own "<event>/<year>" folder) is authoritative
-  // when set — extractYear(date) only covers a photo filed under this
-  // event with no year subfolder yet.
-  function groupByYear(photoList) {
-    var byYear = {};
-    var undated = [];
-    photoList.forEach(function (p) {
-      var year = p.eventYear || extractYear(p.date);
-      if (year) {
-        if (!byYear[year]) byYear[year] = [];
-        byYear[year].push(p);
-      } else {
-        undated.push(p);
-      }
+  function renderEvent(event) {
+    document.title = event.name + " | Memories of Thurmaston";
+    headingEl.textContent = event.name;
+    crumbEl.textContent = event.name;
+
+    var photos = event.photos || [];
+    if (event.date || photos.length) {
+      subheadingEl.textContent = [event.date, photos.length + (photos.length === 1 ? " photo" : " photos")].filter(Boolean).join(" · ");
+      subheadingEl.hidden = false;
+    }
+
+    if (event.description) {
+      descriptionEl.innerHTML = formatMultilineText(event.description);
+      descriptionEl.hidden = false;
+      descriptionEl.classList.add("visible");
+    }
+
+    galleryEl.innerHTML = photos.map(renderThumb).join("");
+    Array.prototype.forEach.call(galleryEl.querySelectorAll(".photo-thumb"), function (btn, i) {
+      btn.addEventListener("click", function () { openZoom(photos[i]); });
     });
-    var dated = Object.keys(byYear).map(Number).sort(function (a, b) { return a - b; })
-      .map(function (year) { return { year: year, photos: byYear[year] }; });
-    return { dated: dated, undated: undated };
   }
 
-  function renderTimeline(years) {
-    var html = years.dated.map(renderYearGroup).join("");
-    if (years.undated.length > 0) {
-      html += '<h2 class="location-timeline-heading">Date unknown</h2><div class="photo-grid"></div>';
-    }
-    timelineEl.innerHTML = html;
+  function renderThumb(photo) {
+    return (
+      '<button type="button" class="photo-thumb" style="font:inherit" aria-label="View photo' + (photo.caption ? ": " + escapeHtml(photo.caption) : "") + '">' +
+        '<img src="' + escapeAttr(photo.image) + '" alt="' + escapeHtml(photo.caption || "") + '" loading="lazy">' +
+        (photo.caption ? '<span class="photo-thumb-caption"><strong>' + escapeHtml(photo.caption) + "</strong></span>" : "") +
+      "</button>"
+    );
+  }
 
-    // Photo thumbnails are built as real DOM nodes (buildPhotoThumb),
-    // not HTML strings, so each year's grid is filled in after the
-    // headings/wrapper markup above is in place.
-    var grids = timelineEl.querySelectorAll(".photo-grid");
-    years.dated.forEach(function (group, i) {
-      group.photos.forEach(function (p) { grids[i].appendChild(buildPhotoThumb(p)); });
-    });
-    if (years.undated.length > 0) {
-      var undatedGrid = grids[grids.length - 1];
-      years.undated.forEach(function (p) { undatedGrid.appendChild(buildPhotoThumb(p)); });
+  function escapeAttr(str) { return escapeHtml(str); }
+
+  // Same zoom/pan mechanism as js/place.js's own main-photo viewer —
+  // see its comment for why a vendored library (vendor/panzoom) rather
+  // than hand-rolled pinch-zoom. The instance is created once (on
+  // first open) and reused on later opens.
+  var zoomInstance = null;
+  function openZoom(photo) {
+    if (!zoomOverlay || typeof panzoom === "undefined") return;
+    zoomImage.src = photo.image;
+    zoomImage.alt = photo.caption || "";
+    zoomOverlay.classList.add("open");
+    document.body.style.overflow = "hidden";
+    if (!zoomInstance) {
+      zoomInstance = panzoom(zoomImage, {
+        maxZoom: 6,
+        minZoom: 1,
+        bounds: true,
+        boundsPadding: 0.15,
+        zoomDoubleClickSpeed: 1
+      });
+    } else {
+      zoomInstance.moveTo(0, 0);
+      zoomInstance.zoomAbs(0, 0, 1);
     }
   }
 
-  function renderYearGroup(group) {
-    return '<h2 class="location-timeline-heading">' + group.year + '</h2><div class="photo-grid"></div>';
+  function closeZoom() {
+    if (!zoomOverlay) return;
+    zoomOverlay.classList.remove("open");
+    document.body.style.overflow = "";
+  }
+
+  if (zoomOverlay) {
+    zoomCloseBtn.onclick = closeZoom;
+    zoomOverlay.addEventListener("click", function (e) {
+      if (e.target === zoomOverlay || e.target === zoomStage) closeZoom();
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && zoomOverlay.classList.contains("open")) closeZoom();
+    });
+    zoomInBtn.onclick = function () {
+      if (zoomInstance) zoomInstance.smoothZoom(zoomStage.clientWidth / 2, zoomStage.clientHeight / 2, 1.5);
+    };
+    zoomOutBtn.onclick = function () {
+      if (zoomInstance) zoomInstance.smoothZoom(zoomStage.clientWidth / 2, zoomStage.clientHeight / 2, 1 / 1.5);
+    };
+    zoomResetBtn.onclick = function () {
+      if (zoomInstance) { zoomInstance.moveTo(0, 0); zoomInstance.zoomAbs(0, 0, 1); }
+    };
   }
 });

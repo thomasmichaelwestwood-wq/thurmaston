@@ -70,20 +70,11 @@ collections:
       - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
 
   - name: "photos_events"
-    label: "Events"
-    description: "Every photo in the Events category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. To group a recurring event's photos across years (e.g. Remembrance Day), file it in a folder using the \"Event / Year folder\" box below rather than a typed field — same idea as Streets & Buildings' Melton Road/St Michael's Church subfolders, just one level deeper."
+    label: "Events (single photos)"
+    description: "For a one-off Events photo that isn't part of a described occasion — every photo here, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. For an event with several photos and its own write-up (e.g. Remembrance Day), use the \"Event Pages\" collection instead — one entry there covers the whole occasion, photos and all."
     folder: "data/photos/events"
     create: true
     delete: true
-    nested:
-      depth: 100
-      summary: "{{caption}}"
-    meta:
-      path:
-        widget: "string"
-        label: "Event / Year folder"
-        hint: "Leave blank for a one-off Events photo. To group a recurring event, type \"<Event name>/<year>\" — e.g. \"Remembrance Day Parade/2020\" — using the exact same event name each year (spelling/capitalisation included) so they land in the same folder and group together on the site. Just \"<Event name>\" with no year is fine too if the year isn't known yet."
-        index_file: "index"
     slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
     extension: "json"
     format: "json"
@@ -120,6 +111,47 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "muted-string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "muted-string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
+  # A whole occasion (e.g. "Remembrance Day Parade 1975") as one entry —
+  # a write-up plus every photo of it, uploaded together in one go,
+  # rather than one Events collection entry per photo. Requested
+  # explicitly: uploading a folder of scans into the Photos admin one
+  # at a time (or via a nested folder path) was more fiddly than just
+  # adding them all to one entry directly. Its own page at
+  # event.html?event=<slug>, listed on events.html.
+  - name: "event_pages"
+    label: "Event Pages"
+    description: "A whole event (e.g. \"Remembrance Day Parade 1975\") as one entry — a description plus every photo of it, all uploaded here together. Gets its own page, listed on /events.html. For a single Events photo with no write-up of its own, use the \"Events (single photos)\" collection instead."
+    folder: "data/events"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "name"
+    fields:
+      - { label: "Event name", name: "name", widget: "string", hint: "e.g. \"Remembrance Day Parade 1975\" — shown as the page's heading and this event's tile on /events.html." }
+      - { label: "Date", name: "date", widget: "string", required: false, hint: "e.g. \"1975\" or \"11 November 1975\" — shown under the event name. Leave blank if not known." }
+      - { label: "Description", name: "description", widget: "text", required: false, hint: "The story of this event — shown in full on its page, above the photos." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click where this event took place — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if not known — this puts the event on the interactive map automatically, using this event's own name/date/description."
+        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"War Memorial, Melton Road\" — just descriptive text shown next to the event; set Google Maps coordinates above to actually place it on the map." }
+      - label: "Photos"
+        name: "photos"
+        widget: "list"
+        summary: "{{fields.caption}}"
+        hint: "Add every photo of this event here — upload each one, with an optional caption. There's no limit and no need for a separate entry per photo."
+        field:
+          widget: "object"
+          fields:
+            - { label: "Photo", name: "image", widget: "image", media_folder: "/images/events", public_folder: "/images/events" }
+            - { label: "Caption", name: "caption", widget: "string", required: false, hint: "Optional — shown under this photo. Leave blank if the event's own name/date already says enough." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in these photos." }
+      - { label: "Internal — added", name: "addedAt", widget: "muted-string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new event — it's filled in automatically." }
 
   - name: "photos_nature"
     label: "Nature & Views"

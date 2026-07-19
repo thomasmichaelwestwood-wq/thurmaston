@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Loading… | Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Every year an event has been photographed in Thurmaston, Leicestershire.">
+<meta name="description" content="An event in Thurmaston, Leicestershire, with its own story and photos.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -39,10 +39,24 @@
   </section>
 
   <section class="content-section container">
-    <div class="location-timeline" id="event-timeline"></div>
-    <p class="place-not-found" id="event-not-found" hidden>We couldn't find any photos for that event. It may have been renamed — <a href="events.html">back to Events</a>.</p>
+    <div class="place-history" id="event-description" hidden></div>
+    <div class="photo-grid" id="event-gallery"></div>
+    <p class="place-not-found" id="event-not-found" hidden>We couldn't find that event. It may have been renamed — <a href="events.html">back to Events</a>.</p>
   </section>
 </main>
+
+<div class="place-zoom-overlay" id="place-zoom-overlay">
+  <button class="place-zoom-close" id="place-zoom-close" type="button" aria-label="Close">×</button>
+  <p class="place-zoom-hint">Scroll or pinch to zoom, drag to pan</p>
+  <div class="place-zoom-stage" id="place-zoom-stage">
+    <img id="place-zoom-image" alt="">
+  </div>
+  <div class="place-zoom-controls">
+    <button class="place-zoom-btn" id="place-zoom-out" type="button" aria-label="Zoom out">−</button>
+    <button class="place-zoom-btn" id="place-zoom-reset" type="button" aria-label="Reset zoom">Reset</button>
+    <button class="place-zoom-btn" id="place-zoom-in" type="button" aria-label="Zoom in">+</button>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="container">
@@ -87,6 +101,7 @@
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
+<script src="vendor/panzoom/panzoom.min.js"></script>
 <script src="js/event.js"></script>
 </body>
 </html>

@@ -36,19 +36,11 @@
  *    "Internal — reference code" field shows it next time that photo
  *    is reopened, instead of looking blank forever until someone
  *    fills it in by hand.
- *  - eventName/eventYear (Events category only) are derived from the
- *    photo's own nested folder path (data/photos/events/<event>/<year>/,
- *    filed via the admin's "Event / Year folder" box) whenever that
- *    path actually has subfolders — NOT written back to the file,
- *    unlike the two above, since the folder itself is the source of
- *    truth and re-deriving it fresh every rebuild is what lets moving
- *    a photo to a different folder actually change its grouping on
- *    the site. A Drive-synced Events photo has no such subfolder (it
- *    always lands flat at data/photos/events/<id>.json regardless of
- *    which Drive folder it came from) — automation/drive-photo-sync.gs.js
- *    sets eventName/eventYear directly on the file instead, and this
- *    script leaves them untouched in that case, so both routes end up
- *    equivalent on the live site.
+ *
+ * data/events/*.json (a whole occasion, description plus several
+ * photos in one entry — see the "Event Pages" admin collection) is a
+ * separate concept with its own aggregate and its own rebuild script,
+ * scripts/rebuild-events-index.js — not handled here.
  */
 const fs = require("fs");
 const path = require("path");
@@ -118,25 +110,6 @@ const photos = files.map((filePath) => {
   }
 
   photo.id = path.basename(filePath, ".json");
-
-  // Events only: same "the folder decides, not a typed field" rule
-  // category itself already follows (see CLAUDE.md's "Categorisation
-  // rule") — a photo filed under data/photos/events/<event>/<year>/
-  // (via the admin's nested Events collection, "Event / Year folder")
-  // belongs to that named, recurring event and that year, full stop.
-  // Purely derived from where the file actually lives, same as `id`
-  // above — never written back to the file itself, so moving a photo
-  // to a different folder later is always what changes its grouping,
-  // with nothing stale left behind to contradict it.
-  if (photo.category === "events") {
-    const nestedSegments = path.relative(PHOTOS_DIR, filePath).split(path.sep).slice(1, -1);
-    if (nestedSegments.length > 0) {
-      photo.eventName = nestedSegments[0];
-      if (nestedSegments.length > 1 && /^\d{4}$/.test(nestedSegments[1])) {
-        photo.eventYear = parseInt(nestedSegments[1], 10);
-      }
-    }
-  }
 
   if (photo.coords) {
     const coords = parseCoords(photo.coords);

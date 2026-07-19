@@ -715,6 +715,12 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   text-align: center;
 }
 
+.events-other-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
 /* ---------- Location timeline (location.html) ---------- */
 
 .location-subheading {
