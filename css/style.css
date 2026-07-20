@@ -859,12 +859,27 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 1.05rem;
 }
 
-.chronology-text {
+.chronology-body {
   flex: 1 1 auto;
   min-width: 0;
+}
+
+.chronology-text {
   margin: 0;
   line-height: 1.6;
 }
+
+/* A photo/event with the same year as this entry — the reverse of
+   place.html/event.html's own "See <year> in the Village Chronology"
+   link, worked out automatically from matching dates (js/chronology.js)
+   rather than hand-tagged, so most entries (predating any surviving
+   photo) simply won't have one. */
+.chronology-related {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+}
+.chronology-related a { color: var(--green-700); }
 
 @media (max-width: 600px) {
   .chronology-entry { flex-direction: column; gap: 4px; padding-left: 16px; }

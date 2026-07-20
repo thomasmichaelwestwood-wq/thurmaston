@@ -48,28 +48,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
   var allEntries = [];
 
-  fetch("data/chronology.json")
-    .then(function (res) { return res.ok ? res.json() : { entries: [] }; })
-    .catch(function () { return { entries: [] }; })
-    .then(function (data) {
-      allEntries = (data.entries || []).map(function (e) {
-        return { year: e.year || "", text: e.text || "", sortYear: parseYear(e.year) };
-      });
-      // Always sorted here, not trusted from file order — an entry
-      // added anywhere in the admin's list (the config's own hint says
-      // "order doesn't matter when saving") still ends up in the right
-      // place on the page.
-      allEntries.sort(function (a, b) {
-        var ay = a.sortYear === null ? Infinity : a.sortYear;
-        var by = b.sortYear === null ? Infinity : b.sortYear;
-        return ay - by;
-      });
-      countEl.textContent = allEntries.length + (allEntries.length === 1 ? " entry" : " entries");
-      renderEras();
-      render(allEntries);
-      wireDownloadPdf();
-      applyYearParam();
+  var chronologyPromise = fetch("data/chronology.json").then(function (res) { return res.ok ? res.json() : { entries: [] }; }).catch(function () { return { entries: [] }; });
+  var eventsPromise = fetch("data/events.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; });
+  // js/photos.js (already loaded on this page for the header search
+  // overlay) exposes this same promise — reused rather than fetching
+  // data/photos.json a second time, and it already excludes Hero-only
+  // images the way every other page's photo listing does.
+  var photosPromise = (typeof PHOTOS_DATA_PROMISE !== "undefined") ? PHOTOS_DATA_PROMISE : Promise.resolve([]);
+
+  Promise.all([chronologyPromise, photosPromise, eventsPromise]).then(function (results) {
+    var data = results[0], photos = results[1], events = results[2];
+
+    // The reverse of a photo/event's own "See <year> in the Village
+    // Chronology" link (js/place.js/js/event.js) — every photo or event
+    // with a real, parseable date (extractYear, same placeholder-
+    // excluding logic used everywhere else) becomes something a
+    // same-year chronology entry can link back to. Built automatically
+    // from whatever years happen to line up, not hand-tagged — most of
+    // 130+ entries predate any surviving photo and will simply have
+    // nothing to link to, which is expected, not a gap to fill in.
+    var yearToItems = {};
+    function addItem(year, item) {
+      if (!year) return;
+      (yearToItems[year] = yearToItems[year] || []).push(item);
+    }
+    photos.forEach(function (p) {
+      addItem(extractYear(p.date), { href: "place.html?photo=" + encodeURIComponent(p.id), label: p.caption });
     });
+    events.forEach(function (e) {
+      addItem(extractYear(e.date), { href: "event.html?event=" + encodeURIComponent(e.id), label: e.name });
+    });
+
+    allEntries = (data.entries || []).map(function (e) {
+      var sortYear = parseYear(e.year);
+      return { year: e.year || "", text: e.text || "", sortYear: sortYear, related: (sortYear && yearToItems[sortYear]) || [] };
+    });
+    // Always sorted here, not trusted from file order — an entry
+    // added anywhere in the admin's list (the config's own hint says
+    // "order doesn't matter when saving") still ends up in the right
+    // place on the page.
+    allEntries.sort(function (a, b) {
+      var ay = a.sortYear === null ? Infinity : a.sortYear;
+      var by = b.sortYear === null ? Infinity : b.sortYear;
+      return ay - by;
+    });
+    countEl.textContent = allEntries.length + (allEntries.length === 1 ? " entry" : " entries");
+    renderEras();
+    render(allEntries);
+    wireDownloadPdf();
+    applyYearParam();
+  });
 
   // A photo or Event Page with a real date links here as
   // chronology.html?year=1929 (js/place.js's renderChronologyBanner,
@@ -133,13 +161,25 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function renderEntry(entry) {
+    var related = entry.related.length ? (
+      '<p class="chronology-related">Related: ' +
+        entry.related.map(function (item) {
+          return '<a href="' + escapeAttr(item.href) + '">' + escapeHtml(item.label) + "</a>";
+        }).join(", ") +
+      "</p>"
+    ) : "";
     return (
       '<article class="chronology-entry"' + (entry.sortYear !== null ? ' data-year="' + entry.sortYear + '"' : "") + '>' +
         '<span class="chronology-year">' + escapeHtml(entry.year) + "</span>" +
-        '<p class="chronology-text">' + escapeHtml(entry.text) + "</p>" +
+        '<div class="chronology-body">' +
+          '<p class="chronology-text">' + escapeHtml(entry.text) + "</p>" +
+          related +
+        "</div>" +
       "</article>"
     );
   }
+
+  function escapeAttr(str) { return escapeHtml(str); }
 
   if (searchInput) {
     searchInput.addEventListener("input", function () {
