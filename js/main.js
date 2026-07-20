@@ -37,16 +37,29 @@ function initHero() {
 // Two search boxes can exist on one page now — the header's icon-
 // triggered overlay (every page) and, on the homepage only, a second
 // one sitting right under the hero (#home-search-input/-results). Both
-// search the same combined index (SITE_SEARCH_INDEX + every photo), so
-// the index and the matching/rendering logic are built once here and
-// shared, rather than duplicated per box.
+// search the same combined index (SITE_SEARCH_INDEX + every photo +
+// every chronology entry), so the index and the matching/rendering
+// logic are built once here and shared, rather than duplicated per box.
 function initSearch() {
-  var searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.slice() : [];
+  // Photos and chronology entries load independently (two unrelated
+  // fetches) — each is kept in its own array and the combined index is
+  // rebuilt from all three every time either one resolves, rather than
+  // each callback rebuilding "static + its own results" from scratch,
+  // which would let whichever fetch finishes last silently wipe out the
+  // other's entries.
+  var photoEntries = [];
+  var chronologyEntries = [];
   var boxes = [];
+  var searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.slice() : [];
+
+  function rebuildIndex() {
+    searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries, chronologyEntries);
+    boxes.forEach(function (box) { box.refresh(); });
+  }
 
   if (typeof PHOTOS_DATA_PROMISE !== "undefined") {
     PHOTOS_DATA_PROMISE.then(function (photos) {
-      var photoEntries = photos.map(function (p) {
+      photoEntries = photos.map(function (p) {
         return {
           title: p.caption,
           url: "place.html?photo=" + encodeURIComponent(p.id),
@@ -63,10 +76,34 @@ function initSearch() {
           keywords: [p.location, p.ref, p.history].filter(Boolean).join(" ")
         };
       });
-      searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries);
-      boxes.forEach(function (box) { box.refresh(); });
+      rebuildIndex();
     });
   }
+
+  // Every Village Chronology entry, individually — not just the one
+  // static "Village Chronology" page link SITE_SEARCH_INDEX already
+  // has — so typing a year ("1945") or a keyword ("Domesday") finds the
+  // specific entry, not just the page it lives on. Fetched directly
+  // (not gated behind a page-specific script) since every page already
+  // loads this shared search wiring, and the file's tiny. Links straight
+  // to chronology.html?year=X (js/chronology.js's own ?year= handling
+  // scrolls to and highlights it) when the entry's Year has a real
+  // number to link with; falls back to the plain page otherwise.
+  fetch("data/chronology.json")
+    .then(function (res) { return res.ok ? res.json() : { entries: [] }; })
+    .catch(function () { return { entries: [] }; })
+    .then(function (data) {
+      chronologyEntries = (data.entries || []).map(function (e) {
+        var year = extractYear(e.year);
+        return {
+          title: e.year || "Village Chronology",
+          url: year ? "chronology.html?year=" + encodeURIComponent(year) : "chronology.html",
+          category: "Chronology",
+          excerpt: e.text || ""
+        };
+      });
+      rebuildIndex();
+    });
 
   function renderResultsInto(resultsList, query, emptyHint) {
     resultsList.innerHTML = "";
