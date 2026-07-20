@@ -1639,10 +1639,39 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .place-zoom-btn:hover { background: var(--gold-100); }
 
+/* Prev/Next through a multi-photo gallery (event.html only — place.html's
+   overlay shows one fixed photo with no siblings to step through, so it
+   never renders these buttons at all). Same solid-white treatment as the
+   close button/zoom controls, for the same reason: needs to stay legible
+   over a photo of any colour. */
+.place-zoom-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #fff;
+  border: none;
+  color: var(--green-900);
+  font-size: 2rem;
+  line-height: 1;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.place-zoom-nav:hover { background: var(--gold-100); }
+.place-zoom-nav[hidden] { display: none; }
+.place-zoom-prev { left: 16px; }
+.place-zoom-next { right: 16px; }
+
 @media (max-width: 560px) {
   /* Cramped next to the close button at this width, and pinch-to-zoom
      is the natural first thing to try on a touchscreen anyway. */
   .place-zoom-hint { display: none; }
+  .place-zoom-nav { width: 40px; height: 40px; font-size: 1.6rem; }
+  .place-zoom-prev { left: 6px; }
+  .place-zoom-next { right: 6px; }
 }
 
 /* ---------- Footer ---------- */

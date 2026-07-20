@@ -27,7 +27,15 @@ document.addEventListener("DOMContentLoaded", function () {
   var zoomInBtn = document.getElementById("place-zoom-in");
   var zoomOutBtn = document.getElementById("place-zoom-out");
   var zoomResetBtn = document.getElementById("place-zoom-reset");
+  var zoomPrevBtn = document.getElementById("place-zoom-prev");
+  var zoomNextBtn = document.getElementById("place-zoom-next");
   if (!galleryEl) return;
+
+  // The photos currently in the gallery, and which one the zoom overlay
+  // is showing — lets Prev/Next step through the same list the thumbnail
+  // grid was built from, without closing and reopening the overlay.
+  var currentPhotos = [];
+  var currentIndex = -1;
 
   var params = new URLSearchParams(location.search);
   var eventId = params.get("event");
@@ -67,9 +75,11 @@ document.addEventListener("DOMContentLoaded", function () {
       descriptionEl.classList.add("visible");
     }
 
+    currentPhotos = photos;
+
     galleryEl.innerHTML = photos.map(renderThumb).join("");
     Array.prototype.forEach.call(galleryEl.querySelectorAll(".photo-thumb"), function (btn, i) {
-      btn.addEventListener("click", function () { openZoom(photos[i]); });
+      btn.addEventListener("click", function () { openZoom(i); });
     });
   }
 
@@ -88,9 +98,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // than hand-rolled pinch-zoom. The instance is created once (on
   // first open) and reused on later opens.
   var zoomInstance = null;
-  function openZoom(src) {
+  function openZoom(index) {
     if (!zoomOverlay || typeof panzoom === "undefined") return;
-    zoomImage.src = src;
+    currentIndex = index;
+    zoomImage.src = currentPhotos[currentIndex];
     zoomImage.alt = "";
     zoomOverlay.classList.add("open");
     document.body.style.overflow = "hidden";
@@ -106,6 +117,29 @@ document.addEventListener("DOMContentLoaded", function () {
       zoomInstance.moveTo(0, 0);
       zoomInstance.zoomAbs(0, 0, 1);
     }
+    updateZoomNav();
+  }
+
+  // Wraps round in both directions (Next past the last photo loops back
+  // to the first, and vice versa) rather than disabling the button at
+  // either end — one fewer edge case for a gallery someone's flicking
+  // through quickly.
+  function goToPhoto(index) {
+    var len = currentPhotos.length;
+    if (!len) return;
+    currentIndex = (index % len + len) % len;
+    zoomImage.src = currentPhotos[currentIndex];
+    zoomImage.alt = "";
+    if (zoomInstance) { zoomInstance.moveTo(0, 0); zoomInstance.zoomAbs(0, 0, 1); }
+  }
+
+  // Prev/Next only make sense with more than one photo — hidden rather
+  // than just inert, so a single-photo event's overlay looks the same
+  // as place.html's (no dead-looking arrows either side of the photo).
+  function updateZoomNav() {
+    var show = currentPhotos.length > 1;
+    if (zoomPrevBtn) zoomPrevBtn.hidden = !show;
+    if (zoomNextBtn) zoomNextBtn.hidden = !show;
   }
 
   function closeZoom() {
@@ -120,8 +154,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (e.target === zoomOverlay || e.target === zoomStage) closeZoom();
     });
     document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && zoomOverlay.classList.contains("open")) closeZoom();
+      if (!zoomOverlay.classList.contains("open")) return;
+      if (e.key === "Escape") closeZoom();
+      if (e.key === "ArrowLeft") goToPhoto(currentIndex - 1);
+      if (e.key === "ArrowRight") goToPhoto(currentIndex + 1);
     });
+    if (zoomPrevBtn) zoomPrevBtn.onclick = function () { goToPhoto(currentIndex - 1); };
+    if (zoomNextBtn) zoomNextBtn.onclick = function () { goToPhoto(currentIndex + 1); };
     zoomInBtn.onclick = function () {
       if (zoomInstance) zoomInstance.smoothZoom(zoomStage.clientWidth / 2, zoomStage.clientHeight / 2, 1.5);
     };
