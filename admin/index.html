@@ -5,6 +5,19 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Content Manager | Memories of Thurmaston</title>
 <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<!-- Sveltia's plain "text" field (History, Description) has no
+     widget-level option for its box size — Decap-compatible "text"
+     fields never had one either, it's just whatever height the native
+     <textarea> element defaults to. This plain CSS override (not a
+     custom widget/registration API, which Sveltia doesn't support yet
+     — see the script comment below) makes every one of those bigger by
+     default, since History routinely holds several paragraphs. Safe
+     even if Sveltia's internal markup ever changes: an unmatched
+     selector just does nothing, it can't break the admin the way a
+     failed widget registration can. -->
+<style>
+textarea { min-height: 220px !important; }
+</style>
 </head>
 <body>
 <!-- A plain link back to the live homepage, floated above whatever the

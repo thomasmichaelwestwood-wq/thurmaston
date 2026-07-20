@@ -68,7 +68,16 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        # The leading "^$|" lets an empty value through the pattern
+        # check, here and on every other Coordinates field in this
+        # file. Sveltia always saves a real empty string for a blank
+        # optional field — required: false only makes it optional to
+        # *type*, not optional in the saved output — so without this,
+        # that empty string still had to match the pattern below
+        # (which needs at least one digit), and leaving Coordinates
+        # blank silently failed to save, exactly as if the field were
+        # required after all.
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
@@ -111,7 +120,7 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
@@ -146,7 +155,7 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click where this event took place — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if not known — this puts the event on the interactive map automatically, using this event's own name/date/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"War Memorial, Melton Road\" — just descriptive text shown next to the event; set Google Maps coordinates above to actually place it on the map." }
       - label: "Photos"
         name: "photos"
@@ -192,7 +201,7 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
@@ -235,7 +244,7 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
@@ -277,7 +286,7 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
@@ -320,7 +329,7 @@ collections:
         widget: "string"
         required: false
         hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
-        pattern: ['-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
       - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
       - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
