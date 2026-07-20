@@ -842,6 +842,15 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .chronology-entry + .chronology-entry { border-top: 1px solid var(--line); }
 
+/* Landed here via a photo/event's own "See <year> in the Village
+   Chronology" link (chronology.html?year=X) — highlights every entry
+   sharing that year so it's obvious which row the link was actually
+   about, not just scrolled to roughly the right area. */
+.chronology-entry-highlight {
+  background: var(--gold-100);
+  border-left-color: var(--green-900);
+}
+
 .chronology-year {
   flex: 0 0 100px;
   font-family: var(--font-head);

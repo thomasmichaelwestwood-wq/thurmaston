@@ -20,6 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var descriptionEl = document.getElementById("event-description");
   var galleryEl = document.getElementById("event-gallery");
   var notFoundEl = document.getElementById("event-not-found");
+  var chronologyBannerEl = document.getElementById("event-chronology-banner");
   var zoomOverlay = document.getElementById("place-zoom-overlay");
   var zoomStage = document.getElementById("place-zoom-stage");
   var zoomImage = document.getElementById("place-zoom-image");
@@ -67,6 +68,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (event.date || photos.length) {
       subheadingEl.textContent = [event.date, photos.length + (photos.length === 1 ? " photo" : " photos")].filter(Boolean).join(" · ");
       subheadingEl.hidden = false;
+    }
+
+    // Same year-based nudge to the Village Chronology as a photo's own
+    // page (js/place.js's renderChronologyBanner) — only shown when
+    // extractYear can pull a real year out of this event's own Date.
+    if (chronologyBannerEl) {
+      var year = extractYear(event.date);
+      if (year) {
+        chronologyBannerEl.href = "chronology.html?year=" + encodeURIComponent(year);
+        chronologyBannerEl.innerHTML = "See <strong>" + year + "</strong> in the Village Chronology →";
+        chronologyBannerEl.hidden = false;
+      }
     }
 
     if (event.description) {

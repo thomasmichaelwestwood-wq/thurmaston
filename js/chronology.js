@@ -68,7 +68,25 @@ document.addEventListener("DOMContentLoaded", function () {
       renderEras();
       render(allEntries);
       wireDownloadPdf();
+      applyYearParam();
     });
+
+  // A photo or Event Page with a real date links here as
+  // chronology.html?year=1929 (js/place.js's renderChronologyBanner,
+  // js/event.js's own copy of the same thing) — landing with that param
+  // set jumps straight to, and highlights, whichever entries share that
+  // year, rather than leaving a visitor to scroll/search for it
+  // themselves. Matches on the same sortYear every other year-grouping
+  // here already uses, so "1929" finds an entry whose Year field is
+  // exactly "1929" just as readily as one written "c.1929" would.
+  function applyYearParam() {
+    var yearParam = parseInt(new URLSearchParams(location.search).get("year"), 10);
+    if (!yearParam) return;
+    var matches = timelineEl.querySelectorAll('[data-year="' + yearParam + '"]');
+    if (matches.length === 0) return;
+    Array.prototype.forEach.call(matches, function (el) { el.classList.add("chronology-entry-highlight"); });
+    matches[0].scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
   function renderEras() {
     var present = {};
@@ -116,7 +134,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function renderEntry(entry) {
     return (
-      '<article class="chronology-entry">' +
+      '<article class="chronology-entry"' + (entry.sortYear !== null ? ' data-year="' + entry.sortYear + '"' : "") + '>' +
         '<span class="chronology-year">' + escapeHtml(entry.year) + "</span>" +
         '<p class="chronology-text">' + escapeHtml(entry.text) + "</p>" +
       "</article>"

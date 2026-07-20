@@ -12,6 +12,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
   var locationBannerEl = document.getElementById("place-location-banner");
+  var chronologyBannerEl = document.getElementById("place-chronology-banner");
   var zoomOverlay = document.getElementById("place-zoom-overlay");
   var zoomStage = document.getElementById("place-zoom-stage");
   var zoomImage = document.getElementById("place-zoom-image");
@@ -73,6 +74,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (primaryPhoto) {
       renderLocationBanner(primaryPhoto, photos);
+      renderChronologyBanner(primaryPhoto);
       renderPhotoPanel(primaryPhoto);
       renderHistorySection(primaryPhoto);
       renderKnowMore(primaryPhoto);
@@ -475,6 +477,23 @@ document.addEventListener("DOMContentLoaded", function () {
     locationBannerEl.innerHTML =
       "This is one of " + siblings.length + " photos of <strong>" + escapeHtml(label) + "</strong> — see the full history and timeline →";
     locationBannerEl.hidden = false;
+  }
+
+  // A quick nudge to that year's spot in the Village Chronology
+  // (chronology.html?year=X, see js/chronology.js) — only shown when
+  // extractYear can actually pull a real year out of this photo's own
+  // Date field (so a photo still on the "Added <Month> <Year>"
+  // placeholder, or with no date at all, doesn't link to a year that
+  // isn't really its own). Same eye-catching banner style as the
+  // location nudge above, for the same reason: a plain text link here
+  // was the thing that went unnoticed before.
+  function renderChronologyBanner(photo) {
+    if (!chronologyBannerEl) return;
+    var year = extractYear(photo.date);
+    if (!year) return;
+    chronologyBannerEl.href = "chronology.html?year=" + encodeURIComponent(year);
+    chronologyBannerEl.innerHTML = "See <strong>" + year + "</strong> in the Village Chronology →";
+    chronologyBannerEl.hidden = false;
   }
 
   // Other photos at the same place (placeKey, see above) — quietly
