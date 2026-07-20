@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "name": "Remembrance Day",
+    "date": "1967",
+    "description": "1967 Remembrance Parade",
+    "location": "Leicester City centre",
+    "photos": [
+      "/images/events/843 Thurmaston Scout Parade 1967.JPG",
+      "/images/events/844 Thurmaston Scout Parade 1967.JPG",
+      "/images/events/846 Thurmaston Scout Parade 1967.JPG",
+      "/images/events/847 Thurmaston Scout Parade 1967.JPG",
+      "/images/events/848 Thurmaston Scout Parade 1967.JPG",
+      "/images/events/845 The Three Cranes Hotel, Humberstone Gate, Leicester 1967.JPG"
+    ],
+    "consentNoted": true,
+    "addedAt": "2026-07-20T11:32:28.225Z",
+    "id": "20260720113212-remembrance-day",
+    "lat": 52.6798737358646,
+    "lng": -1.0998636161851645
+  }
+]
