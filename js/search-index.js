@@ -8,6 +8,8 @@ const SITE_SEARCH_INDEX = [
     excerpt: "Submit a photo, story or memory of Thurmaston to add to the village archive." },
   { title: "Interactive Map", url: "map.html", category: "History",
     excerpt: "An interactive map of buildings and places that used to stand in Thurmaston." },
+  { title: "Village Chronology", url: "chronology.html", category: "History",
+    excerpt: "A year-by-year timeline of Thurmaston, from the Domesday Book in 1086 to the present." },
   { title: "Photo Archive", url: "index.html#photos", category: "History",
     excerpt: "Old photographs of the village, organised by streets, people, nature, aerial and more." },
 

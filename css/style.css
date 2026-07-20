@@ -807,6 +807,61 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   .location-entry-media { flex: none; }
 }
 
+/* ---------- Village Chronology ---------- */
+
+.chronology-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 14px;
+  justify-content: space-between;
+  max-width: 800px;
+  margin: 0 auto 16px;
+}
+.chronology-toolbar .photo-search-input { margin-bottom: 0; flex: 1 1 260px; max-width: none; }
+.chronology-toolbar .chronology-download-pdf-btn { flex: none; }
+
+#chronology-eras {
+  max-width: 800px;
+  margin: 0 auto 8px;
+}
+
+.chronology-timeline {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Same left-rail look as .location-entry, minus the photo column —
+   a chronology entry is text-only. */
+.chronology-entry {
+  display: flex;
+  align-items: baseline;
+  gap: 20px;
+  padding: 16px 0 16px 24px;
+  border-left: 3px solid var(--gold-600);
+}
+.chronology-entry + .chronology-entry { border-top: 1px solid var(--line); }
+
+.chronology-year {
+  flex: 0 0 100px;
+  font-family: var(--font-head);
+  font-weight: 700;
+  color: var(--green-900);
+  font-size: 1.05rem;
+}
+
+.chronology-text {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .chronology-entry { flex-direction: column; gap: 4px; padding-left: 16px; }
+  .chronology-year { flex: none; }
+}
+
 /* A prominent nudge to a place's timeline page (location.html) when
    more than one photo shares this one's Location — see js/place.js's
    renderLocationBanner. Styled as its own eye-catching callout (not

@@ -86,6 +86,29 @@ collections:
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
 
+  # A single hand-curated list (data/chronology.json), not one file per
+  # entry — same shape the old "Map pins" collection used before it was
+  # removed from the admin (see js/map.js's own comment on that file).
+  # Fits a village history list well: a few hundred entries at most,
+  # small enough to load and edit as one whole list rather than needing
+  # per-entry files plus a rebuild-and-aggregate script the way Photos
+  # and Event Pages do. js/chronology.js reads this file directly.
+  - name: "chronology"
+    label: "Village Chronology"
+    description: "The village's year-by-year timeline, shown at /chronology.html. Add a new entry anywhere in the list for anything recent — order doesn't matter when saving, the page sorts everything into year order itself — or edit/delete one that's already here."
+    files:
+      - name: "chronology"
+        label: "Village Chronology"
+        file: "data/chronology.json"
+        fields:
+          - label: "Timeline entries"
+            name: "entries"
+            widget: "list"
+            summary: "{{fields.year}} — {{fields.text}}"
+            fields:
+              - { label: "Year", name: "year", widget: "string", hint: "e.g. \"1929\", \"1920s\", \"c1870\", \"1848/9\" — whatever's known, doesn't need to be one exact year." }
+              - { label: "What happened", name: "text", widget: "text", hint: "A short description of what happened." }
+
   - name: "photos_events"
     label: "Events (single photos)"
     description: "For a one-off Events photo that isn't part of a described occasion — every photo here, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. For an event with several photos and its own write-up (e.g. Remembrance Day), use the \"Event Pages\" collection instead — one entry there covers the whole occasion, photos and all."
