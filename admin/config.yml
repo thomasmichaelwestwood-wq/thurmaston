@@ -105,6 +105,14 @@ collections:
             name: "entries"
             widget: "list"
             summary: "{{fields.year}} — {{fields.text}}"
+            # Collapsed to one summary line per entry by default — with
+            # ~130+ entries, expanded Year/What-happened fields for every
+            # single one would mean a very long scroll just to reach the
+            # "Add" button at the bottom (list widgets always add a new
+            # item after the last one, there's no way to move that to
+            # the top). Collapsed rows make that scroll much shorter;
+            # click a row to expand it and edit that entry as normal.
+            collapsed: true
             fields:
               - { label: "Year", name: "year", widget: "string", hint: "e.g. \"1929\", \"1920s\", \"c1870\", \"1848/9\" — whatever's known, doesn't need to be one exact year." }
               - { label: "What happened", name: "text", widget: "text", hint: "A short description of what happened." }
