@@ -148,7 +148,16 @@ function openPdfInViewer(buildDoc, filename, btn, loadingTitle) {
     alert("Sorry, the PDF tool didn't load. Try refreshing the page.");
     return;
   }
-  var pdfWindow = window.open("", "_blank");
+  // A plain window.open("", "_blank") with no window-feature string just
+  // opens another tab in the same browser window — passing a size here
+  // is what tells the browser to spawn it as a genuinely separate
+  // window instead (standard behaviour: a browser can't sensibly turn
+  // "here's a fixed size for this" into just another tab). Deliberately
+  // not adding "noopener" alongside it — that would make window.open()
+  // return null instead of a usable reference, which is exactly what
+  // this function needs to write the loading page into and later
+  // navigate to the finished PDF.
+  var pdfWindow = window.open("", "_blank", "width=1000,height=1000");
   if (pdfWindow) {
     pdfWindow.document.write(
       "<title>" + escapeHtml(loadingTitle || "Preparing your PDF…") + "</title>" +
