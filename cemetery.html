@@ -50,6 +50,13 @@
     <ul id="cemetery-search-results" class="home-search-results"></ul>
 
     <h2 style="margin-top:32px">Full directory</h2>
+    <div class="pick-toolbar" id="cemetery-pick-toolbar" hidden>
+      <div class="pick-toolbar-actions">
+        <button type="button" class="chip" id="cemetery-select-all">Select all</button>
+        <button type="button" class="chip" id="cemetery-select-none">Select none</button>
+      </div>
+      <button type="button" class="btn btn-primary" id="cemetery-download-pdf-btn">Download selected as PDF</button>
+    </div>
     <ul class="cemetery-directory-list" id="cemetery-directory"></ul>
     <p class="place-not-found" id="cemetery-empty" hidden>No graves have been added yet — check back soon.</p>
   </section>
@@ -99,6 +106,9 @@
 
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
+<script src="vendor/jspdf/jspdf.umd.min.js"></script>
+<script src="vendor/qrcode-generator/qrcode.js"></script>
+<script src="js/pdf-helpers.js"></script>
 <script src="js/photos.js"></script>
 <script src="js/cemetery.js"></script>
 </body>

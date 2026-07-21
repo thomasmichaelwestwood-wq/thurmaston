@@ -5,6 +5,9 @@ document.addEventListener("DOMContentLoaded", function () {
   var timelineEl = document.getElementById("location-timeline");
   var notFoundEl = document.getElementById("location-not-found");
   var downloadPdfBtn = document.getElementById("location-download-pdf-btn");
+  var selectActionsEl = document.getElementById("location-select-actions");
+  var selectAllBtn = document.getElementById("location-select-all");
+  var selectNoneBtn = document.getElementById("location-select-none");
   if (!timelineEl || typeof PHOTOS_DATA_PROMISE === "undefined") return;
 
   var params = new URLSearchParams(location.search);
@@ -38,6 +41,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var ordered = orderPhotos(matches);
     renderTimeline(ordered);
+    if (matches.length > 1) {
+      selectActionsEl.hidden = false;
+      wireCheckboxSelectAll(".pick-checkbox", selectAllBtn, selectNoneBtn);
+    }
     renderDownloadPdf(placeName, ordered);
   });
 
@@ -76,9 +83,12 @@ document.addEventListener("DOMContentLoaded", function () {
     if (photo.credit && photo.credit !== "—") metaParts.push("Credit: " + photo.credit);
     return (
       '<article class="location-entry">' +
-        '<a class="location-entry-media" href="place.html?photo=' + encodeURIComponent(photo.id) + '">' +
-          '<img src="' + escapeAttr(photo.src) + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
-        "</a>" +
+        '<div class="pick-photo-item" style="flex:0 0 180px">' +
+          '<input type="checkbox" class="pick-checkbox" data-id="' + escapeAttr(photo.id) + '" checked>' +
+          '<a class="location-entry-media" href="place.html?photo=' + encodeURIComponent(photo.id) + '">' +
+            '<img src="' + escapeAttr(photo.src) + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
+          "</a>" +
+        "</div>" +
         '<div class="location-entry-body">' +
           '<a class="location-entry-caption" href="place.html?photo=' + encodeURIComponent(photo.id) + '">' + escapeHtml(photo.caption) + "</a>" +
           '<p class="location-entry-meta">' + escapeHtml(metaParts.filter(Boolean).join(" · ")) + "</p>" +
@@ -91,24 +101,36 @@ document.addEventListener("DOMContentLoaded", function () {
   function escapeAttr(str) { return escapeHtml(str); }
 
   // Same "open in a viewer tab" pipeline as a single photo's own PDF
-  // (js/place.js, see js/pdf-helpers.js for the shared parts) — one
-  // PDF covering every photo of this place, in the same timeline
-  // order as the page above, each with its own image, date/credit and
-  // full History text.
+  // (js/place.js, see js/pdf-helpers.js for the shared parts) — built
+  // fresh from whichever checkboxes are ticked at the moment Download
+  // is clicked (all of them, by default), each with its own image,
+  // date/credit and full History text, in the same timeline order as
+  // the page above.
   function renderDownloadPdf(placeName, ordered) {
     if (!downloadPdfBtn) return;
     downloadPdfBtn.onclick = function () {
+      var allPhotos = ordered.dated.concat(ordered.undated);
+      var checkedIds = checkedPickIds(".pick-checkbox");
+      var selected = {
+        dated: ordered.dated.filter(function (p) { return checkedIds[p.id]; }),
+        undated: ordered.undated.filter(function (p) { return checkedIds[p.id]; })
+      };
+      var selectedPhotos = selected.dated.concat(selected.undated);
+      if (selectedPhotos.length === 0) {
+        alert("Tick at least one photo to include in the PDF.");
+        return;
+      }
+
       openPdfInViewer(function () {
-        var allPhotos = ordered.dated.concat(ordered.undated);
         return Promise.all([
-          Promise.all(allPhotos.map(function (p) {
+          Promise.all(selectedPhotos.map(function (p) {
             return loadImageElement(p.src).catch(function () { return null; });
           })),
           buildQrPngDataUrl(locationPageUrl())
         ]).then(function (results) {
           var imagesByPhotoId = {};
-          allPhotos.forEach(function (p, i) { imagesByPhotoId[p.id] = results[0][i]; });
-          return buildLocationPdf(placeName, ordered, imagesByPhotoId, results[1]);
+          selectedPhotos.forEach(function (p, i) { imagesByPhotoId[p.id] = results[0][i]; });
+          return buildLocationPdf(placeName, selected, imagesByPhotoId, results[1]);
         });
       }, pdfFilenameBase(placeName) + ".pdf", downloadPdfBtn, placeName);
     };
@@ -162,54 +184,16 @@ document.addEventListener("DOMContentLoaded", function () {
     y += 10;
 
     ordered.dated.forEach(function (photo) {
-      y = addLocationPdfEntry(doc, photo, imagesByPhotoId[photo.id], margin, y, maxWidth);
+      y = addPdfPhotoEntry(doc, photo, imagesByPhotoId[photo.id], margin, y, maxWidth);
     });
     if (ordered.undated.length > 0) {
       y = addPdfHeading(doc, "Date unknown", margin, y);
       ordered.undated.forEach(function (photo) {
-        y = addLocationPdfEntry(doc, photo, imagesByPhotoId[photo.id], margin, y, maxWidth);
+        y = addPdfPhotoEntry(doc, photo, imagesByPhotoId[photo.id], margin, y, maxWidth);
       });
     }
 
     stampPdfFooter(doc, margin);
     return doc;
-  }
-
-  function addLocationPdfEntry(doc, photo, img, margin, y, maxWidth) {
-    if (img) {
-      var ratio = img.naturalHeight / img.naturalWidth;
-      var imgWidth = maxWidth;
-      var imgHeight = imgWidth * ratio;
-      var maxImgHeight = 90;
-      if (imgHeight > maxImgHeight) {
-        imgHeight = maxImgHeight;
-        imgWidth = imgHeight / ratio;
-      }
-      y = ensureSpace(doc, y, imgHeight, margin);
-      doc.addImage(img, guessImageFormat(photo.src), margin, y, imgWidth, imgHeight);
-      y += imgHeight + 6;
-    }
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    y = ensureSpace(doc, y, 7, margin);
-    doc.text(photo.caption || "Untitled photo", margin, y);
-    y += 7;
-
-    var metaParts = [photo.date];
-    if (photo.credit && photo.credit !== "—") metaParts.push("Credit: " + photo.credit);
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    y = ensureSpace(doc, y, 6, margin);
-    doc.text(metaParts.filter(Boolean).join("  ·  "), margin, y);
-    doc.setTextColor(0);
-    y += 8;
-
-    doc.setFontSize(11);
-    if (photo.history) {
-      y = addPdfParagraph(doc, photo.history, margin, y, maxWidth);
-    }
-    return y + 8;
   }
 });

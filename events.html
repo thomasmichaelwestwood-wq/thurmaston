@@ -40,6 +40,13 @@
   </section>
 
   <section class="content-section container">
+    <div class="pick-toolbar" id="events-pick-toolbar" hidden>
+      <div class="pick-toolbar-actions">
+        <button type="button" class="chip" id="events-select-all">Select all</button>
+        <button type="button" class="chip" id="events-select-none">Select none</button>
+      </div>
+      <button type="button" class="btn btn-primary" id="events-download-pdf-btn">Download selected as PDF</button>
+    </div>
     <div class="photo-filters" id="events-tiles"></div>
     <p class="place-not-found" id="events-empty" hidden>No events have been added yet — check back soon.</p>
     <p class="events-other-link"><a href="category.html?cat=events">Browse single Events photos →</a></p>
@@ -90,6 +97,9 @@
 
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
+<script src="vendor/jspdf/jspdf.umd.min.js"></script>
+<script src="vendor/qrcode-generator/qrcode.js"></script>
+<script src="js/pdf-helpers.js"></script>
 <script src="js/photos.js"></script>
 <script src="js/events.js"></script>
 </body>

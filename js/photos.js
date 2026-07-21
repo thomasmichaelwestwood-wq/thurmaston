@@ -46,16 +46,57 @@ function buildPhotoThumb(photo) {
   return fig;
 }
 
+// Same thumb, wrapped with a tick-to-include checkbox for the category
+// page's "download selected as PDF" toolbar (see renderGrid below) — a
+// sibling of the <a>, not nested inside it, so clicking the checkbox
+// never also triggers the thumbnail's own navigation to place.html.
+function buildPickablePhotoItem(photo) {
+  var wrapper = document.createElement("div");
+  wrapper.className = "pick-photo-item";
+  var checkbox = document.createElement("input");
+  checkbox.type = "checkbox";
+  checkbox.className = "pick-checkbox";
+  checkbox.dataset.id = photo.id;
+  checkbox.checked = true;
+  wrapper.appendChild(checkbox);
+  wrapper.appendChild(buildPhotoThumb(photo));
+  return wrapper;
+}
+
+// Oldest-first by the photo's own real date (extractYear), with
+// anything undated held back into its own group at the end — same
+// convention js/location.js's orderPhotos already established for a
+// place's timeline, just flattened into one array rather than a
+// {dated, undated} pair, since the category grid doesn't need a
+// separate "Date unknown" heading the way a timeline page does.
+function orderPhotosChronologically(photos) {
+  var dated = [];
+  var undated = [];
+  photos.forEach(function (p) {
+    var year = extractYear(p.date);
+    if (year) dated.push({ photo: p, year: year });
+    else undated.push(p);
+  });
+  dated.sort(function (a, b) { return a.year - b.year; });
+  return dated.map(function (entry) { return entry.photo; }).concat(undated);
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   var gridEl = document.getElementById("photo-grid");
   var gridStatusEl = document.getElementById("photo-grid-status");
   var gridFooterEl = document.getElementById("photo-grid-footer");
   var filterEl = document.getElementById("photo-filters");
+  var toolbarEl = document.getElementById("photo-pick-toolbar");
+  var selectAllBtn = document.getElementById("photo-select-all");
+  var selectNoneBtn = document.getElementById("photo-select-none");
+  var downloadPdfBtn = document.getElementById("photo-download-pdf-btn");
   var PREVIEW_COUNT = 8;
   var showingAll = false;
   var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "streets";
   var allPhotos = [];
   var visiblePhotos = [];
+
+  if (selectAllBtn && selectNoneBtn) wireCheckboxSelectAll(".pick-checkbox", selectAllBtn, selectNoneBtn);
 
   PHOTOS_DATA_PROMISE.then(function (photos) {
     allPhotos = photos;
@@ -100,15 +141,16 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // The grid never dumps the whole archive by default — with hundreds or
-  // thousands of photos that's just an endless scroll. Instead it shows the
-  // most recent PREVIEW_COUNT (allPhotos is newest-first) and leaves finding
-  // a specific one to the search box above (js/main.js's shared dropdown
-  // search, not filtered to this grid — see CLAUDE.md) or the map's pins,
-  // with a "show all" escape hatch for anyone who really wants to scroll
-  // the lot.
+  // thousands of photos that's just an endless scroll. Instead it shows
+  // the earliest PREVIEW_COUNT, oldest-first (orderPhotosChronologically
+  // — was newest-added-first before "chronologically" was requested
+  // explicitly) and leaves finding a specific one to the search box
+  // above (js/main.js's shared dropdown search, not filtered to this
+  // grid — see CLAUDE.md) or the map's pins, with a "show all" escape
+  // hatch for anyone who really wants to scroll the lot.
   function renderGrid() {
     if (!gridEl) return;
-    visiblePhotos = allPhotos.filter(matches);
+    visiblePhotos = orderPhotosChronologically(allPhotos.filter(matches));
 
     gridEl.innerHTML = "";
 
@@ -119,6 +161,7 @@ document.addEventListener("DOMContentLoaded", function () {
       gridEl.appendChild(empty);
       setGridStatus(0, false);
       renderShowAllButton(0, false);
+      updatePickToolbar([], false);
       return;
     }
 
@@ -126,21 +169,108 @@ document.addEventListener("DOMContentLoaded", function () {
     var displayPhotos = capped ? visiblePhotos.slice(0, PREVIEW_COUNT) : visiblePhotos;
 
     displayPhotos.forEach(function (photo) {
-      gridEl.appendChild(buildPhotoThumb(photo));
+      gridEl.appendChild(buildPickablePhotoItem(photo));
     });
 
     setGridStatus(visiblePhotos.length, capped);
     renderShowAllButton(visiblePhotos.length, capped);
+    updatePickToolbar(displayPhotos, capped);
   }
 
   function setGridStatus(total, capped) {
     if (!gridStatusEl) return;
     if (!total) { gridStatusEl.textContent = ""; return; }
     if (capped) {
-      gridStatusEl.textContent = "Showing the " + PREVIEW_COUNT + " most recently added photos of " + total + " — search above or use the map to find more.";
+      gridStatusEl.textContent = "Showing the earliest " + PREVIEW_COUNT + " of " + total + " photos — search above or use the map to find more, or \"Show all\" below to browse (and build a PDF from) every one.";
     } else {
       gridStatusEl.textContent = "All " + total + (total === 1 ? " photo" : " photos") + " in this category.";
     }
+  }
+
+  // The picker toolbar (Select all/none + Download PDF) only appears
+  // once every matching photo is actually on the page with a checkbox
+  // of its own — while the grid is still capped at PREVIEW_COUNT,
+  // showing it would silently only let a visitor build a PDF from the
+  // handful currently visible, not the whole category, which reads as
+  // a bug ("I picked select-all, why is my PDF missing photos?") rather
+  // than the deliberate space-saving the cap actually is elsewhere on
+  // this page.
+  function updatePickToolbar(displayPhotos, capped) {
+    if (!toolbarEl) return;
+    if (capped || displayPhotos.length < 2) {
+      toolbarEl.hidden = true;
+      return;
+    }
+    toolbarEl.hidden = false;
+    wireDownloadPdf(displayPhotos);
+  }
+
+  function wireDownloadPdf(photos) {
+    if (!downloadPdfBtn) return;
+    var label = (typeof CATEGORY_INFO !== "undefined" && CATEGORY_INFO[activeCategory]) ? CATEGORY_INFO[activeCategory].label : "Photos";
+    downloadPdfBtn.onclick = function () {
+      var checkedIds = checkedPickIds(".pick-checkbox");
+      var selected = photos.filter(function (p) { return checkedIds[p.id]; });
+      if (selected.length === 0) {
+        alert("Tick at least one photo to include in the PDF.");
+        return;
+      }
+      openPdfInViewer(function () {
+        return Promise.all([
+          Promise.all(selected.map(function (p) { return loadImageElement(p.src).catch(function () { return null; }); })),
+          buildQrPngDataUrl(SITE_URL + "/category.html?cat=" + encodeURIComponent(activeCategory))
+        ]).then(function (results) {
+          var imagesById = {};
+          selected.forEach(function (p, i) { imagesById[p.id] = results[0][i]; });
+          return buildCategoryPdf(label, selected, imagesById, results[1]);
+        });
+      }, pdfFilenameBase(label) + ".pdf", downloadPdfBtn, label);
+    };
+  }
+
+  function buildCategoryPdf(label, photos, imagesById, qrDataUrl) {
+    var doc = new window.jspdf.jsPDF({ unit: "mm", format: "a4" });
+    doc.setProperties({ title: label });
+    var pageWidth = doc.internal.pageSize.getWidth();
+    var margin = 18;
+    var maxWidth = pageWidth - margin * 2;
+    var y = margin;
+
+    var qrSize = 26;
+    var titleMaxWidth = maxWidth;
+    if (qrDataUrl) {
+      titleMaxWidth = maxWidth - qrSize - 6;
+      doc.addImage(qrDataUrl, "PNG", pageWidth - margin - qrSize, margin, qrSize, qrSize);
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(7);
+      doc.setTextColor(120);
+      var qrCaptionX = pageWidth - margin - qrSize / 2;
+      doc.text("Scan to view online", qrCaptionX, margin + qrSize + 4, { align: "center" });
+      doc.text("Downloaded " + downloadedDateLabel(), qrCaptionX, margin + qrSize + 8, { align: "center" });
+      doc.setTextColor(0);
+    }
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18);
+    var titleLines = doc.splitTextToSize(label, titleMaxWidth);
+    doc.text(titleLines, margin, y);
+    y += titleLines.length * 8 + 4;
+    if (qrDataUrl) y = Math.max(y, margin + qrSize + 13);
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    y = ensureSpace(doc, y, 8, margin);
+    doc.text(photos.length + (photos.length === 1 ? " photo" : " photos") + ".", margin, y);
+    doc.setTextColor(0);
+    y += 10;
+
+    photos.forEach(function (photo) {
+      y = addPdfPhotoEntry(doc, photo, imagesById[photo.id], margin, y, maxWidth);
+    });
+
+    stampPdfFooter(doc, margin);
+    return doc;
   }
 
   function renderShowAllButton(total, capped) {

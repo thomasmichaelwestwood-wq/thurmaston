@@ -88,10 +88,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (matchedEntries.length === 0) return;
     chronologyListEl.innerHTML = matchedEntries.map(function (entry, i) {
       return (
-        '<li class="year-pick-item">' +
-          '<input type="checkbox" class="year-checkbox" data-type="entry" data-id="' + i + '" checked>' +
-          '<div class="year-pick-item-body">' +
-            '<p class="year-pick-item-text">' + escapeHtml(entry.text || "") + "</p>" +
+        '<li class="pick-item">' +
+          '<input type="checkbox" class="pick-checkbox" data-type="entry" data-id="' + i + '" checked>' +
+          '<div class="pick-item-body">' +
+            '<p class="pick-item-text">' + escapeHtml(entry.text || "") + "</p>" +
           "</div>" +
         "</li>"
       );
@@ -104,11 +104,11 @@ document.addEventListener("DOMContentLoaded", function () {
     eventsListEl.innerHTML = matchedEvents.map(function (event) {
       var meta = [event.date, (event.photos || []).length ? (event.photos.length + (event.photos.length === 1 ? " photo" : " photos")) : null].filter(Boolean).join(" · ");
       return (
-        '<li class="year-pick-item">' +
-          '<input type="checkbox" class="year-checkbox" data-type="event" data-id="' + escapeAttr(event.id) + '" checked>' +
-          '<div class="year-pick-item-body">' +
-            '<div class="year-pick-item-title"><a href="event.html?event=' + encodeURIComponent(event.id) + '">' + escapeHtml(event.name) + "</a></div>" +
-            (meta ? '<p class="year-pick-item-meta">' + escapeHtml(meta) + "</p>" : "") +
+        '<li class="pick-item">' +
+          '<input type="checkbox" class="pick-checkbox" data-type="event" data-id="' + escapeAttr(event.id) + '" checked>' +
+          '<div class="pick-item-body">' +
+            '<div class="pick-item-title"><a href="event.html?event=' + encodeURIComponent(event.id) + '">' + escapeHtml(event.name) + "</a></div>" +
+            (meta ? '<p class="pick-item-meta">' + escapeHtml(meta) + "</p>" : "") +
           "</div>" +
         "</li>"
       );
@@ -121,8 +121,8 @@ document.addEventListener("DOMContentLoaded", function () {
     photosListEl.innerHTML = matchedPhotos.map(function (photo) {
       var subtitle = [photo.date, photo.location].filter(Boolean).join(" · ");
       return (
-        '<li class="year-photo-item">' +
-          '<input type="checkbox" class="year-checkbox" data-type="photo" data-id="' + escapeAttr(photo.id) + '" checked>' +
+        '<li class="pick-photo-item">' +
+          '<input type="checkbox" class="pick-checkbox" data-type="photo" data-id="' + escapeAttr(photo.id) + '" checked>' +
           '<a class="photo-thumb" href="place.html?photo=' + encodeURIComponent(photo.id) + '">' +
             '<img src="' + escapeAttr(photo.src) + '" alt="' + escapeHtml(photo.caption) + '" loading="lazy">' +
             '<span class="photo-thumb-caption"><strong>' + escapeHtml(photo.caption) + '</strong>' +
@@ -138,22 +138,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function escapeAttr(str) { return escapeHtml(str); }
 
   function wireSelectButtons() {
-    selectAllBtn.addEventListener("click", function () { setAllChecked(true); });
-    selectNoneBtn.addEventListener("click", function () { setAllChecked(false); });
-  }
-
-  function setAllChecked(checked) {
-    Array.prototype.forEach.call(document.querySelectorAll(".year-checkbox"), function (box) {
-      box.checked = checked;
-    });
-  }
-
-  function checkedIds(type) {
-    var ids = {};
-    Array.prototype.forEach.call(document.querySelectorAll('.year-checkbox[data-type="' + type + '"]:checked'), function (box) {
-      ids[box.dataset.id] = true;
-    });
-    return ids;
+    wireCheckboxSelectAll(".pick-checkbox", selectAllBtn, selectNoneBtn);
   }
 
   // Same "open in a viewer tab" pipeline as every other PDF on this
@@ -163,9 +148,9 @@ document.addEventListener("DOMContentLoaded", function () {
   // them in.
   function wireDownloadPdf() {
     downloadPdfBtn.onclick = function () {
-      var checkedEntryIds = checkedIds("entry");
-      var checkedEventIds = checkedIds("event");
-      var checkedPhotoIds = checkedIds("photo");
+      var checkedEntryIds = checkedPickIds('.pick-checkbox[data-type="entry"]');
+      var checkedEventIds = checkedPickIds('.pick-checkbox[data-type="event"]');
+      var checkedPhotoIds = checkedPickIds('.pick-checkbox[data-type="photo"]');
 
       var selectedEntries = matchedEntries.filter(function (e, i) { return checkedEntryIds[i]; });
       var selectedEvents = matchedEvents.filter(function (e) { return checkedEventIds[e.id]; });
@@ -243,77 +228,18 @@ document.addEventListener("DOMContentLoaded", function () {
     if (events.length) {
       y = addPdfHeading(doc, "Events", margin, y);
       events.forEach(function (event) {
-        y = addYearPdfEventEntry(doc, event, imagesBySrc[(event.photos || [])[0]], margin, y, maxWidth);
+        y = addPdfEventEntry(doc, event, imagesBySrc[(event.photos || [])[0]], margin, y, maxWidth);
       });
     }
 
     if (photos.length) {
       y = addPdfHeading(doc, "Photos", margin, y);
       photos.forEach(function (photo) {
-        y = addYearPdfPhotoEntry(doc, photo, imagesBySrc[photo.src], margin, y, maxWidth);
+        y = addPdfPhotoEntry(doc, photo, imagesBySrc[photo.src], margin, y, maxWidth);
       });
     }
 
     stampPdfFooter(doc, margin);
     return doc;
-  }
-
-  function addYearPdfImage(doc, img, src, margin, y, maxWidth, maxImgHeight) {
-    var ratio = img.naturalHeight / img.naturalWidth;
-    var imgWidth = maxWidth;
-    var imgHeight = imgWidth * ratio;
-    if (imgHeight > maxImgHeight) {
-      imgHeight = maxImgHeight;
-      imgWidth = imgHeight / ratio;
-    }
-    y = ensureSpace(doc, y, imgHeight, margin);
-    doc.addImage(img, guessImageFormat(src), margin, y, imgWidth, imgHeight);
-    return y + imgHeight + 6;
-  }
-
-  function addYearPdfEventEntry(doc, event, img, margin, y, maxWidth) {
-    var coverSrc = (event.photos || [])[0];
-    if (img) y = addYearPdfImage(doc, img, coverSrc, margin, y, maxWidth, 80);
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    y = ensureSpace(doc, y, 7, margin);
-    doc.text(event.name || "Untitled event", margin, y);
-    y += 7;
-
-    if (event.date) {
-      doc.setFont("helvetica", "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(100);
-      y = ensureSpace(doc, y, 6, margin);
-      doc.text(event.date, margin, y);
-      doc.setTextColor(0);
-      y += 6;
-    }
-
-    doc.setFontSize(11);
-    if (event.description) {
-      y = addPdfParagraph(doc, event.description, margin, y, maxWidth);
-    }
-    return y + 6;
-  }
-
-  function addYearPdfPhotoEntry(doc, photo, img, margin, y, maxWidth) {
-    if (img) y = addYearPdfImage(doc, img, photo.src, margin, y, maxWidth, 90);
-
-    doc.setFont("helvetica", "bold");
-    doc.setFontSize(12);
-    y = ensureSpace(doc, y, 7, margin);
-    doc.text(photo.caption || "Untitled photo", margin, y);
-    y += 7;
-
-    var metaParts = [photo.date, photo.location];
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(10);
-    doc.setTextColor(100);
-    y = ensureSpace(doc, y, 6, margin);
-    doc.text(metaParts.filter(Boolean).join("  ·  "), margin, y);
-    doc.setTextColor(0);
-    return y + 10;
   }
 });

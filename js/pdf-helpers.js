@@ -98,6 +98,117 @@ function addPdfParagraph(doc, text, margin, y, maxWidth) {
   return y + 4;
 }
 
+// ---------- Pick-and-choose PDF pattern ----------
+// Shared by every page that lists more than one of something with a
+// checkbox per item and combines whichever are ticked into one PDF:
+// year.html, category.html, events.html, location.html, cemetery.html.
+// Each page still builds its own PDF layout (the items differ too much
+// to share that), but the selection UI and the per-photo/per-event PDF
+// blocks are identical everywhere they're used, so they live here once.
+
+// Wires a page's "Select all"/"Select none" buttons to every checkbox
+// matching checkboxSelector — e.g. ".pick-checkbox" or a more specific
+// selector if a page has more than one independent group of checkboxes
+// (year.html does: entries/events/photos are one combined "select all").
+function wireCheckboxSelectAll(checkboxSelector, selectAllBtn, selectNoneBtn) {
+  function setAllChecked(checked) {
+    Array.prototype.forEach.call(document.querySelectorAll(checkboxSelector), function (box) {
+      box.checked = checked;
+    });
+  }
+  if (selectAllBtn) selectAllBtn.addEventListener("click", function () { setAllChecked(true); });
+  if (selectNoneBtn) selectNoneBtn.addEventListener("click", function () { setAllChecked(false); });
+}
+
+// Reads whichever checkboxes are ticked *right now* (not a stored
+// selection — there isn't one) into a plain { id: true } lookup, keyed
+// by each checkbox's data-id. Read fresh at the moment Download is
+// clicked, same reasoning as everywhere else on this site that a
+// "build a PDF from what's currently selected" button exists.
+function checkedPickIds(checkboxSelector) {
+  var ids = {};
+  Array.prototype.forEach.call(document.querySelectorAll(checkboxSelector + ":checked"), function (box) {
+    ids[box.dataset.id] = true;
+  });
+  return ids;
+}
+
+function addPdfImage(doc, img, src, margin, y, maxWidth, maxImgHeight) {
+  var ratio = img.naturalHeight / img.naturalWidth;
+  var imgWidth = maxWidth;
+  var imgHeight = imgWidth * ratio;
+  if (imgHeight > maxImgHeight) {
+    imgHeight = maxImgHeight;
+    imgWidth = imgHeight / ratio;
+  }
+  y = ensureSpace(doc, y, imgHeight, margin);
+  doc.addImage(img, guessImageFormat(src), margin, y, imgWidth, imgHeight);
+  return y + imgHeight + 6;
+}
+
+// One photo's block in a combined PDF — image (if preloaded), caption,
+// date/location/credit, and its History text if it has one. Used by
+// year.html, category.html and location.html alike; previously each
+// had its own near-identical version (location.html's had credit/
+// History but not Location text, year.html's had Location text but not
+// credit/History) — this is the union of both, a strict improvement
+// for both callers rather than a lowest-common-denominator cut-down.
+function addPdfPhotoEntry(doc, photo, img, margin, y, maxWidth) {
+  if (img) y = addPdfImage(doc, img, photo.src, margin, y, maxWidth, 90);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  y = ensureSpace(doc, y, 7, margin);
+  doc.text(photo.caption || "Untitled photo", margin, y);
+  y += 7;
+
+  var metaParts = [photo.date, photo.location];
+  if (photo.credit && photo.credit !== "—") metaParts.push("Credit: " + photo.credit);
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  y = ensureSpace(doc, y, 6, margin);
+  doc.text(metaParts.filter(Boolean).join("  ·  "), margin, y);
+  doc.setTextColor(0);
+  y += 8;
+
+  doc.setFontSize(11);
+  if (photo.history) {
+    y = addPdfParagraph(doc, photo.history, margin, y, maxWidth);
+  }
+  return y + 4;
+}
+
+// One Event Page's block in a combined PDF — its cover photo (first in
+// its own photos list, if any — not the whole gallery, to keep a
+// multi-event PDF from ballooning), name, date and description.
+function addPdfEventEntry(doc, event, img, margin, y, maxWidth) {
+  var coverSrc = (event.photos || [])[0];
+  if (img) y = addPdfImage(doc, img, coverSrc, margin, y, maxWidth, 80);
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  y = ensureSpace(doc, y, 7, margin);
+  doc.text(event.name || "Untitled event", margin, y);
+  y += 7;
+
+  if (event.date) {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    y = ensureSpace(doc, y, 6, margin);
+    doc.text(event.date, margin, y);
+    doc.setTextColor(0);
+    y += 6;
+  }
+
+  doc.setFontSize(11);
+  if (event.description) {
+    y = addPdfParagraph(doc, event.description, margin, y, maxWidth);
+  }
+  return y + 6;
+}
+
 function pdfFilenameBase(text) {
   var base = (text || "document").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
   return base || "document";

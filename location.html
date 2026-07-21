@@ -40,7 +40,13 @@
   </section>
 
   <section class="content-section container">
-    <button class="btn place-download-pdf-btn location-download-pdf-btn" id="location-download-pdf-btn" type="button">View / Print PDF</button>
+    <div class="pick-toolbar" id="location-pick-toolbar">
+      <div class="pick-toolbar-actions" id="location-select-actions" hidden>
+        <button type="button" class="chip" id="location-select-all">Select all</button>
+        <button type="button" class="chip" id="location-select-none">Select none</button>
+      </div>
+      <button class="btn place-download-pdf-btn location-download-pdf-btn" id="location-download-pdf-btn" type="button">Download selected as PDF</button>
+    </div>
     <div class="location-timeline" id="location-timeline"></div>
     <p class="place-not-found" id="location-not-found" hidden>We couldn't find any photos for that place. It may have been renamed — <a href="index.html">back to the homepage</a>.</p>
   </section>
