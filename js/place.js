@@ -479,20 +479,20 @@ document.addEventListener("DOMContentLoaded", function () {
     locationBannerEl.hidden = false;
   }
 
-  // A quick nudge to that year's spot in the Village Chronology
-  // (chronology.html?year=X, see js/chronology.js) — only shown when
-  // extractYear can actually pull a real year out of this photo's own
-  // Date field (so a photo still on the "Added <Month> <Year>"
-  // placeholder, or with no date at all, doesn't link to a year that
-  // isn't really its own). Same eye-catching banner style as the
-  // location nudge above, for the same reason: a plain text link here
-  // was the thing that went unnoticed before.
+  // A quick nudge to that year's own page (year.html?year=X — the
+  // Village Chronology entry, plus any other photos/events sharing it,
+  // see js/year.js) — only shown when extractYear can actually pull a
+  // real year out of this photo's own Date field (so a photo still on
+  // the "Added <Month> <Year>" placeholder, or with no date at all,
+  // doesn't link to a year that isn't really its own). Same eye-catching
+  // banner style as the location nudge above, for the same reason: a
+  // plain text link here was the thing that went unnoticed before.
   function renderChronologyBanner(photo) {
     if (!chronologyBannerEl) return;
     var year = extractYear(photo.date);
     if (!year) return;
-    chronologyBannerEl.href = "chronology.html?year=" + encodeURIComponent(year);
-    chronologyBannerEl.innerHTML = "See <strong>" + year + "</strong> in the Village Chronology →";
+    chronologyBannerEl.href = "year.html?year=" + encodeURIComponent(year);
+    chronologyBannerEl.innerHTML = "See everything from <strong>" + year + "</strong> →";
     chronologyBannerEl.hidden = false;
   }
 

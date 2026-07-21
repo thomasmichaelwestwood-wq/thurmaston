@@ -71,8 +71,8 @@ function initHero() {
 // first rather than stacking several competing attractions on the
 // front page; showing full prose here would quietly reintroduce that,
 // just relocated into the hero. Chips are the middle ground: glanceable,
-// interactive, and reuse the exact chronology.html?year=X deep link
-// (js/chronology.js's applyYearParam) already built.
+// interactive, and reuse the exact year.html?year=X deep link (js/year.js)
+// already built.
 //
 // Sampled by even index spacing across the sorted list (not a
 // hand-picked "featured" set) so it always spans earliest-to-most-
@@ -104,7 +104,7 @@ function initHeroChronology() {
     });
 
     listEl.innerHTML = picks.map(function (e) {
-      return '<li><a class="chip" href="chronology.html?year=' + encodeURIComponent(e.sortYear) + '">' + escapeHtml(e.year) + "</a></li>";
+      return '<li><a class="chip" href="year.html?year=' + encodeURIComponent(e.sortYear) + '">' + escapeHtml(e.year) + "</a></li>";
     }).join("");
   });
 }
@@ -160,14 +160,14 @@ function initSearch() {
   // static "Village Chronology" page link SITE_SEARCH_INDEX already
   // has — so typing a year ("1945") or a keyword ("Domesday") finds the
   // specific entry, not just the page it lives on. Links straight to
-  // chronology.html?year=X (js/chronology.js's own ?year= handling
-  // scrolls to and highlights it) when the entry's Year has a real
-  // number to link with; falls back to the plain page otherwise.
+  // year.html?year=X (js/year.js — everything from that year, not just
+  // this one entry) when the entry's Year has a real number to link
+  // with; falls back to the plain chronology page otherwise.
   CHRONOLOGY_DATA_PROMISE.then(function (entries) {
     chronologyEntries = entries.map(function (e) {
       return {
         title: e.year || "Village Chronology",
-        url: e.sortYear ? "chronology.html?year=" + encodeURIComponent(e.sortYear) : "chronology.html",
+        url: e.sortYear ? "year.html?year=" + encodeURIComponent(e.sortYear) : "chronology.html",
         category: "Chronology",
         excerpt: e.text
       };

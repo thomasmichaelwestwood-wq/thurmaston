@@ -1041,22 +1041,22 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .chronology-entry + .chronology-entry { border-top: 1px solid var(--line); }
 
-/* Landed here via a photo/event's own "See <year> in the Village
-   Chronology" link (chronology.html?year=X) — highlights every entry
-   sharing that year so it's obvious which row the link was actually
-   about, not just scrolled to roughly the right area. */
-.chronology-entry-highlight {
-  background: var(--gold-100);
-  border-left-color: var(--green-900);
-}
-
+/* A link through to year.html?year=X — "everything from that year"
+   (chronology entries, photos, events), not just this one row — so
+   it's styled to still read as the bold year label it always was,
+   with an underline only on hover as the one added affordance that
+   it's now clickable. Entries with no parseable year (`entry.sortYear
+   === null`) render a plain, unlinked span instead — see
+   js/chronology.js's renderEntry. */
 .chronology-year {
   flex: 0 0 100px;
   font-family: var(--font-head);
   font-weight: 700;
   color: var(--green-900);
   font-size: 1.05rem;
+  text-decoration: none;
 }
+a.chronology-year:hover { text-decoration: underline; }
 
 .chronology-body {
   flex: 1 1 auto;
@@ -1068,21 +1068,71 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   line-height: 1.6;
 }
 
-/* A photo/event with the same year as this entry — the reverse of
-   place.html/event.html's own "See <year> in the Village Chronology"
-   link, worked out automatically from matching dates (js/chronology.js)
-   rather than hand-tagged, so most entries (predating any surviving
-   photo) simply won't have one. */
-.chronology-related {
-  margin: 8px 0 0;
-  font-size: 0.85rem;
-  color: var(--ink-soft);
-}
-.chronology-related a { color: var(--green-700); }
-
 @media (max-width: 600px) {
   .chronology-entry { flex-direction: column; gap: 4px; padding-left: 16px; }
   .chronology-year { flex: none; }
+}
+
+/* ---------- Year page (year.html) ---------- */
+
+.year-select-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  max-width: 900px;
+  margin: 0 auto 28px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+.year-select-actions { display: flex; gap: 8px; }
+
+#year-chronology-section, #year-events-section, #year-photos-section {
+  max-width: 900px;
+  margin: 0 auto 36px;
+}
+
+.year-pick-list { list-style: none; margin: 12px 0 0; padding: 0; }
+.year-pick-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.year-pick-item:last-child { border-bottom: none; }
+.year-pick-item input[type="checkbox"] {
+  margin-top: 4px;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--green-700);
+  cursor: pointer;
+}
+.year-pick-item-body { flex: 1 1 auto; min-width: 0; }
+.year-pick-item-title { font-weight: 600; font-family: var(--font-head); }
+.year-pick-item-title a { color: var(--green-900); text-decoration: none; }
+.year-pick-item-title a:hover { text-decoration: underline; }
+.year-pick-item-meta { font-size: 0.85rem; color: var(--ink-soft); margin: 2px 0 0; }
+.year-pick-item-text { margin: 0; line-height: 1.6; }
+
+.year-pick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+.year-photo-item { position: relative; }
+.year-photo-item input[type="checkbox"] {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 2;
+  width: 20px;
+  height: 20px;
+  accent-color: var(--green-700);
+  cursor: pointer;
 }
 
 /* A prominent nudge to a place's timeline page (location.html) when

@@ -70,14 +70,15 @@ document.addEventListener("DOMContentLoaded", function () {
       subheadingEl.hidden = false;
     }
 
-    // Same year-based nudge to the Village Chronology as a photo's own
-    // page (js/place.js's renderChronologyBanner) — only shown when
-    // extractYear can pull a real year out of this event's own Date.
+    // Same year-based nudge to that year's own page (year.html) as a
+    // photo's own page (js/place.js's renderChronologyBanner) — only
+    // shown when extractYear can pull a real year out of this event's
+    // own Date.
     if (chronologyBannerEl) {
       var year = extractYear(event.date);
       if (year) {
-        chronologyBannerEl.href = "chronology.html?year=" + encodeURIComponent(year);
-        chronologyBannerEl.innerHTML = "See <strong>" + year + "</strong> in the Village Chronology →";
+        chronologyBannerEl.href = "year.html?year=" + encodeURIComponent(year);
+        chronologyBannerEl.innerHTML = "See everything from <strong>" + year + "</strong> →";
         chronologyBannerEl.hidden = false;
       }
     }
