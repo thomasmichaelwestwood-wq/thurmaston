@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Number a photo | Memories of Thurmaston</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Standalone tool, not part of Sveltia CMS — Sveltia doesn't support
+     custom field types yet (see admin/index.html's own comment on
+     that), so there's no way to build a "click on the image to place a
+     marker" widget inside the CMS form itself. Instead: a plain page
+     dad opens separately, clicks each person in a group photo to place
+     a numbered marker, then copies the resulting JSON and pastes it
+     into that photo's "Numbered people (JSON)" field in the normal
+     Photos collection. Two manual steps instead of one seamless one,
+     but needs no backend/auth of its own — consistent with the rest of
+     this static site. -->
+<style>
+  :root { --green-900: #1f4d3a; --green-700: #2c6b4f; --gold-600: #b9822f; --cream: #faf6ee; --line: #ddd6c4; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: var(--cream);
+    color: #22281f;
+    padding: 24px;
+  }
+  h1 { color: var(--green-900); font-size: 1.4rem; margin: 0 0 6px; }
+  p.lede { color: #52584c; margin: 0 0 20px; max-width: 640px; line-height: 1.5; }
+  .panel {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+    margin-bottom: 20px;
+    max-width: 900px;
+  }
+  label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.9rem; }
+  input[type="text"], input[type="file"] {
+    width: 100%;
+    max-width: 480px;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    font-size: 0.9rem;
+  }
+  .btn {
+    display: inline-block;
+    background: var(--green-900);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-right: 8px;
+  }
+  .btn:hover { background: var(--gold-600); }
+  .btn.secondary { background: #eee; color: #333; }
+  .btn.secondary:hover { background: #ddd; }
+  .btn:disabled { opacity: 0.5; cursor: default; }
+  #stage-wrap {
+    position: relative;
+    display: inline-block;
+    max-width: 100%;
+    line-height: 0;
+    cursor: crosshair;
+  }
+  #stage-wrap img { max-width: 100%; height: auto; display: block; user-select: none; -webkit-user-drag: none; }
+  .marker {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    margin-left: -14px;
+    margin-top: -14px;
+    border-radius: 50%;
+    background: var(--gold-600);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    cursor: pointer;
+  }
+  .marker:hover { background: #a33; }
+  textarea {
+    width: 100%;
+    max-width: 640px;
+    min-height: 100px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 0.8rem;
+    padding: 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  .hint { color: #888; font-size: 0.8rem; margin-top: 6px; }
+  .empty-note { color: #888; font-size: 0.9rem; }
+</style>
+</head>
+<body>
+
+<h1>Number a group photo</h1>
+<p class="lede">Choose a photo, then click on each person (in whatever order you like) to drop a numbered marker. Click a marker again to remove it — the rest renumber automatically so they always run 1, 2, 3… with no gaps. When you're done, copy the JSON below and paste it into that photo's "Numbered people (JSON)" field in the admin.</p>
+
+<div class="panel">
+  <label for="file-input">Choose a photo from your computer</label>
+  <input type="file" id="file-input" accept="image/*">
+  <p class="hint">Nothing is uploaded anywhere — this only runs in your browser. Upload the photo itself via the normal Photos collection as usual, either before or after numbering it here.</p>
+</div>
+
+<div class="panel" id="stage-panel" hidden>
+  <div id="stage-wrap">
+    <img id="stage-img" alt="Photo being numbered">
+  </div>
+  <p class="hint">Click anywhere on the photo to add the next number. Click a marker to remove it.</p>
+  <div style="margin-top:14px">
+    <button type="button" class="btn secondary" id="undo-btn">Undo last</button>
+    <button type="button" class="btn secondary" id="clear-btn">Clear all</button>
+  </div>
+</div>
+
+<div class="panel" id="output-panel" hidden>
+  <label for="json-output">JSON to paste into "Numbered people (JSON)"</label>
+  <textarea id="json-output" readonly></textarea>
+  <div style="margin-top:10px">
+    <button type="button" class="btn" id="copy-btn">Copy to clipboard</button>
+    <span class="hint" id="copy-status"></span>
+  </div>
+</div>
+
+<script>
+(function () {
+  var fileInput = document.getElementById("file-input");
+  var stagePanel = document.getElementById("stage-panel");
+  var stageWrap = document.getElementById("stage-wrap");
+  var stageImg = document.getElementById("stage-img");
+  var outputPanel = document.getElementById("output-panel");
+  var jsonOutput = document.getElementById("json-output");
+  var copyBtn = document.getElementById("copy-btn");
+  var copyStatus = document.getElementById("copy-status");
+  var undoBtn = document.getElementById("undo-btn");
+  var clearBtn = document.getElementById("clear-btn");
+
+  var points = []; // [{x, y}] in percent of image dimensions
+
+  fileInput.addEventListener("change", function () {
+    var file = fileInput.files && fileInput.files[0];
+    if (!file) return;
+    var url = URL.createObjectURL(file);
+    stageImg.src = url;
+    points = [];
+    stagePanel.hidden = false;
+    outputPanel.hidden = true;
+    renderMarkers();
+  });
+
+  stageWrap.addEventListener("click", function (e) {
+    if (e.target.classList.contains("marker")) return; // handled by the marker's own listener
+    var rect = stageImg.getBoundingClientRect();
+    var x = ((e.clientX - rect.left) / rect.width) * 100;
+    var y = ((e.clientY - rect.top) / rect.height) * 100;
+    points.push({ x: round2(x), y: round2(y) });
+    renderMarkers();
+  });
+
+  undoBtn.addEventListener("click", function () {
+    points.pop();
+    renderMarkers();
+  });
+
+  clearBtn.addEventListener("click", function () {
+    points = [];
+    renderMarkers();
+  });
+
+  copyBtn.addEventListener("click", function () {
+    navigator.clipboard.writeText(jsonOutput.value).then(function () {
+      copyStatus.textContent = "Copied!";
+      setTimeout(function () { copyStatus.textContent = ""; }, 2000);
+    }, function () {
+      jsonOutput.select();
+      copyStatus.textContent = "Couldn't copy automatically — text is selected, press Ctrl/Cmd+C.";
+    });
+  });
+
+  function round2(n) { return Math.round(n * 100) / 100; }
+
+  // Removing a marker mid-list re-numbers everything after it down by
+  // one, rather than leaving a gap — matches how numbering a photo by
+  // hand normally works (there's never a "number 4" missing from a
+  // 1-2-3-5 sequence).
+  function removePoint(index) {
+    points.splice(index, 1);
+    renderMarkers();
+  }
+
+  function renderMarkers() {
+    Array.prototype.forEach.call(stageWrap.querySelectorAll(".marker"), function (el) { el.remove(); });
+    points.forEach(function (p, i) {
+      var marker = document.createElement("div");
+      marker.className = "marker";
+      marker.textContent = String(i + 1);
+      marker.style.left = p.x + "%";
+      marker.style.top = p.y + "%";
+      marker.addEventListener("click", function (e) {
+        e.stopPropagation();
+        removePoint(i);
+      });
+      stageWrap.appendChild(marker);
+    });
+
+    if (points.length === 0) {
+      outputPanel.hidden = true;
+      return;
+    }
+    outputPanel.hidden = false;
+    var data = points.map(function (p, i) { return { number: i + 1, x: p.x, y: p.y }; });
+    jsonOutput.value = JSON.stringify(data);
+  }
+})();
+</script>
+</body>
+</html>

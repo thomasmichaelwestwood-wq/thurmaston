@@ -123,6 +123,48 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (hasLocation) renderMiniMap(photo, mapUrl);
     renderZoomableImage(photo);
+    renderNumberedPeople(photo);
+  }
+
+  // A group photo can have people numbered for identification —
+  // placed with the standalone admin/number-photo.html tool (Sveltia
+  // has no custom-field-type support yet, so there's no way to build a
+  // "click the photo" widget directly into the CMS form — see that
+  // tool's own comment) and stored as a plain JSON string in the
+  // photo's "Numbered people (JSON)" field: [{number, x, y}, ...],
+  // x/y as percentages of the image so markers stay correctly placed
+  // at any display size. Each marker reuses the existing "Know more"
+  // popup rather than a second, separate submission mechanism — just
+  // pre-filled to say which numbered person the message is about.
+  function renderNumberedPeople(photo) {
+    var mediaEl = photoPanelEl.querySelector(".place-photo-panel-media");
+    if (!mediaEl || !photo.numberedPeople) return;
+    var points;
+    try {
+      points = JSON.parse(photo.numberedPeople);
+    } catch (e) {
+      return;
+    }
+    if (!Array.isArray(points) || points.length === 0) return;
+
+    points.forEach(function (p) {
+      if (typeof p.number !== "number" || typeof p.x !== "number" || typeof p.y !== "number") return;
+      var marker = document.createElement("button");
+      marker.type = "button";
+      marker.className = "place-photo-marker";
+      marker.style.left = p.x + "%";
+      marker.style.top = p.y + "%";
+      marker.textContent = String(p.number);
+      marker.setAttribute("aria-label", "Who is number " + p.number + "? Tell us");
+      marker.addEventListener("click", function (e) {
+        // Sits on top of the click-to-zoom image underneath it — stop
+        // the click reaching that handler too, or a marker tap would
+        // both open this popup and the full-screen zoom overlay at once.
+        e.stopPropagation();
+        openKnowMoreModal(photo, p.number);
+      });
+      mediaEl.appendChild(marker);
+    });
   }
 
   // Click the main photo to open it full-screen with zoom/pan — added
@@ -272,7 +314,7 @@ document.addEventListener("DOMContentLoaded", function () {
     knowMoreModal.querySelector(".place-know-more-body").innerHTML = renderSubmitForm(photo);
     knowMoreBtn.hidden = false;
 
-    knowMoreBtn.onclick = function () { knowMoreModal.classList.add("open"); };
+    knowMoreBtn.onclick = function () { openKnowMoreModal(photo); };
     knowMoreModal.querySelector(".place-know-more-close").onclick = closeKnowMore;
     knowMoreModal.addEventListener("click", function (e) {
       if (e.target === knowMoreModal) closeKnowMore();
@@ -280,6 +322,16 @@ document.addEventListener("DOMContentLoaded", function () {
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeKnowMore();
     });
+  }
+
+  // Shared by the "Know more" button itself and by clicking a numbered
+  // person marker (renderNumberedPeople, above) — the latter just
+  // re-fills the form body first so the message is pre-tagged with
+  // which numbered person it's about.
+  function openKnowMoreModal(photo, personNumber) {
+    if (!knowMoreModal) return;
+    knowMoreModal.querySelector(".place-know-more-body").innerHTML = renderSubmitForm(photo, personNumber);
+    knowMoreModal.classList.add("open");
   }
 
   function closeKnowMore() {
@@ -411,15 +463,22 @@ document.addEventListener("DOMContentLoaded", function () {
   // Same fields as before — just now shown inside a popup instead of
   // always on the page. Still not wired to a backend, see the note in
   // the form itself.
-  function renderSubmitForm(photo) {
+  function renderSubmitForm(photo, personNumber) {
+    var refValue = photo.ref || photo.caption || photo.id;
+    var intro = "Have a date, a name, a story, or another photo of the same place? Tell us and we'll add it.";
+    if (personNumber) {
+      refValue += " — person #" + personNumber;
+      intro = "Know who number " + personNumber + " is? Tell us and we'll add it.";
+    }
     return (
       "<h4>Know more about this photo?</h4>" +
-      "<p>Have a date, a name, a story, or another photo of the same place? Tell us and we'll add it.</p>" +
+      "<p>" + escapeHtml(intro) + "</p>" +
       '<form class="stack" action="#" method="post">' +
         '<input type="hidden" name="photo-id" value="' + escapeAttr(photo.id) + '">' +
+        (personNumber ? '<input type="hidden" name="person-number" value="' + escapeAttr(String(personNumber)) + '">' : "") +
         "<div>" +
           '<label for="place-submit-ref">About this photo</label>' +
-          '<input type="text" id="place-submit-ref" name="photo-ref" value="' + escapeAttr(photo.ref || photo.caption || photo.id) + '" readonly>' +
+          '<input type="text" id="place-submit-ref" name="photo-ref" value="' + escapeAttr(refValue) + '" readonly>' +
         "</div>" +
         "<div>" +
           '<label for="place-submit-name">Your name</label>' +

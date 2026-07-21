@@ -89,6 +89,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   # A single hand-curated list (data/chronology.json), not one file per
   # entry — same shape the old "Map pins" collection used before it was
@@ -186,6 +187,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "event_pages"
     label: "Event Pages"
@@ -260,6 +262,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   # A whole occasion (e.g. "Remembrance Day Parade 1975") as one entry —
   # a write-up plus every photo of it, uploaded together in one go,
@@ -310,6 +313,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "photos_industry"
     label: "Industry"
@@ -353,6 +357,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "photos_nature"
     label: "Nature & Views"
@@ -396,6 +401,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "photos_other"
     label: "Other"
@@ -439,6 +445,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
   - name: "photos_people"
     label: "People"
     description: "Every photo in the People category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
@@ -481,6 +488,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "photos_schools"
     label: "Schools"
@@ -524,6 +532,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "memories"
     label: "Shared Memories"
@@ -591,6 +600,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
   - name: "photos_streets"
     label: "Streets & Buildings"
     description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
@@ -633,6 +643,7 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
 
   - name: "chronology"
     label: "Village Chronology"

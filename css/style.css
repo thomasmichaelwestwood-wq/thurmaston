@@ -1236,6 +1236,37 @@ a.chronology-year:hover { text-decoration: underline; }
   align-items: center;
   gap: 5px;
 }
+/* Numbered-person markers (js/place.js renderNumberedPeople) — small
+   circular buttons positioned by percentage over the photo, one per
+   person the tool at admin/number-photo.html was used to click. Each
+   opens the "Know more" popup pre-filled with its number rather than
+   needing a second submission mechanism. Sized/coloured to read as
+   clickable without competing with the zoom-hint badge. */
+.place-photo-marker {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  margin-left: -14px;
+  margin-top: -14px;
+  border-radius: 50%;
+  background: var(--gold-600);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.85rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  padding: 0;
+}
+.place-photo-marker:hover,
+.place-photo-marker:focus-visible {
+  background: var(--green-700);
+  outline: none;
+}
 .place-photo-panel-info {
   flex: 1 1 260px;
   padding: 24px 26px;
