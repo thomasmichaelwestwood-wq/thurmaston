@@ -117,6 +117,23 @@ collections:
               - { label: "Year", name: "year", widget: "string", hint: "e.g. \"1929\", \"1920s\", \"c1870\", \"1848/9\" — whatever's known, doesn't need to be one exact year." }
               - { label: "What happened", name: "text", widget: "text", hint: "A short description of what happened." }
 
+  - name: "memories"
+    label: "Shared Memories"
+    description: "Short resident stories shown in the homepage's \"Shared memories\" section. Edit one of the starter placeholders here, or add a new one whenever a memory comes in worth featuring — e.g. from the \"Share your memory\" form once it's wired up, or an email."
+    files:
+      - name: "memories"
+        label: "Shared Memories"
+        file: "data/memories.json"
+        fields:
+          - label: "Memories"
+            name: "entries"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Label", name: "meta", widget: "string", required: false, default: "Shared memory", hint: "Small label shown above the title — e.g. \"Shared memory\" or, for a starter placeholder, \"Placeholder story\"." }
+              - { label: "Title", name: "title", widget: "string", hint: "e.g. \"The old Melton Road shops\"." }
+              - { label: "Memory", name: "text", widget: "text", hint: "The memory itself, shown on the homepage." }
+
   - name: "photos_events"
     label: "Events (single photos)"
     description: "For a one-off Events photo that isn't part of a described occasion — every photo here, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. For an event with several photos and its own write-up (e.g. Remembrance Day), use the \"Event Pages\" collection instead — one entry there covers the whole occasion, photos and all."

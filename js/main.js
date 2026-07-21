@@ -226,6 +226,15 @@ function initSearch() {
       var li = document.createElement("li");
       var a = document.createElement("a");
       a.href = item.url;
+      // An absolute URL means this result leaves the site entirely
+      // (e.g. the Facebook group) — open those in a new tab, same
+      // convention already used for every hand-written Facebook link
+      // elsewhere on the site, rather than navigating the visitor away
+      // from the search they were just doing.
+      if (/^https?:\/\//i.test(item.url)) {
+        a.target = "_blank";
+        a.rel = "noopener";
+      }
       a.innerHTML =
         '<span class="result-title">' + escapeHtml(item.title) +
         '<span class="result-cat">' + escapeHtml(item.category) + "</span></span>" +

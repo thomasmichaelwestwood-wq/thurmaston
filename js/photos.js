@@ -69,7 +69,24 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     Array.prototype.forEach.call(filterEl.querySelectorAll("[data-category]"), function (btn) {
       var photo = latestByCategory[btn.dataset.category];
-      if (photo) btn.style.backgroundImage = "url('" + photo.src + "')";
+      if (photo) {
+        btn.style.backgroundImage = "url('" + photo.src + "')";
+      } else if (btn.dataset.category === "events") {
+        // Event Pages (data/events/<id>.json, aggregated into
+        // data/events.json — see the admin's "Event Pages" collection)
+        // keep their photos in their own list, separate from the flat
+        // "Events (single photos)" collection allPhotos/data/photos.json
+        // covers above — so the Events tile could have real photos
+        // behind it (via Event Pages) while still finding nothing in
+        // latestByCategory. Falls back to the newest Event Page that
+        // has at least one photo (events.json is already sorted
+        // newest-first — see rebuild-events-index.js), same "most
+        // recently added" convention every other tile already follows.
+        fetch("data/events.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (events) {
+          var withPhotos = events.find(function (e) { return e.photos && e.photos.length; });
+          if (withPhotos) btn.style.backgroundImage = "url('" + withPhotos.photos[0] + "')";
+        });
+      }
     });
   }
 
