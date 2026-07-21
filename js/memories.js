@@ -23,10 +23,13 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderCard(entry) {
     return (
       '<div class="card">' +
+        (entry.photo ? '<img class="card-photo" src="' + escapeAttr(entry.photo) + '" alt="" loading="lazy">' : "") +
         (entry.meta ? '<div class="meta">' + escapeHtml(entry.meta) + "</div>" : "") +
         "<h3>" + escapeHtml(entry.title || "") + "</h3>" +
         formatMultilineText(entry.text || "") +
       "</div>"
     );
   }
+
+  function escapeAttr(str) { return escapeHtml(str); }
 });

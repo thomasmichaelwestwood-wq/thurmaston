@@ -21,18 +21,22 @@ publish_mode: simple
 media_folder: "images/cms-uploads"
 public_folder: "/images/cms-uploads"
 
-# One collection per category, each saving into its own real folder
-# (data/photos/<category>/ for the entry, images/photos/<category>/ for
-# the photo itself) rather than one flat "Photos" collection — requested
-# explicitly, so the folders you see in the repo/media library actually
-# match the six categories used throughout the site (the category pages,
-# the photo filters, etc). Decap's image widget can't route an upload
-# into a folder based on another field's value (e.g. picking a category
-# from a dropdown) — the folder has to be fixed per field/collection —
-# which is why this is six collections rather than one collection with a
-# smarter upload widget. "Streets & Buildings" is listed first since
-# Decap opens the first-listed collection by default on login, and it's
-# the largest/most-used category.
+# One collection per photo category, each saving into its own real
+# folder (data/photos/<category>/ for the entry, images/photos/<category>/
+# for the photo itself) rather than one flat "Photos" collection —
+# requested explicitly, so the folders you see in the repo/media library
+# actually match the six categories used throughout the site (the
+# category pages, the photo filters, etc). Decap's image widget can't
+# route an upload into a folder based on another field's value (e.g.
+# picking a category from a dropdown) — the folder has to be fixed per
+# field/collection — which is why this is six collections rather than
+# one collection with a smarter upload widget.
+#
+# Every collection below (not just the six photo ones) is listed
+# alphabetically by its label — which also means whichever collection
+# is alphabetically first is what opens by default on login (Decap/
+# Sveltia both just open the first-listed collection); currently that's
+# Aerial. Keep new collections in alphabetical order when adding one.
 collections:
   - name: "photos_aerial"
     label: "Aerial"
@@ -93,46 +97,83 @@ collections:
   # small enough to load and edit as one whole list rather than needing
   # per-entry files plus a rebuild-and-aggregate script the way Photos
   # and Event Pages do. js/chronology.js reads this file directly.
-  - name: "chronology"
-    label: "Village Chronology"
-    description: "The village's year-by-year timeline, shown at /chronology.html. Add a new entry anywhere in the list for anything recent — order doesn't matter when saving, the page sorts everything into year order itself — or edit/delete one that's already here."
-    files:
-      - name: "chronology"
-        label: "Village Chronology"
-        file: "data/chronology.json"
-        fields:
-          - label: "Timeline entries"
-            name: "entries"
-            widget: "list"
-            summary: "{{fields.year}} — {{fields.text}}"
-            # Collapsed to one summary line per entry by default — with
-            # ~130+ entries, expanded Year/What-happened fields for every
-            # single one would mean a very long scroll just to reach the
-            # "Add" button at the bottom (list widgets always add a new
-            # item after the last one, there's no way to move that to
-            # the top). Collapsed rows make that scroll much shorter;
-            # click a row to expand it and edit that entry as normal.
-            collapsed: true
-            fields:
-              - { label: "Year", name: "year", widget: "string", hint: "e.g. \"1929\", \"1920s\", \"c1870\", \"1848/9\" — whatever's known, doesn't need to be one exact year." }
-              - { label: "What happened", name: "text", widget: "text", hint: "A short description of what happened." }
+  - name: "graves"
+    label: "Cemetery"
+    description: "One entry per headstone, listed on /cemetery.html. Each gets its own page, and the name(s) on it are searchable from the site-wide search box, same as photos and events."
+    folder: "data/graves"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "name"
+    fields:
+      - { label: "Name(s) on the headstone", name: "name", widget: "string", hint: "As written on the stone. For a shared/family headstone with more than one name, list them all here, e.g. \"John Smith & Mary Smith\" — either name will be found by search." }
+      - { label: "Grave number", name: "number", widget: "string", required: false, hint: "The number marked on or near this headstone, if numbered." }
+      - { label: "Dates", name: "dates", widget: "string", required: false, hint: "e.g. \"1892–1964\" — as written on the stone, or whatever's known." }
+      - label: "what3words address"
+        name: "whatThreeWords"
+        widget: "string"
+        required: false
+        hint: "The three-word address for this exact spot, e.g. \"index.home.raft\" — look it up once at what3words.com (search the map, or drop a pin), then paste just the three words here (no \"///\" needed). Leave blank if not yet recorded."
+      - { label: "Inscription", name: "inscription", widget: "text", required: false, hint: "The wording on the headstone, if you'd like to record it in full." }
+      - { label: "Notes", name: "notes", widget: "text", required: false, hint: "Anything else worth recording — family, history, how the grave was located." }
+      - label: "Photo of the headstone"
+        name: "photo"
+        widget: "image"
+        required: false
+        media_folder: "/images/graves"
+        public_folder: "/images/graves"
+        hint: "Optional — a close-up photo of this headstone, if you have one."
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Leave blank on a new entry — it's filled in automatically." }
 
-  - name: "memories"
-    label: "Shared Memories"
-    description: "Short resident stories shown in the homepage's \"Shared memories\" section. Edit one of the starter placeholders here, or add a new one whenever a memory comes in worth featuring — e.g. from the \"Share your memory\" form once it's wired up, or an email."
+  - name: "cemetery_overview"
+    label: "Cemetery Overview Photo"
+    description: "The single overview photo shown at the top of /cemetery.html — e.g. an aerial/drone shot of the cemetery. Optional; the page works fine without one."
     files:
-      - name: "memories"
-        label: "Shared Memories"
-        file: "data/memories.json"
+      - name: "cemetery_overview"
+        label: "Cemetery Overview Photo"
+        file: "data/cemetery-overview.json"
         fields:
-          - label: "Memories"
-            name: "entries"
-            widget: "list"
-            summary: "{{fields.title}}"
-            fields:
-              - { label: "Label", name: "meta", widget: "string", required: false, default: "Shared memory", hint: "Small label shown above the title — e.g. \"Shared memory\" or, for a starter placeholder, \"Placeholder story\"." }
-              - { label: "Title", name: "title", widget: "string", hint: "e.g. \"The old Melton Road shops\"." }
-              - { label: "Memory", name: "text", widget: "text", hint: "The memory itself, shown on the homepage." }
+          - label: "Photo"
+            name: "photo"
+            widget: "image"
+            required: false
+            media_folder: "/images/cemetery"
+            public_folder: "/images/cemetery"
+            hint: "An overview photo of the cemetery — an aerial/drone shot works well. Leave blank to hide this section."
+          - { label: "Caption", name: "caption", widget: "string", required: false, hint: "e.g. \"Aerial view of Thurmaston cemetery, 2026\"." }
+
+  - name: "event_pages"
+    label: "Event Pages"
+    description: "A whole event (e.g. \"Remembrance Day Parade 1975\") as one entry — a description plus every photo of it, all uploaded here together. Gets its own page, listed on /events.html. For a single Events photo with no write-up of its own, use the \"Events (single photos)\" collection instead."
+    folder: "data/events"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "name"
+    fields:
+      - { label: "Event name", name: "name", widget: "string", hint: "e.g. \"Remembrance Day Parade 1975\" — shown as the page's heading and this event's tile on /events.html." }
+      - { label: "Date", name: "date", widget: "string", required: false, hint: "e.g. \"1975\" or \"11 November 1975\" — shown under the event name. Leave blank if not known." }
+      - { label: "Description", name: "description", widget: "text", required: false, hint: "The story of this event — shown in full on its page, above the photos." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click where this event took place — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if not known — this puts the event on the interactive map automatically, using this event's own name/date/description."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"War Memorial, Melton Road\" — just descriptive text shown next to the event; set Google Maps coordinates above to actually place it on the map." }
+      - label: "Photos"
+        name: "photos"
+        widget: "image"
+        multiple: true
+        media_folder: "/images/events"
+        public_folder: "/images/events"
+        hint: "Click here, then select as many images as you like at once from your computer or the media library — every one you pick is added in one go."
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in these photos." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new event — it's filled in automatically." }
 
   - name: "photos_events"
     label: "Events (single photos)"
@@ -184,84 +225,6 @@ collections:
   # at a time (or via a nested folder path) was more fiddly than just
   # adding them all to one entry directly. Its own page at
   # event.html?event=<slug>, listed on events.html.
-  - name: "event_pages"
-    label: "Event Pages"
-    description: "A whole event (e.g. \"Remembrance Day Parade 1975\") as one entry — a description plus every photo of it, all uploaded here together. Gets its own page, listed on /events.html. For a single Events photo with no write-up of its own, use the \"Events (single photos)\" collection instead."
-    folder: "data/events"
-    create: true
-    delete: true
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
-    extension: "json"
-    format: "json"
-    identifier_field: "name"
-    fields:
-      - { label: "Event name", name: "name", widget: "string", hint: "e.g. \"Remembrance Day Parade 1975\" — shown as the page's heading and this event's tile on /events.html." }
-      - { label: "Date", name: "date", widget: "string", required: false, hint: "e.g. \"1975\" or \"11 November 1975\" — shown under the event name. Leave blank if not known." }
-      - { label: "Description", name: "description", widget: "text", required: false, hint: "The story of this event — shown in full on its page, above the photos." }
-      - label: "Google Maps coordinates"
-        name: "coords"
-        widget: "string"
-        required: false
-        hint: "On Google Maps, right-click where this event took place — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if not known — this puts the event on the interactive map automatically, using this event's own name/date/description."
-        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
-      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"War Memorial, Melton Road\" — just descriptive text shown next to the event; set Google Maps coordinates above to actually place it on the map." }
-      - label: "Photos"
-        name: "photos"
-        widget: "image"
-        multiple: true
-        media_folder: "/images/events"
-        public_folder: "/images/events"
-        hint: "Click here, then select as many images as you like at once from your computer or the media library — every one you pick is added in one go."
-      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in these photos." }
-      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new event — it's filled in automatically." }
-
-  - name: "graves"
-    label: "Cemetery"
-    description: "One entry per headstone, listed on /cemetery.html. Each gets its own page, and the name(s) on it are searchable from the site-wide search box, same as photos and events."
-    folder: "data/graves"
-    create: true
-    delete: true
-    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
-    extension: "json"
-    format: "json"
-    identifier_field: "name"
-    fields:
-      - { label: "Name(s) on the headstone", name: "name", widget: "string", hint: "As written on the stone. For a shared/family headstone with more than one name, list them all here, e.g. \"John Smith & Mary Smith\" — either name will be found by search." }
-      - { label: "Grave number", name: "number", widget: "string", required: false, hint: "The number marked on or near this headstone, if numbered." }
-      - { label: "Dates", name: "dates", widget: "string", required: false, hint: "e.g. \"1892–1964\" — as written on the stone, or whatever's known." }
-      - label: "what3words address"
-        name: "whatThreeWords"
-        widget: "string"
-        required: false
-        hint: "The three-word address for this exact spot, e.g. \"index.home.raft\" — look it up once at what3words.com (search the map, or drop a pin), then paste just the three words here (no \"///\" needed). Leave blank if not yet recorded."
-      - { label: "Inscription", name: "inscription", widget: "text", required: false, hint: "The wording on the headstone, if you'd like to record it in full." }
-      - { label: "Notes", name: "notes", widget: "text", required: false, hint: "Anything else worth recording — family, history, how the grave was located." }
-      - label: "Photo of the headstone"
-        name: "photo"
-        widget: "image"
-        required: false
-        media_folder: "/images/graves"
-        public_folder: "/images/graves"
-        hint: "Optional — a close-up photo of this headstone, if you have one."
-      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Leave blank on a new entry — it's filled in automatically." }
-
-  - name: "cemetery_overview"
-    label: "Cemetery Overview Photo"
-    description: "The single overview photo shown at the top of /cemetery.html — e.g. an aerial/drone shot of the cemetery. Optional; the page works fine without one."
-    files:
-      - name: "cemetery_overview"
-        label: "Cemetery Overview Photo"
-        file: "data/cemetery-overview.json"
-        fields:
-          - label: "Photo"
-            name: "photo"
-            widget: "image"
-            required: false
-            media_folder: "/images/cemetery"
-            public_folder: "/images/cemetery"
-            hint: "An overview photo of the cemetery — an aerial/drone shot works well. Leave blank to hide this section."
-          - { label: "Caption", name: "caption", widget: "string", required: false, hint: "e.g. \"Aerial view of Thurmaston cemetery, 2026\"." }
-
   - name: "photos_nature"
     label: "Nature & Views"
     description: "Every photo in the Nature & Views category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
@@ -390,6 +353,30 @@ collections:
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
 
+  - name: "memories"
+    label: "Shared Memories"
+    description: "Short resident stories shown in the homepage's \"Shared memories\" section. Edit one of the starter placeholders here, or add a new one whenever a memory comes in worth featuring — e.g. from the \"Share your memory\" form once it's wired up, or an email."
+    files:
+      - name: "memories"
+        label: "Shared Memories"
+        file: "data/memories.json"
+        fields:
+          - label: "Memories"
+            name: "entries"
+            widget: "list"
+            summary: "{{fields.title}}"
+            fields:
+              - { label: "Label", name: "meta", widget: "string", required: false, default: "Shared memory", hint: "Small label shown above the title — e.g. \"Shared memory\" or, for a starter placeholder, \"Placeholder story\"." }
+              - { label: "Title", name: "title", widget: "string", hint: "e.g. \"The old Melton Road shops\"." }
+              - { label: "Memory", name: "text", widget: "text", hint: "The memory itself, shown on the homepage." }
+              - label: "Photo"
+                name: "photo"
+                widget: "image"
+                required: false
+                media_folder: "/images/memories"
+                public_folder: "/images/memories"
+                hint: "Optional — a photo to go with this memory, shown at the top of its card."
+
   - name: "photos_streets"
     label: "Streets & Buildings"
     description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
@@ -432,4 +419,28 @@ collections:
       - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
+  - name: "chronology"
+    label: "Village Chronology"
+    description: "The village's year-by-year timeline, shown at /chronology.html. Add a new entry anywhere in the list for anything recent — order doesn't matter when saving, the page sorts everything into year order itself — or edit/delete one that's already here."
+    files:
+      - name: "chronology"
+        label: "Village Chronology"
+        file: "data/chronology.json"
+        fields:
+          - label: "Timeline entries"
+            name: "entries"
+            widget: "list"
+            summary: "{{fields.year}} — {{fields.text}}"
+            # Collapsed to one summary line per entry by default — with
+            # ~130+ entries, expanded Year/What-happened fields for every
+            # single one would mean a very long scroll just to reach the
+            # "Add" button at the bottom (list widgets always add a new
+            # item after the last one, there's no way to move that to
+            # the top). Collapsed rows make that scroll much shorter;
+            # click a row to expand it and edit that entry as normal.
+            collapsed: true
+            fields:
+              - { label: "Year", name: "year", widget: "string", hint: "e.g. \"1929\", \"1920s\", \"c1870\", \"1848/9\" — whatever's known, doesn't need to be one exact year." }
+              - { label: "What happened", name: "text", widget: "text", hint: "A short description of what happened." }
 

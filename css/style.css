@@ -714,6 +714,22 @@ h1, h2, h3, h4 {
   border-radius: var(--radius);
   padding: 22px;
   box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+/* An optional cover photo (e.g. a Shared Memory with a photo attached)
+   — bled out to the card's own edges via a negative margin matching
+   the card's own padding, rather than sitting inset inside it like a
+   normal image, so it reads as a photo card, not a text card with a
+   thumbnail dropped in. `.card`'s own overflow:hidden clips the image's
+   square corners to the card's rounded ones. */
+.card-photo {
+  display: block;
+  width: calc(100% + 44px);
+  max-width: none;
+  height: 160px;
+  object-fit: cover;
+  margin: -22px -22px 16px;
 }
 
 .card h3 { font-size: 1.1rem; }
