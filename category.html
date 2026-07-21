@@ -12,12 +12,17 @@
 <link rel="stylesheet" href="css/style.css">
 <script>
   var CATEGORY_INFO = {
-    streets: { label: "Streets & Buildings", intro: "Shops, houses, roads, the church and other buildings of Thurmaston through the years." },
-    people:  { label: "People", intro: "Portraits, residents and groups from the village's history." },
-    events:  { label: "Events", intro: "Gatherings, celebrations and occasions from the village's history." },
-    nature:  { label: "Nature & Views", intro: "The park, the river, fields and general scenery around Thurmaston." },
-    aerial:  { label: "Aerial", intro: "Aerial and drone photographs of the village, seen from above." },
-    other:   { label: "Other", intro: "Photos that don't fit neatly into the other categories — still part of the story." }
+    streets:  { label: "Streets & Buildings", intro: "Shops, houses, roads and other buildings of Thurmaston through the years." },
+    people:   { label: "People", intro: "Portraits, residents and groups from the village's history." },
+    events:   { label: "Events", intro: "Gatherings, celebrations and occasions from the village's history." },
+    nature:   { label: "Nature & Views", intro: "The park, the river, fields and general scenery around Thurmaston." },
+    aerial:   { label: "Aerial", intro: "Aerial and drone photographs of the village, seen from above." },
+    other:    { label: "Other", intro: "Photos that don't fit neatly into the other categories — still part of the story." },
+    churches: { label: "Churches & Religious Buildings", intro: "Thurmaston's churches, chapels and other places of worship through the years." },
+    groups:   { label: "Groups & Organisations", intro: "Clubs, societies and community groups that have been part of village life." },
+    industry: { label: "Industry", intro: "Workplaces, businesses and industry in and around Thurmaston." },
+    schools:  { label: "Schools", intro: "Thurmaston's schools, pupils and school life over the years." },
+    sports:   { label: "Sports", intro: "Sports clubs, teams and sporting occasions from the village's history." }
   };
   var params = new URLSearchParams(location.search);
   var LOCKED_CATEGORY = CATEGORY_INFO[params.get("cat")] ? params.get("cat") : "streets";

@@ -144,6 +144,49 @@ collections:
             hint: "An overview photo of the cemetery — an aerial/drone shot works well. Leave blank to hide this section."
           - { label: "Caption", name: "caption", widget: "string", required: false, hint: "e.g. \"Aerial view of Thurmaston cemetery, 2026\"." }
 
+  - name: "photos_churches"
+    label: "Churches & Religious Buildings"
+    description: "Every photo in the Churches & Religious Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/churches"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/churches"
+        public_folder: "/images/photos/churches"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "churches"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
   - name: "event_pages"
     label: "Event Pages"
     description: "A whole event (e.g. \"Remembrance Day Parade 1975\") as one entry — a description plus every photo of it, all uploaded here together. Gets its own page, listed on /events.html. For a single Events photo with no write-up of its own, use the \"Events (single photos)\" collection instead."
@@ -225,6 +268,92 @@ collections:
   # at a time (or via a nested folder path) was more fiddly than just
   # adding them all to one entry directly. Its own page at
   # event.html?event=<slug>, listed on events.html.
+  - name: "photos_groups"
+    label: "Groups & Organisations"
+    description: "Every photo in the Groups & Organisations category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/groups"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/groups"
+        public_folder: "/images/photos/groups"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "groups"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
+  - name: "photos_industry"
+    label: "Industry"
+    description: "Every photo in the Industry category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/industry"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/industry"
+        public_folder: "/images/photos/industry"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "industry"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
   - name: "photos_nature"
     label: "Nature & Views"
     description: "Every photo in the Nature & Views category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
@@ -353,6 +482,49 @@ collections:
       - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
 
+  - name: "photos_schools"
+    label: "Schools"
+    description: "Every photo in the Schools category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/schools"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/schools"
+        public_folder: "/images/photos/schools"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "schools"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+
   - name: "memories"
     label: "Shared Memories"
     description: "Short resident stories shown in the homepage's \"Shared memories\" section. Edit one of the starter placeholders here, or add a new one whenever a memory comes in worth featuring — e.g. from the \"Share your memory\" form once it's wired up, or an email."
@@ -377,6 +549,48 @@ collections:
                 public_folder: "/images/memories"
                 hint: "Optional — a photo to go with this memory, shown at the top of its card."
 
+  - name: "photos_sports"
+    label: "Sports"
+    description: "Every photo in the Sports category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/sports"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/sports"
+        public_folder: "/images/photos/sports"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - label: "Category"
+        name: "category"
+        widget: "hidden"
+        default: "sports"
+        # Fixed to match this collection/folder — not shown as a field to
+        # fill in, since which collection you're already in decides it.
+        # A hidden widget still writes its default into the saved JSON,
+        # so photo.category keeps working everywhere the front end reads
+        # it (category.html, the photo filters, js/map.js's pin colour).
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". Leave blank if the location isn't known — this puts the photo on the map automatically, using this photo's own caption/date/credit. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank." }
+      - { label: "Internal — manual place grouping", name: "placeId", widget: "string", required: false, hint: "Leave blank — photos already group together automatically (matching Google Maps coordinates, or Location text if there are no coordinates). Only fill this in for two photos that are definitely the same place but won't group automatically — e.g. an old photo whose street was renamed since, with no coordinates known and Location typed using the old street name. Type anything here (e.g. the place's name) — the exact same text on every photo of that place — to force them to group together regardless of what their coordinates or Location say." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
   - name: "photos_streets"
     label: "Streets & Buildings"
     description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."

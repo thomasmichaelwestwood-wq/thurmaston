@@ -169,7 +169,12 @@ var CATEGORY_FOLDERS = {
   "Events": "events",
   "Nature & Views": "nature",
   "Aerial": "aerial",
-  "Other": "other"
+  "Other": "other",
+  "Churches & Religious Buildings": "churches",
+  "Groups & Organisations": "groups",
+  "Industry": "industry",
+  "Schools": "schools",
+  "Sports": "sports"
 };
 
 var KNOWN_PLACES = {

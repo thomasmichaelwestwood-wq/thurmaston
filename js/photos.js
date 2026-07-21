@@ -4,7 +4,12 @@ const PHOTO_CATEGORIES = {
   events: { label: "Events" },
   nature: { label: "Nature & Views" },
   aerial: { label: "Aerial" },
-  other: { label: "Other" }
+  other: { label: "Other" },
+  churches: { label: "Churches & Religious Buildings" },
+  groups: { label: "Groups & Organisations" },
+  industry: { label: "Industry" },
+  schools: { label: "Schools" },
+  sports: { label: "Sports" }
 };
 
 // Hero images are for the homepage banner only — a photo used there
