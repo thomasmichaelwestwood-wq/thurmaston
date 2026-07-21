@@ -103,7 +103,18 @@ html { scroll-behavior: smooth; }
 body {
   margin: 0;
   font-family: var(--font-body);
-  background: linear-gradient(180deg, #faf6ee 0%, #f2ead9 100%) fixed;
+  /* Ambient colour blobs behind the base cream gradient — the same
+     "fixed" layer as before, just with soft green/gold radial tints
+     mixed in. Every glass panel below the hero (.card, .callout, form
+     cards, the map sidebar, etc.) blurs *this*, which is what makes
+     them read as glass rather than flat white boxes on a flat page. */
+  background:
+    radial-gradient(640px circle at 8% 4%, rgba(185, 130, 47, 0.14), transparent 60%),
+    radial-gradient(720px circle at 94% 18%, rgba(44, 107, 79, 0.16), transparent 60%),
+    radial-gradient(680px circle at 12% 70%, rgba(31, 77, 58, 0.12), transparent 60%),
+    radial-gradient(560px circle at 92% 96%, rgba(185, 130, 47, 0.12), transparent 60%),
+    linear-gradient(180deg, #faf6ee 0%, #f2ead9 100%);
+  background-attachment: fixed;
   color: var(--ink);
   line-height: 1.6;
 }
@@ -791,10 +802,17 @@ form.stack input, form.stack textarea, form.stack select {
   width: 100%;
   box-sizing: border-box;
   padding: 10px 12px;
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
   border-radius: 8px;
   font-family: var(--font-body);
   font-size: 0.95rem;
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
+  transition: border-color 0.15s ease;
+}
+form.stack input:focus, form.stack textarea:focus, form.stack select:focus {
+  border-color: var(--green-700);
 }
 
 table.simple { width: 100%; border-collapse: collapse; }
@@ -1268,8 +1286,10 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
    or an <a>, inside a ".map-filters" row or not. */
 .chip {
   display: inline-block;
-  border: 1px solid var(--line);
-  background: var(--paper);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg-strong);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
   color: var(--ink);
   font-size: 0.78rem;
   padding: 5px 11px;
