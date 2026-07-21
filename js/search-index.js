@@ -10,6 +10,8 @@ const SITE_SEARCH_INDEX = [
     excerpt: "An interactive map of buildings and places that used to stand in Thurmaston." },
   { title: "Village Chronology", url: "chronology.html", category: "History",
     excerpt: "A year-by-year timeline of Thurmaston, from the Domesday Book in 1086 to the present." },
+  { title: "Cemetery", url: "cemetery.html", category: "History",
+    excerpt: "A directory of headstones in Thurmaston's cemetery — search a name for its grave number and what3words location." },
   { title: "Photo Archive", url: "index.html#photos", category: "History",
     excerpt: "Old photographs of the village, organised by streets, people, nature, aerial and more." },
 

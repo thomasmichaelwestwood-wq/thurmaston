@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Loading… | Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A timeline of every photo from one place in Thurmaston, Leicestershire.">
+<meta name="description" content="A headstone in Thurmaston's cemetery, Leicestershire, with its grave number and what3words location.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -33,18 +33,34 @@
 <main id="main">
   <section class="page-hero">
     <div class="container">
-      <div class="breadcrumb"><a href="index.html">Home</a> / <span id="location-crumb">…</span></div>
-      <h1 id="location-heading">…</h1>
-      <p class="location-subheading" id="location-subheading" hidden></p>
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="cemetery.html">Cemetery</a> / <span id="grave-crumb">…</span></div>
+      <h1 id="grave-heading">…</h1>
+      <p class="location-subheading" id="grave-subheading" hidden></p>
     </div>
   </section>
 
   <section class="content-section container">
-    <button class="btn place-download-pdf-btn location-download-pdf-btn" id="location-download-pdf-btn" type="button">View / Print PDF</button>
-    <div class="location-timeline" id="location-timeline"></div>
-    <p class="place-not-found" id="location-not-found" hidden>We couldn't find any photos for that place. It may have been renamed — <a href="index.html">back to the homepage</a>.</p>
+    <a class="place-location-banner" id="grave-w3w-banner" href="#" target="_blank" rel="noopener" hidden></a>
+    <div class="place-history" id="grave-inscription" hidden></div>
+    <div class="place-history" id="grave-notes" hidden></div>
+    <div class="photo-grid" id="grave-gallery"></div>
+    <p class="place-not-found" id="grave-not-found" hidden>We couldn't find that grave. It may have been renamed or removed — <a href="cemetery.html">back to the Cemetery directory</a>.</p>
+    <p class="events-other-link"><a href="cemetery.html">← Back to the Cemetery directory</a></p>
   </section>
 </main>
+
+<div class="place-zoom-overlay" id="place-zoom-overlay">
+  <button class="icon-btn-circle place-zoom-close" id="place-zoom-close" type="button" aria-label="Close">×</button>
+  <p class="place-zoom-hint">Scroll or pinch to zoom, drag to pan</p>
+  <div class="place-zoom-stage" id="place-zoom-stage">
+    <img id="place-zoom-image" alt="">
+  </div>
+  <div class="place-zoom-controls">
+    <button class="place-zoom-btn" id="place-zoom-out" type="button" aria-label="Zoom out">−</button>
+    <button class="place-zoom-btn" id="place-zoom-reset" type="button" aria-label="Reset zoom">Reset</button>
+    <button class="place-zoom-btn" id="place-zoom-in" type="button" aria-label="Zoom in">+</button>
+  </div>
+</div>
 
 <footer class="site-footer">
   <div class="container">
@@ -91,9 +107,7 @@
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
-<script src="vendor/jspdf/jspdf.umd.min.js"></script>
-<script src="vendor/qrcode-generator/qrcode.js"></script>
-<script src="js/pdf-helpers.js"></script>
-<script src="js/location.js"></script>
+<script src="vendor/panzoom/panzoom.min.js"></script>
+<script src="js/grave.js"></script>
 </body>
 </html>

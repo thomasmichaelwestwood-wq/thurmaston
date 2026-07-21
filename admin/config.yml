@@ -198,6 +198,53 @@ collections:
       - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in these photos." }
       - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new event — it's filled in automatically." }
 
+  - name: "graves"
+    label: "Cemetery"
+    description: "One entry per headstone, listed on /cemetery.html. Each gets its own page, and the name(s) on it are searchable from the site-wide search box, same as photos and events."
+    folder: "data/graves"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "name"
+    fields:
+      - { label: "Name(s) on the headstone", name: "name", widget: "string", hint: "As written on the stone. For a shared/family headstone with more than one name, list them all here, e.g. \"John Smith & Mary Smith\" — either name will be found by search." }
+      - { label: "Grave number", name: "number", widget: "string", required: false, hint: "The number marked on or near this headstone, if numbered." }
+      - { label: "Dates", name: "dates", widget: "string", required: false, hint: "e.g. \"1892–1964\" — as written on the stone, or whatever's known." }
+      - label: "what3words address"
+        name: "whatThreeWords"
+        widget: "string"
+        required: false
+        hint: "The three-word address for this exact spot, e.g. \"index.home.raft\" — look it up once at what3words.com (search the map, or drop a pin), then paste just the three words here (no \"///\" needed). Leave blank if not yet recorded."
+      - { label: "Inscription", name: "inscription", widget: "text", required: false, hint: "The wording on the headstone, if you'd like to record it in full." }
+      - { label: "Notes", name: "notes", widget: "text", required: false, hint: "Anything else worth recording — family, history, how the grave was located." }
+      - label: "Photo of the headstone"
+        name: "photo"
+        widget: "image"
+        required: false
+        media_folder: "/images/graves"
+        public_folder: "/images/graves"
+        hint: "Optional — a close-up photo of this headstone, if you have one."
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Leave blank on a new entry — it's filled in automatically." }
+
+  - name: "cemetery_overview"
+    label: "Cemetery Overview Photo"
+    description: "The single overview photo shown at the top of /cemetery.html — e.g. an aerial/drone shot of the cemetery. Optional; the page works fine without one."
+    files:
+      - name: "cemetery_overview"
+        label: "Cemetery Overview Photo"
+        file: "data/cemetery-overview.json"
+        fields:
+          - label: "Photo"
+            name: "photo"
+            widget: "image"
+            required: false
+            media_folder: "/images/cemetery"
+            public_folder: "/images/cemetery"
+            hint: "An overview photo of the cemetery — an aerial/drone shot works well. Leave blank to hide this section."
+          - { label: "Caption", name: "caption", widget: "string", required: false, hint: "e.g. \"Aerial view of Thurmaston cemetery, 2026\"." }
+
   - name: "photos_nature"
     label: "Nature & Views"
     description: "Every photo in the Nature & Views category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."

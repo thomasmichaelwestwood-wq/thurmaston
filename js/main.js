@@ -23,6 +23,16 @@ var CHRONOLOGY_DATA_PROMISE = fetch("data/chronology.json")
     });
   });
 
+// Same shared-promise idea as CHRONOLOGY_DATA_PROMISE above — fetched
+// once, consumed by initSearch() (below) and by js/cemetery.js's own
+// directory listing, rather than each fetching data/cemetery.json
+// separately. Already a flat array of { name, number, dates,
+// whatThreeWords, inscription, notes, photo, id }, built by
+// scripts/rebuild-cemetery-index.js, so no extra parsing needed here.
+var CEMETERY_DATA_PROMISE = fetch("data/cemetery.json")
+  .then(function (res) { return res.ok ? res.json() : []; })
+  .catch(function () { return []; });
+
 function initNavToggle() {
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.querySelector(".main-nav");
@@ -114,11 +124,12 @@ function initSearch() {
   // other's entries.
   var photoEntries = [];
   var chronologyEntries = [];
+  var cemeteryEntries = [];
   var boxes = [];
   var searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.slice() : [];
 
   function rebuildIndex() {
-    searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries, chronologyEntries);
+    searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries, chronologyEntries, cemeteryEntries);
     boxes.forEach(function (box) { box.refresh(); });
   }
 
@@ -159,6 +170,23 @@ function initSearch() {
         url: e.sortYear ? "chronology.html?year=" + encodeURIComponent(e.sortYear) : "chronology.html",
         category: "Chronology",
         excerpt: e.text
+      };
+    });
+    rebuildIndex();
+  });
+
+  // Every grave, individually, by name — this is the actual point of
+  // the Cemetery feature: type a name in any search box on the site and
+  // land straight on that grave's own page (number + what3words
+  // location), not just a static "Cemetery" page link.
+  CEMETERY_DATA_PROMISE.then(function (graves) {
+    cemeteryEntries = graves.map(function (g) {
+      return {
+        title: g.name,
+        url: "grave.html?grave=" + encodeURIComponent(g.id),
+        category: "Cemetery",
+        excerpt: [g.number ? "Grave " + g.number : null, g.dates].filter(Boolean).join(" · "),
+        keywords: [g.inscription, g.notes].filter(Boolean).join(" ")
       };
     });
     rebuildIndex();
@@ -270,6 +298,17 @@ function initSearch() {
   wireSearchBox(
     document.getElementById("photo-search-input"),
     document.getElementById("photo-search-results"),
+    null
+  );
+
+  // cemetery.html's own "Search for a name" box — present only there.
+  // Uses the same shared, whole-site index as every other search box
+  // (so a name also surfaces any matching photos/events), which is a
+  // feature, not noise — see category.html's box above for the same
+  // reasoning already established.
+  wireSearchBox(
+    document.getElementById("cemetery-search-input"),
+    document.getElementById("cemetery-search-results"),
     null
   );
 }

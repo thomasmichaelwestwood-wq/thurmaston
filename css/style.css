@@ -735,6 +735,41 @@ h1, h2, h3, h4 {
 .info-list li:last-child { border-bottom: none; }
 .info-list .dt { min-width: 76px; font-weight: 600; color: var(--green-900); }
 
+/* ---------- Cemetery directory ---------- */
+
+.cemetery-overview {
+  margin: 0 0 28px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--glass-border);
+}
+.cemetery-overview img { width: 100%; display: block; }
+.cemetery-overview figcaption {
+  padding: 10px 14px;
+  background: var(--glass-bg-strong);
+  color: var(--ink-soft);
+  font-size: 0.85rem;
+}
+
+.cemetery-directory-list { list-style: none; padding: 0; margin: 0; }
+.cemetery-directory-list li { border-bottom: 1px solid var(--line); }
+.cemetery-directory-list li:last-child { border-bottom: none; }
+.cemetery-directory-list a {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 6px;
+  text-decoration: none;
+  color: inherit;
+  border-radius: 8px;
+  transition: background 0.15s ease;
+}
+.cemetery-directory-list a:hover { background: var(--green-100); }
+.cemetery-directory-name { font-weight: 600; color: var(--green-900); font-family: var(--font-head); }
+.cemetery-directory-meta { color: var(--ink-soft); font-size: 0.85rem; white-space: nowrap; }
+
 .tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
 .tag {
   background: var(--green-100);

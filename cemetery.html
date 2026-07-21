@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Loading… | Memories of Thurmaston</title>
+<title>Cemetery | Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A timeline of every photo from one place in Thurmaston, Leicestershire.">
+<meta name="description" content="A directory of headstones in Thurmaston's cemetery, Leicestershire — search a name to find its grave number and what3words location.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -22,7 +22,7 @@
     <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Menu</button>
     <nav class="main-nav" id="main-nav" aria-label="Main">
       <a href="index.html">Home</a>
-      <a href="cemetery.html">Cemetery</a>
+      <a href="cemetery.html" aria-current="page">Cemetery</a>
       <a href="contact.html">Contact</a>
       <a href="/admin/">Admin</a>
     </nav>
@@ -33,16 +33,25 @@
 <main id="main">
   <section class="page-hero">
     <div class="container">
-      <div class="breadcrumb"><a href="index.html">Home</a> / <span id="location-crumb">…</span></div>
-      <h1 id="location-heading">…</h1>
-      <p class="location-subheading" id="location-subheading" hidden></p>
+      <div class="breadcrumb"><a href="index.html">Home</a> / <span>Cemetery</span></div>
+      <h1>Cemetery</h1>
+      <p>A directory of headstones in Thurmaston's cemetery. Search a name below, or browse the full list — each entry shows the grave number and its what3words location.</p>
     </div>
   </section>
 
   <section class="content-section container">
-    <button class="btn place-download-pdf-btn location-download-pdf-btn" id="location-download-pdf-btn" type="button">View / Print PDF</button>
-    <div class="location-timeline" id="location-timeline"></div>
-    <p class="place-not-found" id="location-not-found" hidden>We couldn't find any photos for that place. It may have been renamed — <a href="index.html">back to the homepage</a>.</p>
+    <figure class="cemetery-overview" id="cemetery-overview" hidden>
+      <img id="cemetery-overview-img" alt="Aerial view of Thurmaston cemetery">
+      <figcaption id="cemetery-overview-caption"></figcaption>
+    </figure>
+
+    <label for="cemetery-search-input" class="category-search-label">Search for a name</label>
+    <input type="text" id="cemetery-search-input" class="photo-search-input photo-search-input-wide" placeholder="Search by name…" autocomplete="off">
+    <ul id="cemetery-search-results" class="home-search-results"></ul>
+
+    <h2 style="margin-top:32px">Full directory</h2>
+    <ul class="cemetery-directory-list" id="cemetery-directory"></ul>
+    <p class="place-not-found" id="cemetery-empty" hidden>No graves have been added yet — check back soon.</p>
   </section>
 </main>
 
@@ -91,9 +100,6 @@
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
-<script src="vendor/jspdf/jspdf.umd.min.js"></script>
-<script src="vendor/qrcode-generator/qrcode.js"></script>
-<script src="js/pdf-helpers.js"></script>
-<script src="js/location.js"></script>
+<script src="js/cemetery.js"></script>
 </body>
 </html>

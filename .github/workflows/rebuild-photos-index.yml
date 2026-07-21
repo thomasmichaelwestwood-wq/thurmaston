@@ -14,6 +14,11 @@ name: Rebuild photos index
 # own rebuild script (scripts/rebuild-events-index.js) — folded into
 # this same workflow since it's the same kind of "regenerate a derived
 # aggregate and commit it back" job, just a second data source.
+#
+# data/graves/<id>.json (one file per headstone, see the admin's
+# "Graves" collection) works the same way too — its own aggregate
+# (data/cemetery.json) and its own rebuild script
+# (scripts/rebuild-cemetery-index.js).
 
 on:
   push:
@@ -21,6 +26,7 @@ on:
     paths:
       - "data/photos/**"
       - "data/events/**"
+      - "data/graves/**"
 
 # Runs queue up one after another rather than racing each other to push
 # (e.g. several photos synced from Drive in the same few minutes).
@@ -48,18 +54,24 @@ jobs:
       - name: Rebuild data/events.json from data/events/*.json
         run: node scripts/rebuild-events-index.js
 
+      - name: Rebuild data/cemetery.json from data/graves/*.json
+        run: node scripts/rebuild-cemetery-index.js
+
       - name: Commit and push if changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/photos.json data/photos/ data/events.json
-          # data/events/ may not exist at all yet (no Event Pages ever
-          # created) — a plain `git add data/events/` on a nonexistent
-          # path is fatal ("did not match any files"), unlike the
-          # always-present data/photos/ above, so it's only added when
-          # actually there.
+          git add data/photos.json data/photos/ data/events.json data/cemetery.json
+          # data/events/ and data/graves/ may not exist at all yet (no
+          # Event Pages / Graves ever created) — a plain `git add
+          # data/events/` on a nonexistent path is fatal ("did not
+          # match any files"), unlike the always-present data/photos/
+          # above, so each is only added when actually there.
           if [ -d data/events ]; then
             git add data/events/
+          fi
+          if [ -d data/graves ]; then
+            git add data/graves/
           fi
           if git diff --cached --quiet; then
             echo "No changes to commit"
