@@ -2,7 +2,26 @@ document.addEventListener("DOMContentLoaded", function () {
   initNavToggle();
   initHero();
   initSearch();
+  initHeroChronology();
 });
+
+// Fetched once, shared by initSearch() (every entry becomes a search
+// result) and initHeroChronology() (the homepage's "notable years"
+// chips) — same idea as js/photos.js's PHOTOS_DATA_PROMISE, a single
+// promise other functions in this file can await without each
+// triggering their own separate fetch of the same file. Resolves to
+// { year, text, sortYear } per entry — sortYear via the shared
+// extractYear() (declared further down this file; safe to call from
+// here since the .then() callback only actually runs once the fetch
+// resolves, long after the whole script has finished loading).
+var CHRONOLOGY_DATA_PROMISE = fetch("data/chronology.json")
+  .then(function (res) { return res.ok ? res.json() : { entries: [] }; })
+  .catch(function () { return { entries: [] }; })
+  .then(function (data) {
+    return (data.entries || []).map(function (e) {
+      return { year: e.year || "", text: e.text || "", sortYear: extractYear(e.year) };
+    });
+  });
 
 function initNavToggle() {
   var toggle = document.querySelector(".nav-toggle");
@@ -32,6 +51,52 @@ function initHero() {
         if (slide) slide.style.backgroundImage = "url('" + heroPhotos[0].src + "')";
       }
     });
+}
+
+// The homepage hero's Village Chronology card shows a handful of
+// clickable "notable year" chips, not the chronology's full entry text
+// or its whole era browser — CLAUDE.md already documents that a full
+// chronology-on-the-homepage layout was considered and rejected once,
+// since this site was deliberately redesigned to stay photo-archive-
+// first rather than stacking several competing attractions on the
+// front page; showing full prose here would quietly reintroduce that,
+// just relocated into the hero. Chips are the middle ground: glanceable,
+// interactive, and reuse the exact chronology.html?year=X deep link
+// (js/chronology.js's applyYearParam) already built.
+//
+// Sampled by even index spacing across the sorted list (not a
+// hand-picked "featured" set) so it always spans earliest-to-most-
+// recent with no new field needed in the data or the CMS. No-ops
+// silently if the fetch is slow or fails — the card's own copy and CTA
+// button are static HTML, so the only thing ever missing is the chips.
+function initHeroChronology() {
+  var listEl = document.getElementById("hero-chronology-years");
+  if (!listEl) return;
+
+  CHRONOLOGY_DATA_PROMISE.then(function (entries) {
+    var dated = entries.filter(function (e) { return e.sortYear !== null; });
+    if (dated.length === 0) return;
+    dated.sort(function (a, b) { return a.sortYear - b.sortYear; });
+
+    var count = Math.min(4, dated.length);
+    var picks = [];
+    for (var i = 0; i < count; i++) {
+      var idx = count === 1 ? 0 : Math.round((i * (dated.length - 1)) / (count - 1));
+      picks.push(dated[idx]);
+    }
+    // A short list can round two sample points to the same index —
+    // drop the repeat rather than showing the same year chip twice.
+    var seenYears = {};
+    picks = picks.filter(function (e) {
+      if (seenYears[e.sortYear]) return false;
+      seenYears[e.sortYear] = true;
+      return true;
+    });
+
+    listEl.innerHTML = picks.map(function (e) {
+      return '<li><a class="chip" href="chronology.html?year=' + encodeURIComponent(e.sortYear) + '">' + escapeHtml(e.year) + "</a></li>";
+    }).join("");
+  });
 }
 
 // Two search boxes can exist on one page now — the header's icon-
@@ -83,27 +148,21 @@ function initSearch() {
   // Every Village Chronology entry, individually — not just the one
   // static "Village Chronology" page link SITE_SEARCH_INDEX already
   // has — so typing a year ("1945") or a keyword ("Domesday") finds the
-  // specific entry, not just the page it lives on. Fetched directly
-  // (not gated behind a page-specific script) since every page already
-  // loads this shared search wiring, and the file's tiny. Links straight
-  // to chronology.html?year=X (js/chronology.js's own ?year= handling
+  // specific entry, not just the page it lives on. Links straight to
+  // chronology.html?year=X (js/chronology.js's own ?year= handling
   // scrolls to and highlights it) when the entry's Year has a real
   // number to link with; falls back to the plain page otherwise.
-  fetch("data/chronology.json")
-    .then(function (res) { return res.ok ? res.json() : { entries: [] }; })
-    .catch(function () { return { entries: [] }; })
-    .then(function (data) {
-      chronologyEntries = (data.entries || []).map(function (e) {
-        var year = extractYear(e.year);
-        return {
-          title: e.year || "Village Chronology",
-          url: year ? "chronology.html?year=" + encodeURIComponent(year) : "chronology.html",
-          category: "Chronology",
-          excerpt: e.text || ""
-        };
-      });
-      rebuildIndex();
+  CHRONOLOGY_DATA_PROMISE.then(function (entries) {
+    chronologyEntries = entries.map(function (e) {
+      return {
+        title: e.year || "Village Chronology",
+        url: e.sortYear ? "chronology.html?year=" + encodeURIComponent(e.sortYear) : "chronology.html",
+        category: "Chronology",
+        excerpt: e.text
+      };
     });
+    rebuildIndex();
+  });
 
   function renderResultsInto(resultsList, query, emptyHint) {
     resultsList.innerHTML = "";

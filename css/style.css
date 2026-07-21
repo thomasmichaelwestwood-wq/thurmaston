@@ -38,9 +38,63 @@
   --glass-border: rgba(255, 255, 255, 0.55);
   --glass-bg-dark: rgba(255, 255, 255, 0.09);
   --glass-border-dark: rgba(255, 255, 255, 0.18);
+  /* A second, smaller blur tier — for small/chrome surfaces (chips,
+     small overlays) that don't want the full --glass-blur strength.
+     Everything bigger (cards, panels, modals, the header) uses the
+     original --glass-blur. Added when 4 different components had each
+     hardcoded their own one-off blur value instead of sharing a token
+     — folding them onto just these two tiers, rather than adding a
+     third bespoke value each time, is the actual fix. */
+  --glass-blur-sm: blur(12px) saturate(160%);
+  /* Translucent green-900 — the dark-glass counterpart to the light
+     --glass-bg-* family above, for panels that used to be 100% opaque
+     solid --green-900 (the hero cards, the photo facts panel, page
+     banners, modals). Same hue, so no text-color/contrast rework
+     needed on anything switched over to it — just the fill becomes
+     glass instead of flat. */
+  --glass-bg-green: rgba(31, 77, 58, 0.82);
+  --glass-bg-green-strong: rgba(31, 77, 58, 0.92);
   --font-head: "Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  /* Spacing scale (4px rhythm) — used on new/touched selectors only;
+     not retrofitted onto every existing hand-picked padding/margin
+     value in the file, that's a separate, deliberately deferred pass. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 56px;
+  --space-10: 72px;
+  /* Type scale — named to match sizes already used around the site
+     (so this reads as a naming pass, not a resize), applied only to
+     new/touched selectors for the same reason as the spacing scale. */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-md: 1.125rem;
+  --text-lg: 1.25rem;
+  --text-xl: 1.5rem;
+  --text-2xl: clamp(1.75rem, 1.4rem + 1.5vw, 2.25rem);
+  --text-3xl: clamp(1.8rem, 1.2rem + 3vw, 2.8rem); /* = the existing hero h1 clamp */
 }
+
+/* Radius/shadow pairing rule (a convention, not a new mechanism):
+     pills/chips/inputs      -> --radius-pill + --shadow
+     grid cards/tiles        -> --radius + --shadow (--shadow-lg on hover)
+     standalone panels/modals/hero cards -> --radius-lg + --shadow-lg
+   Stating this explicitly is what makes a stray value (e.g. a button
+   using an 8px or 20px radius instead of one of the above) visible as
+   a violation to fix, rather than "just another one-off."
+
+   Breakpoint scale already in use across this file (kept as literal
+   px values in @media conditions — custom properties can't be read
+   inside a media-query condition in any browser): 340 / 480 / 560 /
+   640 / 780 / 980. New responsive rules should pick from this list
+   rather than inventing another value. */
 
 * { box-sizing: border-box; }
 
@@ -227,8 +281,8 @@ h1, h2, h3, h4 {
   position: fixed;
   inset: 0;
   background: rgba(20, 26, 22, 0.35);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
   z-index: 200;
   display: none;
   align-items: flex-start;
@@ -329,46 +383,41 @@ h1, h2, h3, h4 {
 }
 
 /* ---------- Hero ---------- */
+/* Rebuilt as a full-bleed photo backdrop with a green-tinted scrim and
+   two floating frosted-glass cards on top (the site's info/search, and
+   a Village Chronology teaser) — the "layered translucent panel over
+   imagery" look (macOS Control Center, Apple's own marketing pages)
+   requested explicitly, in place of the previous fixed-height photo-
+   beside-a-solid-green-box split. Makes the photo more prominent
+   (full-bleed, not a boxed 3:2 side panel) rather than less, and
+   solves what would otherwise be a tight fixed-height budget for
+   fitting a second card in — .hero's height is now content-driven
+   below 980px and only gets a tall min-height at/above it. */
 
 .hero {
   position: relative;
-  display: flex;
-  min-height: 300px;
-  max-height: 460px;
-  height: 38vh;
-  /* Not hidden here — .hero-media below clips its own photo with its
-     own overflow:hidden, so this can stay visible, which the search
-     results dropdown in .hero-search needs (it would otherwise be cut
-     off at the hero's fixed height as soon as it had more than a
-     couple of results). */
-  overflow: visible;
+  overflow: hidden;
   color: #fff;
-}
-
-.hero-content {
-  position: relative;
-  flex: 1 1 auto;
-  min-width: 0;
   display: flex;
-  flex-direction: column;
-  justify-content: center;
-  background: var(--green-900);
-  padding: 32px clamp(20px, 4vw, 56px);
+  align-items: center;
 }
 
-/* Sized to the hero photo's own 6:4 (3:2) proportions rather than a
-   fixed percentage of the hero's width — at a fixed hero height, width
-   is derived from that ratio, so background-size:cover on .hero-slide
-   below shows the whole photo with no odd cropping, instead of forcing
-   a 3:2 image into a much wider/flatter box shape. */
+@media (min-width: 980px) {
+  .hero { min-height: clamp(560px, 62vh, 720px); }
+}
+
+/* Full-bleed backdrop (was a flexed, fixed-aspect side panel) — fills
+   the whole .hero regardless of its height. */
 .hero-media {
-  position: relative;
-  flex: 0 0 auto;
-  height: 100%;
-  aspect-ratio: 3 / 2;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
   overflow: hidden;
 }
 
+/* Unchanged — still the exact element js/main.js's initHero() targets
+   (hero.querySelector(".hero-slide")) to swap in the real photo from
+   data/hero.json once one exists. */
 .hero-slide {
   position: absolute;
   inset: 0;
@@ -379,7 +428,53 @@ h1, h2, h3, h4 {
 }
 .hero-slide.active { opacity: 1; }
 
-.hero-content h1 {
+/* Green-tinted, not black/grey — keeps the overlay on-palette while it
+   does its actual job (card text staying legible over whatever photo
+   is live). Directional so more of the photo reads clearly on the
+   right, under the smaller chronology card, than under the denser
+   text of the main card on the left. */
+.hero-scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(31, 77, 58, 0.82) 0%, rgba(31, 77, 58, 0.55) 45%, rgba(31, 77, 58, 0.2) 100%);
+}
+
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding-top: var(--space-8);
+  padding-bottom: var(--space-8);
+}
+
+.hero-cards {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  gap: var(--space-7);
+  align-items: start;
+}
+
+.hero-card {
+  background: var(--glass-bg-green);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-dark);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: clamp(24px, 3vw, 40px);
+}
+
+.eyebrow {
+  font-family: var(--font-head);
+  font-weight: 700;
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--gold-100);
+  margin: 0 0 8px;
+}
+
+.hero-card-main h1 {
   color: #fff;
   font-weight: 800;
   font-size: clamp(1.8rem, 3vw, 2.8rem);
@@ -425,16 +520,16 @@ h1, h2, h3, h4 {
   outline-offset: 1px;
 }
 
-/* Positioned to float below the input regardless of the hero's own
-   fixed height (see .hero's overflow:visible above) — same card look
-   as .home-search-results elsewhere (that class is still applied,
-   just repositioned here), just anchored absolutely since it's
-   floating over the hero photo/green panel rather than sitting inline
-   in the page flow. Targeted by #home-search-results (an ID, not just
-   the .hero-search-results class) so these overrides reliably beat
+/* Same card look as .home-search-results elsewhere (that class is
+   still applied, just repositioned here), anchored absolutely since
+   it's floating over a glass hero card, not sitting inline in the
+   page flow. Targeted by #home-search-results (an ID, not just the
+   .hero-search-results class) so these overrides reliably beat
    .home-search-results's own margin/max-width regardless of which
-   block happens to come later in this file — class-vs-class specificity
-   ties are order-dependent and easy to accidentally invert later. */
+   block happens to come later in this file. z-index raised from the
+   original 5 to sit above .hero-card-chronology, which now sits
+   directly below this card in normal flow on the stacked mobile
+   layout (it didn't need to clear another card before). */
 #home-search-results.hero-search-results {
   position: absolute;
   top: calc(100% + 8px);
@@ -442,7 +537,7 @@ h1, h2, h3, h4 {
   right: 0;
   max-width: none;
   margin: 0;
-  z-index: 5;
+  z-index: 20;
 }
 
 .hero-cta {
@@ -451,23 +546,51 @@ h1, h2, h3, h4 {
   flex-wrap: wrap;
 }
 
-@media (max-width: 720px) {
-  .hero {
-    flex-direction: column;
-    height: auto;
-    max-height: none;
+.hero-chronology-title {
+  color: #fff;
+  font-size: var(--text-lg);
+  margin: 0 0 8px;
+}
+
+.hero-chronology-lede {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #d9e6db;
+  margin: 0 0 var(--space-4);
+}
+
+.hero-chronology-years {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-5);
+  padding: 0;
+}
+
+/* .chip's base look (light bg, dark text/border) is built for a light
+   page background — inverted here for the dark glass card it sits on,
+   same two states (rest/hover) as everywhere else .chip is used. */
+.hero-chronology-years .chip {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+}
+.hero-chronology-years .chip:hover {
+  background: #fff;
+  color: var(--green-900);
+  border-color: #fff;
+}
+
+@media (max-width: 980px) {
+  .hero-cards {
+    grid-template-columns: 1fr;
+    gap: var(--space-6);
   }
-  .hero-content {
-    flex: none;
-    max-width: 100%;
-    padding: 28px 20px;
-  }
-  .hero-media {
-    flex: none;
-    width: 100%;
-    height: auto;
-    aspect-ratio: 3 / 2;
-  }
+}
+
+@media (max-width: 640px) {
+  .hero-inner { padding-top: var(--space-7); padding-bottom: var(--space-7); }
 }
 
 .btn {
@@ -486,8 +609,8 @@ h1, h2, h3, h4 {
 .btn-outline {
   border-color: rgba(255,255,255,0.6);
   background: rgba(255,255,255,0.12);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
   color: #fff;
 }
 .btn-outline:hover { background: #fff; color: var(--green-900); }
@@ -525,7 +648,14 @@ h1, h2, h3, h4 {
 /* ---------- Generic content sections ---------- */
 
 .page-hero {
-  background: var(--green-900);
+  /* Translucent instead of flat — no border/radius added here unlike
+     the other converted dark-glass panels below, since this is a
+     full-bleed banner spanning the whole viewport width, not an inset
+     floating box; a border on it would just draw two stray vertical
+     lines at the screen edges. */
+  background: var(--glass-bg-green);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   color: #fff;
   padding: 46px 0;
 }
@@ -906,6 +1036,13 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 }
 .place-location-banner:hover { background: #efdcb4; }
 .place-location-banner strong { color: var(--green-900); }
+/* Pre-existing bug, fixed here: this class's own "display: block" was
+   overriding the browser's default [hidden] handling, so a photo with
+   no location-banner content (most photos) still showed an empty gold
+   box — noticed while screenshotting this page for the glass redesign,
+   unrelated to it. Applies to both banners sharing this class
+   (#place-location-banner and #place-chronology-banner). */
+.place-location-banner[hidden] { display: none; }
 
 /* The "facts" card at the top of a story page — the same information
    the photo's lightbox shows (name, date/location, category/credit,
@@ -915,7 +1052,10 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   display: none;
   max-width: 900px;
   margin: 0 auto 36px;
-  background: var(--green-900);
+  background: var(--glass-bg-green);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-dark);
   color: #fff;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -1045,7 +1185,10 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   display: none;
   max-width: 900px;
   margin: 0 auto 36px;
-  background: var(--green-900);
+  background: var(--glass-bg-green);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-dark);
   color: #fff;
   border-radius: var(--radius-lg);
   padding: 24px 26px;
@@ -1116,22 +1259,32 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   margin-bottom: 12px;
 }
 
-.map-filters button {
+/* A small pill-shaped tag/filter, used wherever the site needs a row
+   of short clickable labels — map category filters, chronology era
+   jump buttons, the homepage hero's chronology year links. Was
+   ".map-filters button" (a parent-scoped descendant selector, with a
+   hardcoded 20px radius instead of the shared pill token) — a
+   standalone class instead, so the exact same look works on a <button>
+   or an <a>, inside a ".map-filters" row or not. */
+.chip {
+  display: inline-block;
   border: 1px solid var(--line);
   background: var(--paper);
   color: var(--ink);
   font-size: 0.78rem;
   padding: 5px 11px;
-  border-radius: 20px;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
   cursor: pointer;
   font-family: var(--font-body);
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
-.map-filters button.active {
+.chip.active {
   background: var(--green-900);
   border-color: var(--green-900);
   color: #fff;
 }
-.map-filters button:hover:not(.active) {
+.chip:hover:not(.active) {
   border-color: var(--green-700);
 }
 
@@ -1387,14 +1540,19 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   text-align: center;
 }
 
+/* Extends .btn (js/photos.js adds both classes) — border-radius and
+   font-weight now come from there; everything below is a genuine
+   override (this button is smaller and its border/transition differ
+   from .btn's defaults), kept explicit rather than stripped, so this
+   stays pixel-identical to before. Composing onto .btn instead of
+   redeclaring from scratch means this now also gets .btn's :active
+   press-feedback for free. */
 .btn-show-all {
   background: var(--green-100);
   color: var(--green-900);
   border: 1px solid var(--glass-border);
-  border-radius: var(--radius-pill);
   padding: 10px 22px;
   font-family: var(--font-body);
-  font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
   transition: background 0.15s ease;
@@ -1438,8 +1596,8 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-size: 0.85rem;
   text-align: left;
   background: rgba(20, 30, 22, 0.35);
-  backdrop-filter: blur(12px) saturate(180%);
-  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  backdrop-filter: var(--glass-blur-sm);
+  -webkit-backdrop-filter: var(--glass-blur-sm);
   border: 1px solid rgba(255,255,255,0.25);
   padding: 6px 14px;
   border-radius: var(--radius-pill);
@@ -1591,8 +1749,8 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   position: fixed;
   inset: 0;
   background: rgba(10, 13, 11, 0.82);
-  backdrop-filter: blur(14px) saturate(160%);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   z-index: 400;
   display: none;
   align-items: center;
@@ -1606,7 +1764,14 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   width: min(480px, 94vw);
   max-height: 88vh;
   overflow-y: auto;
-  background: var(--green-900);
+  /* The stronger glass tier, not the standard one — this card already
+     sits over its own dimmed/blurred backdrop (.place-know-more-modal),
+     so it needs the extra opacity to stay legible rather than reading
+     as blur-on-blur. */
+  background: var(--glass-bg-green-strong);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border-dark);
   border-radius: var(--radius-lg);
   padding: 24px;
   box-shadow: var(--shadow-lg);
@@ -1665,23 +1830,31 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   -webkit-user-drag: none;
 }
 
+/* Shared base for a solid-white circular icon button over a photo
+   (needs to stay legible over any colour) — .place-zoom-close and
+   .place-zoom-nav used to redeclare the same background/border/color/
+   radius/shadow/hover independently; this is that shared look, with
+   each keeping only its own position/size on top of it. */
+.icon-btn-circle {
+  background: #fff;
+  border: none;
+  color: var(--green-900);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.icon-btn-circle:hover { background: var(--gold-100); }
+
 .place-zoom-close {
   position: absolute;
   top: 16px;
   right: 20px;
-  background: #fff;
-  border: none;
-  color: var(--green-900);
   font-size: 1.8rem;
   line-height: 1;
   width: 44px;
   height: 44px;
-  border-radius: 50%;
-  cursor: pointer;
   z-index: 2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
-.place-zoom-close:hover { background: var(--gold-100); }
 
 .place-zoom-hint {
   position: absolute;
@@ -1712,7 +1885,7 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
   font-weight: 700;
   min-width: 44px;
   padding: 10px 16px;
-  border-radius: 8px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
@@ -1720,24 +1893,18 @@ table.simple th { color: var(--green-900); font-family: var(--font-head); }
 
 /* Prev/Next through a multi-photo gallery (event.html only — place.html's
    overlay shows one fixed photo with no siblings to step through, so it
-   never renders these buttons at all). Same solid-white treatment as the
-   close button/zoom controls, for the same reason: needs to stay legible
-   over a photo of any colour. */
+   never renders these buttons at all). Extends .icon-btn-circle (see
+   above) for the same reason .place-zoom-close does: needs to stay
+   legible over a photo of any colour. */
 .place-zoom-nav {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: #fff;
-  border: none;
-  color: var(--green-900);
   font-size: 2rem;
   line-height: 1;
   width: 48px;
   height: 48px;
-  border-radius: 50%;
-  cursor: pointer;
   z-index: 2;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 .place-zoom-nav:hover { background: var(--gold-100); }
 .place-zoom-nav[hidden] { display: none; }

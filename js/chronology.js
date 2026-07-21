@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
     var eras = ERAS.concat([UNKNOWN_ERA]).filter(function (era) { return present[era.id]; });
     if (eras.length < 2) return; // Not worth a jump bar for a single bucket.
     erasEl.innerHTML = eras.map(function (era) {
-      return '<button type="button" data-era="' + era.id + '">' + escapeHtml(era.label) + "</button>";
+      return '<button type="button" class="chip" data-era="' + era.id + '">' + escapeHtml(era.label) + "</button>";
     }).join("");
     erasEl.hidden = false;
     erasEl.addEventListener("click", function (e) {

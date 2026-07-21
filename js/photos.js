@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (!capped) return;
     var btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "btn-show-all";
+    btn.className = "btn btn-show-all";
     btn.textContent = "Show all " + total + " photos";
     btn.addEventListener("click", function () {
       showingAll = true;

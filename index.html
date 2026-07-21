@@ -32,20 +32,34 @@
 <main id="main">
 
   <section class="hero" data-hero>
-    <div class="hero-content">
-      <h1>Memories of Thurmaston</h1>
-      <p class="hero-subtitle">The history of our village</p>
-      <p class="hero-lede">A community archive of old photographs, personal stories and local history — built by the people who lived it. Browse the photo archive, explore the interactive map of buildings that used to stand in the village, or share a memory of your own below.</p>
-      <div class="hero-search">
-        <input type="text" id="home-search-input" class="hero-search-input" placeholder="Search by caption, street, name or date…" autocomplete="off" aria-label="Search the archive">
-        <ul id="home-search-results" class="home-search-results hero-search-results"></ul>
-      </div>
-      <div class="hero-cta">
-        <a class="btn btn-outline" href="map.html">See the interactive map</a>
-      </div>
-    </div>
-    <div class="hero-media">
+    <div class="hero-media" aria-hidden="true">
       <div class="hero-slide active" style="background-image:url('images/hero/melton-road.svg')"></div>
+      <div class="hero-scrim"></div>
+    </div>
+    <div class="container hero-inner">
+      <div class="hero-cards">
+        <div class="hero-card hero-card-main">
+          <p class="eyebrow">Thurmaston, Leicestershire</p>
+          <h1>Memories of Thurmaston</h1>
+          <p class="hero-subtitle">The history of our village</p>
+          <p class="hero-lede">A community archive of old photographs, personal stories and local history — built by the people who lived it. Browse the photo archive, explore the interactive map of buildings that used to stand in the village, or share a memory of your own below.</p>
+          <div class="hero-search">
+            <input type="text" id="home-search-input" class="hero-search-input" placeholder="Search by caption, street, name or date…" autocomplete="off" aria-label="Search the archive">
+            <ul id="home-search-results" class="home-search-results hero-search-results"></ul>
+          </div>
+          <div class="hero-cta">
+            <a class="btn btn-outline" href="map.html">See the interactive map</a>
+          </div>
+        </div>
+
+        <div class="hero-card hero-card-chronology">
+          <p class="eyebrow">Village Chronology</p>
+          <h2 class="hero-chronology-title">900+ years of history</h2>
+          <p class="hero-chronology-lede">From the Domesday Book's mill on the River Soar to today — explored year by year.</p>
+          <ul class="hero-chronology-years" id="hero-chronology-years" aria-label="Notable years"></ul>
+          <a class="btn btn-primary" href="chronology.html">Browse the Chronology →</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -59,14 +73,6 @@
       <a href="category.html?cat=nature" data-category="nature"><span>Nature &amp; Views</span></a>
       <a href="category.html?cat=aerial" data-category="aerial"><span>Aerial</span></a>
       <a href="category.html?cat=other" data-category="other"><span>Other</span></a>
-    </div>
-  </section>
-
-  <section class="content-section container">
-    <div class="callout">
-      <h3>Curious how the village has changed?</h3>
-      <p>Browse our year-by-year <strong>Village Chronology</strong> — from the Domesday Book's mention of a mill on the River Soar in 1086, right up to today.</p>
-      <a class="btn btn-primary" href="chronology.html">Explore the Village Chronology →</a>
     </div>
   </section>
 
