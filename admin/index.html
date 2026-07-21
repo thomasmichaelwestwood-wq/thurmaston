@@ -26,6 +26,31 @@ textarea { min-height: 220px !important; }
      CMS mounting its own UI into the page — it doesn't wipe out sibling
      elements that were already there. -->
 <a href="/index.html" id="back-to-site-link" style="position:fixed;bottom:16px;right:16px;z-index:99999;background:#1f4d3a;color:#fff;padding:8px 16px;border-radius:8px;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.3);">← Back to site</a>
+<!-- Same "plain DOM element floated above the CMS" trick as the "Back
+     to site" link above — a small status badge showing when the daily
+     GitHub → Google Drive backup (automation/drive-photo-sync.gs.js's
+     backupToDrive) last ran. That script writes data/backup-status.json
+     back to GitHub after each backup (the one exception to the backup
+     being strictly one-way) purely so this badge has something to
+     read — plain fetch, no Drive/Sheets API access needed here. -->
+<div id="backup-status-badge" style="position:fixed;bottom:16px;left:16px;z-index:99999;background:rgba(31,77,58,0.85);color:#fff;padding:8px 16px;border-radius:8px;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.3);">Checking backup status…</div>
+<script>
+  fetch("../data/backup-status.json")
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .catch(function () { return null; })
+    .then(function (status) {
+      var el = document.getElementById("backup-status-badge");
+      if (!status || !status.lastBackedUp) {
+        el.textContent = "No backup recorded yet";
+        return;
+      }
+      var d = new Date(status.lastBackedUp);
+      var label = isNaN(d.getTime())
+        ? status.lastBackedUp
+        : d.toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+      el.textContent = "Last backed up: " + label;
+    });
+</script>
 <!-- Sveltia CMS — switched from Decap CMS specifically because Decap's
      media library doesn't reliably support selecting/uploading several
      images at once (confirmed both in testing and in Decap's own open

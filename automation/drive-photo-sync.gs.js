@@ -483,6 +483,7 @@ function backupToDrive() {
   backupPhotos(ss, token, owner, repo);
   backupMapPins(ss, token, owner, repo);
   backupPages(ss, token, owner, repo);
+  writeBackupStatus(ss, token, owner, repo);
 
   // Spreadsheets are created with a blank "Sheet1" — drop it once the
   // real tabs above exist, so the backup only shows meaningful sheets.
@@ -555,6 +556,30 @@ function writeSheetRows(ss, sheetName, headers, rows) {
     }));
   });
   sheet.setFrozenRows(1);
+}
+
+// Backs onto the Drive backup with a small status file *back* on
+// GitHub (the one exception to this being one-way GitHub → Drive) so
+// the admin can show "Last backed up" without needing Drive/Sheets API
+// access of its own — admin/index.html just fetches this plain JSON
+// file over HTTPS like any other data file. Updates the existing file
+// in place (fetches its current sha first, same read-then-PUT pattern
+// appendHeroEntry already uses) rather than always creating a fresh
+// one.
+function writeBackupStatus(ss, token, owner, repo) {
+  var status = {
+    lastBackedUp: Utilities.formatDate(new Date(), "Etc/UTC", "yyyy-MM-dd'T'HH:mm:ss'Z'"),
+    sheetUrl: ss.getUrl()
+  };
+  var path = "data/backup-status.json";
+  var content = JSON.stringify(status, null, 2) + "\n";
+  var sha;
+  try {
+    sha = ghGet(path, token, owner, repo).sha;
+  } catch (e) {
+    // Doesn't exist yet (first run) — ghPut below creates it fresh.
+  }
+  ghPut(path, Utilities.base64Encode(Utilities.newBlob(content).getBytes()), "Update backup status", token, owner, repo, sha);
 }
 
 function fetchJsonFile(path, token, owner, repo) {
