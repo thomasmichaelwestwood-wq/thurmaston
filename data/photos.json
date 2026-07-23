@@ -1,5 +1,21 @@
 [
   {
+    "src": "/images/photos/aerial/2001_1110 Melton Road, Bodyworks Ref 2134.JPG",
+    "caption": "Thurmaston Bodyworks",
+    "category": "streets",
+    "date": "2001",
+    "credit": "Mick Westwood",
+    "location": "",
+    "history": "Thurmaston Bodyworks, vehicle repair and spray shop. Next door is Sunny Textiles",
+    "consentNoted": true,
+    "ref": "2001_1110 Melton Road, Bodyworks Ref 2134.JPG",
+    "placeId": "",
+    "id": "20260723195130-thurmaston-bodyworks",
+    "addedAt": "2026-07-23T19:51:49.459Z",
+    "lat": 52.67896912269194,
+    "lng": -1.0992768711642544
+  },
+  {
     "src": "/images/photos/aerial/001 Black Horse MOT 1 1-2.jpg",
     "caption": "Black Horse",
     "category": "streets",
