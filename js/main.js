@@ -289,14 +289,36 @@ function initSearch() {
     overlay.classList.remove("open");
   }
 
-  // The homepage's own search box, sitting right under the hero —
-  // present only on index.html, so this is a no-op (wireSearchBox
-  // bails on missing elements) everywhere else.
-  wireSearchBox(
-    document.getElementById("home-search-input"),
-    document.getElementById("home-search-results"),
-    null
-  );
+  // The homepage's own search box, floating inside the hero's main
+  // card — present only on index.html, so this is a no-op
+  // (wireSearchBox bails on missing elements) everywhere else.
+  var homeSearchInput = document.getElementById("home-search-input");
+  var homeSearchResults = document.getElementById("home-search-results");
+  var homeSearchBox = wireSearchBox(homeSearchInput, homeSearchResults, null);
+
+  // Now that the dropdown floats over the "Photo archive" section
+  // below it (css/style.css removed .hero's overflow:hidden so it's
+  // no longer clipped there), it needs its own way to get out of the
+  // way again — clicking elsewhere on the page or pressing Escape
+  // hides it without clearing what was typed, and refocusing the
+  // input (e.g. tabbing back to it) brings the same results straight
+  // back rather than making someone retype the query.
+  if (homeSearchBox && homeSearchInput && homeSearchResults) {
+    homeSearchInput.addEventListener("focus", function () {
+      homeSearchResults.hidden = false;
+    });
+    document.addEventListener("click", function (e) {
+      if (!homeSearchInput.contains(e.target) && !homeSearchResults.contains(e.target)) {
+        homeSearchResults.hidden = true;
+      }
+    });
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && document.activeElement === homeSearchInput) {
+        homeSearchResults.hidden = true;
+        homeSearchInput.blur();
+      }
+    });
+  }
 
   // category.html's "Looking for something specific?" box — present
   // only there. Used to run its own separate filter over just that

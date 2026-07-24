@@ -405,9 +405,15 @@ h1, h2, h3, h4 {
    fitting a second card in — .hero's height is now content-driven
    below 980px and only gets a tall min-height at/above it. */
 
+/* No overflow:hidden here (deliberately) — .hero-media already clips
+   its own backdrop image to itself via inset:0 + its own overflow:
+   hidden below, so the outer hero doesn't need to as well, and NOT
+   clipping here is what lets the search results dropdown
+   (#home-search-results, below) float over the "Photo archive"
+   section underneath instead of being cut off at the hero's own
+   bottom edge. */
 .hero {
   position: relative;
-  overflow: hidden;
   color: #fff;
   display: flex;
   align-items: center;
@@ -541,6 +547,13 @@ h1, h2, h3, h4 {
    original 5 to sit above .hero-card-chronology, which now sits
    directly below this card in normal flow on the stacked mobile
    layout (it didn't need to clear another card before). */
+/* Capped and internally scrollable — about 5 results' worth — rather
+   than growing to fit every match, now that .hero no longer clips it
+   (above): with 20 possible matches (renderResultsInto's own cap) an
+   uncapped list would otherwise float a very tall card down over most
+   of the "Photo archive" section below it. overscroll-behavior stops
+   scrolling through the end of the list from also scrolling the page
+   underneath it. */
 #home-search-results.hero-search-results {
   position: absolute;
   top: calc(100% + 8px);
@@ -549,6 +562,9 @@ h1, h2, h3, h4 {
   max-width: none;
   margin: 0;
   z-index: 20;
+  max-height: 340px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .hero-cta {

@@ -58,13 +58,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "aerial"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -165,13 +173,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "churches"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -240,13 +256,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "events"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -291,13 +315,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "groups"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -335,13 +367,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "industry"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -379,13 +419,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "nature"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -423,13 +471,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "other"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -466,13 +522,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "people"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -510,13 +574,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "schools"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -578,13 +650,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "sports"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"
@@ -621,13 +701,21 @@ collections:
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
       - label: "Category"
         name: "category"
-        widget: "hidden"
+        widget: "select"
         default: "streets"
-        # Fixed to match this collection/folder — not shown as a field to
-        # fill in, since which collection you're already in decides it.
-        # A hidden widget still writes its default into the saved JSON,
-        # so photo.category keeps working everywhere the front end reads
-        # it (category.html, the photo filters, js/map.js's pin colour).
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Industry", value: "industry" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
       - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
       - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
       - label: "Google Maps coordinates"

@@ -49,6 +49,14 @@ const ROOT = path.join(__dirname, "..");
 const PHOTOS_DIR = path.join(ROOT, "data", "photos");
 const OUTPUT = path.join(ROOT, "data", "photos.json");
 
+// Matches admin/config.yml's 11 photos_* collection folders exactly —
+// the only categories a photo's Category field (a select dropdown,
+// not free text) could ever actually contain.
+const KNOWN_CATEGORIES = new Set([
+  "aerial", "churches", "events", "groups", "industry",
+  "nature", "other", "people", "schools", "sports", "streets"
+]);
+
 function parseCoords(str) {
   const match = typeof str === "string" && str.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
   if (!match) return null;
@@ -80,6 +88,31 @@ const photos = files.map((filePath) => {
     photo = JSON.parse(raw);
   } catch (e) {
     throw new Error("Invalid JSON in " + path.relative(ROOT, filePath) + ": " + e.message);
+  }
+
+  // A photo's Category is a normal editable dropdown in the admin (see
+  // admin/config.yml) — the subfolder it happens to sit in is otherwise
+  // only an organisational convenience for browsing collections there,
+  // never something the front end reads (the aggregate below always
+  // uses photo.category directly). If someone corrects a misfiled
+  // photo's Category and saves, this is what actually relocates its
+  // file to match — otherwise the live site would already be right
+  // (it only ever reads the field) but the admin's own collection tabs
+  // would silently keep showing it under the wrong one forever. Skips
+  // silently, rather than overwriting, on the near-impossible chance a
+  // same-named file already exists at the destination.
+  const currentCategory = path.relative(PHOTOS_DIR, filePath).split(path.sep)[0];
+  if (photo.category && KNOWN_CATEGORIES.has(photo.category) && photo.category !== currentCategory) {
+    const targetDir = path.join(PHOTOS_DIR, photo.category);
+    fs.mkdirSync(targetDir, { recursive: true });
+    const targetPath = path.join(targetDir, path.basename(filePath));
+    if (fs.existsSync(targetPath)) {
+      console.warn("Skipping relocate for " + path.relative(ROOT, filePath) + " — a file already exists at " + path.relative(ROOT, targetPath));
+    } else {
+      fs.renameSync(filePath, targetPath);
+      console.log("Relocated " + path.relative(ROOT, filePath) + " -> " + path.relative(ROOT, targetPath) + " (Category field said \"" + photo.category + "\")");
+      filePath = targetPath;
+    }
   }
 
   // Both of these get written back to the photo's own file (not just
