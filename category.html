@@ -138,6 +138,17 @@
   document.getElementById("category-crumb").textContent = CATEGORY_INFO[LOCKED_CATEGORY].label;
   document.getElementById("category-heading").textContent = CATEGORY_INFO[LOCKED_CATEGORY].label;
   document.getElementById("category-intro").textContent = CATEGORY_INFO[LOCKED_CATEGORY].intro;
+
+  // On every other category the map leads (it's mostly buildings/
+  // streets/places) — but People photos are rarely about a specific
+  // spot, so the map's the least relevant thing to lead with here.
+  // Moved after the photos rather than removed: a person photo can
+  // still have a location pinned, and the map still finds it.
+  if (LOCKED_CATEGORY === "people") {
+    var mapSection = document.getElementById("map");
+    var photosSection = document.getElementById("photos");
+    if (mapSection && photosSection) photosSection.after(mapSection);
+  }
 </script>
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
