@@ -691,6 +691,20 @@ collections:
     extension: "json"
     format: "json"
     identifier_field: "caption"
+    # This is the one category likely to grow large enough that one
+    # flat list becomes hard to browse (many different streets, unlike
+    # e.g. Aerial or Sports) — grouped by the existing Location field
+    # so the sidebar list shows a collapsible group per street instead
+    # of one long list, with no new field for anyone to fill in. Only
+    # works as cleanly as Location itself is worded consistently for
+    # the same street (e.g. always "Melton Road," not sometimes with
+    # ", Thurmaston" tacked on) — if that turns out too fragmented in
+    # practice, the fix is a dedicated short "Street" field purely for
+    # grouping, not this. Not added to every other collection: they're
+    # small enough that one flat list is still perfectly easy to scan.
+    view_groups:
+      - label: "Street"
+        field: "location"
     fields:
       - label: "Photo"
         name: "src"
