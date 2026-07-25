@@ -683,7 +683,7 @@ collections:
       - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
   - name: "photos_streets"
     label: "Streets & Buildings"
-    description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    description: "Every photo in the Streets & Buildings category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. This list is grouped by street, using whatever you type into each photo's \"Location\" box — type the street name the same way every time (e.g. always \"Melton Road\", not sometimes \"Melton Road, Thurmaston\") so photos of the same street land in the same group instead of being split apart."
     folder: "data/photos/streets"
     create: true
     delete: true
