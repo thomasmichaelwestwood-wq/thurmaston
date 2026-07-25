@@ -183,12 +183,16 @@ auto-synced photo; tick it once you've confirmed it's fine to have public
 **Photos of the same place normally group together on their own** —
 "More photos from…" on a photo's page, and its own timeline at
 `/location.html` — matching Google Maps coordinates first, or Location
-text if there are no coordinates. If two photos are definitely the
+text if there are no coordinates. **Always fill in coordinates when you
+have them, even if you also fill in Location** — coordinates are what
+actually link photos of the same place together; Location is just the
+descriptive text shown on the page. If two photos are definitely the
 same place but aren't grouping (e.g. an old photo from before a street
-was renamed, with no coordinates and Location typed using the old
-name), type the same text — anything, a building's name is easiest —
-into both photos' "Internal — manual place grouping" field. That
-overrides everything else and forces them together.
+was renamed — Melton Road used to be Main Street — with no coordinates
+and Location typed using the old name), type the same text — anything,
+a building's name is easiest — into both photos' "Same place as
+another photo (if it won't link up on its own)" field. That overrides
+everything else and forces them together.
 
 ## Who can upload
 
