@@ -7,9 +7,9 @@
   "coords": "52.68346889232541, -1.101045635804306",
   "location": "",
   "history": "'The Plank' near Johnson's Bridge, Watermead Park",
-  "consentNoted": false,
+  "consentNoted": true,
   "ref": "2135",
-  "placeId": "",
+  "placeId": "toast",
   "id": "",
   "addedAt": "2026-07-25T18:20:36.721Z",
   "numberedPeople": ""
