@@ -5,6 +5,23 @@ How photos get onto the live site — two ways: drop them into Google Drive
 through the admin at `/admin` (see "2b," below) when there's no Drive
 involved — a photo someone's just handed you, say.
 
+> **The two-rule version of "how do photos link to others of the same place":**
+>
+> 1. **If you know the coordinates, always put them in.** Right-click the
+>    spot on Google Maps, copy the numbers, paste them into "Google Maps
+>    coordinates." That's what links this photo to every other photo of
+>    the same building — even if the street name's changed since, even
+>    if the words in "Location" are completely different. Coordinates do
+>    the linking. Location is just the caption underneath the photo.
+> 2. **Only if you *don't* have coordinates for an old photo, and the
+>    street's since been renamed** (Melton Road used to be Main Street) —
+>    type the building's name into "Same place as another photo," using
+>    the *exact same words* on every photo of that place.
+>
+> If a photo isn't linking up with others and you're not sure why, the
+> answer is almost always "no coordinates were entered" — the fix is
+> nearly always rule 1, not rule 2.
+
 ## 1. Drop photos into Google Drive
 
 Inside the shared **"Memories of Thurmaston Photos"** folder, there are
