@@ -1,6 +1,6 @@
 [
   {
-    "src": "/images/photos/aerial/2025 0309_2025 The plank Johnson's Bridge Ref 2135.JPG",
+    "src": "/images/photos/nature/2025 0309_2025 The plank Johnson's Bridge Ref 2135.JPG",
     "caption": "Johnson's Bridge",
     "category": "nature",
     "date": "September 2025",
@@ -17,7 +17,7 @@
     "lng": -1.101045635804306
   },
   {
-    "src": "/images/photos/aerial/096 Black horse Pook MOT 1-8.jpg",
+    "src": "/images/photos/streets/096 Black horse Pook MOT 1-8.jpg",
     "caption": "Black horse, Main Street",
     "category": "streets",
     "date": "c1914",
@@ -33,7 +33,7 @@
     "lng": -1.0992018106817052
   },
   {
-    "src": "/images/photos/aerial/2001_1110 Melton Road, Bodyworks Ref 2134.JPG",
+    "src": "/images/photos/streets/2001_1110 Melton Road, Bodyworks Ref 2134.JPG",
     "caption": "Thurmaston Bodyworks on the site of the Black Horse",
     "category": "streets",
     "date": "2001",
@@ -49,7 +49,7 @@
     "lng": -1.0992018106817052
   },
   {
-    "src": "/images/photos/aerial/001 Black Horse MOT 1 1-2.jpg",
+    "src": "/images/photos/streets/001 Black Horse MOT 1 1-2.jpg",
     "caption": "Black Horse, Main Street",
     "category": "streets",
     "date": "c1900",
@@ -65,7 +65,7 @@
     "lng": -1.0992018106817052
   },
   {
-    "src": "/images/photos/aerial/249 Owen Hartshorn.jpg",
+    "src": "/images/photos/people/249 Owen Hartshorn.jpg",
     "caption": "Owen Hartshorn",
     "category": "people",
     "date": "1945",
@@ -273,7 +273,7 @@
     "addedAt": "2026-07-15T13:31:18Z"
   },
   {
-    "src": "/images/photos/aerial/320 Melton Road looking south (Mercury) MOT 2-30.jpg",
+    "src": "/images/photos/streets/320 Melton Road looking south (Mercury) MOT 2-30.jpg",
     "caption": "Melton Road looking south",
     "category": "streets",
     "date": "1983",

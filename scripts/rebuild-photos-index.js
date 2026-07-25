@@ -47,7 +47,13 @@ const path = require("path");
 
 const ROOT = path.join(__dirname, "..");
 const PHOTOS_DIR = path.join(ROOT, "data", "photos");
+const IMAGES_DIR = path.join(ROOT, "images", "photos");
 const OUTPUT = path.join(ROOT, "data", "photos.json");
+
+// Matches a photo's own src, e.g. "/images/photos/aerial/foo.jpg" —
+// used to find and relocate the actual image file alongside its JSON
+// (see the Category-mismatch block below).
+const SRC_PATTERN = /^\/images\/photos\/([^/]+)\/([^/]+)$/;
 
 // Matches admin/config.yml's 11 photos_* collection folders exactly —
 // the only categories a photo's Category field (a select dropdown,
@@ -101,6 +107,7 @@ const photos = files.map((filePath) => {
   // would silently keep showing it under the wrong one forever. Skips
   // silently, rather than overwriting, on the near-impossible chance a
   // same-named file already exists at the destination.
+  let dirty = false;
   const currentCategory = path.relative(PHOTOS_DIR, filePath).split(path.sep)[0];
   if (photo.category && KNOWN_CATEGORIES.has(photo.category) && photo.category !== currentCategory) {
     const targetDir = path.join(PHOTOS_DIR, photo.category);
@@ -115,6 +122,37 @@ const photos = files.map((filePath) => {
     }
   }
 
+  // The actual image file moves too, not just the JSON — a photo whose
+  // Category was corrected used to leave its image sitting in the old
+  // category's folder forever (src is "just a URL," so it still
+  // worked), but that meant this one recategorised photo silently
+  // looked inconsistent with every other photo on the site, where the
+  // image and its category always do match — confusing to notice and
+  // impossible to explain to someone non-technical. Parsed straight
+  // from the photo's own `src` (not from the JSON's folder above,
+  // which may already have moved this same run) so this still works
+  // even if the two ever get out of step with each other.
+  if (photo.category && KNOWN_CATEGORIES.has(photo.category) && typeof photo.src === "string") {
+    const srcMatch = photo.src.match(SRC_PATTERN);
+    if (srcMatch && srcMatch[1] !== photo.category) {
+      const [, srcCategory, filename] = srcMatch;
+      const sourceImagePath = path.join(IMAGES_DIR, srcCategory, filename);
+      const targetImageDir = path.join(IMAGES_DIR, photo.category);
+      const targetImagePath = path.join(targetImageDir, filename);
+      if (!fs.existsSync(sourceImagePath)) {
+        console.warn("Skipping image relocate for " + path.relative(ROOT, filePath) + " — expected image not found at " + path.relative(ROOT, sourceImagePath));
+      } else if (fs.existsSync(targetImagePath)) {
+        console.warn("Skipping image relocate for " + path.relative(ROOT, sourceImagePath) + " — a file already exists at " + path.relative(ROOT, targetImagePath));
+      } else {
+        fs.mkdirSync(targetImageDir, { recursive: true });
+        fs.renameSync(sourceImagePath, targetImagePath);
+        photo.src = "/images/photos/" + photo.category + "/" + filename;
+        dirty = true;
+        console.log("Relocated image " + path.relative(ROOT, sourceImagePath) + " -> " + path.relative(ROOT, targetImagePath));
+      }
+    }
+  }
+
   // Both of these get written back to the photo's own file (not just
   // the in-memory copy used for the aggregate below) so a value
   // computed once here shows up next time the photo is opened in the
@@ -125,7 +163,6 @@ const photos = files.map((filePath) => {
   // is aggregate-only and would corrupt the per-file schema (the CMS's
   // Coordinates field expects a "lat, lng" string, not split numbers)
   // if it ever leaked into a write-back.
-  let dirty = false;
   if (!photo.addedAt) {
     photo.addedAt = new Date().toISOString();
     dirty = true;
