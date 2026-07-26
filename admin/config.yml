@@ -56,6 +56,7 @@ collections:
         public_folder: "/images/photos/aerial"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -171,6 +172,7 @@ collections:
         public_folder: "/images/photos/churches"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -238,7 +240,7 @@ collections:
 
   - name: "photos_events"
     label: "Events (single photos)"
-    description: "For a one-off Events photo that isn't part of a described occasion — every photo here, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. For an event with several photos and its own write-up (e.g. Remembrance Day), use the \"Event Pages\" collection instead — one entry there covers the whole occasion, photos and all."
+    description: "For a one-off Events photo that isn't part of a described occasion — every photo here, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. For an event with several photos and its own write-up (e.g. Remembrance Day), use the \"Event Pages\" collection instead — one entry there covers the whole occasion, photos and all. This list is grouped by Location — type it the same way every time (e.g. always \"War Memorial, Melton Road\") so photos of the same occasion/place land in the same group."
     folder: "data/photos/events"
     create: true
     delete: true
@@ -246,6 +248,9 @@ collections:
     extension: "json"
     format: "json"
     identifier_field: "caption"
+    view_groups:
+      - label: "Location"
+        field: "location"
     fields:
       - label: "Photo"
         name: "src"
@@ -254,6 +259,7 @@ collections:
         public_folder: "/images/photos/events"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -313,6 +319,7 @@ collections:
         public_folder: "/images/photos/groups"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -365,6 +372,7 @@ collections:
         public_folder: "/images/photos/industry"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -401,7 +409,7 @@ collections:
 
   - name: "photos_nature"
     label: "Nature & Views"
-    description: "Every photo in the Nature & Views category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    description: "Every photo in the Nature & Views category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. This list is grouped by Location — type it the same way every time (e.g. always \"Watermead Country Park\") so photos of the same place land in the same group."
     folder: "data/photos/nature"
     create: true
     delete: true
@@ -409,6 +417,9 @@ collections:
     extension: "json"
     format: "json"
     identifier_field: "caption"
+    view_groups:
+      - label: "Location"
+        field: "location"
     fields:
       - label: "Photo"
         name: "src"
@@ -417,6 +428,7 @@ collections:
         public_folder: "/images/photos/nature"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -469,6 +481,7 @@ collections:
         public_folder: "/images/photos/other"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -504,7 +517,7 @@ collections:
       - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
   - name: "photos_people"
     label: "People"
-    description: "Every photo in the People category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    description: "Every photo in the People category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing. This list is grouped by the \"Person / family name\" field — fill that in (the same way every time for the same person) so photos of them land in the same group."
     folder: "data/photos/people"
     create: true
     delete: true
@@ -512,6 +525,9 @@ collections:
     extension: "json"
     format: "json"
     identifier_field: "caption"
+    view_groups:
+      - label: "Person"
+        field: "personName"
     fields:
       - label: "Photo"
         name: "src"
@@ -520,6 +536,7 @@ collections:
         public_folder: "/images/photos/people"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -572,6 +589,7 @@ collections:
         public_folder: "/images/photos/schools"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -648,6 +666,7 @@ collections:
         public_folder: "/images/photos/sports"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"
@@ -691,17 +710,19 @@ collections:
     extension: "json"
     format: "json"
     identifier_field: "caption"
-    # This is the one category likely to grow large enough that one
-    # flat list becomes hard to browse (many different streets, unlike
-    # e.g. Aerial or Sports) — grouped by the existing Location field
-    # so the sidebar list shows a collapsible group per street instead
-    # of one long list, with no new field for anyone to fill in. Only
-    # works as cleanly as Location itself is worded consistently for
-    # the same street (e.g. always "Melton Road," not sometimes with
-    # ", Thurmaston" tacked on) — if that turns out too fragmented in
-    # practice, the fix is a dedicated short "Street" field purely for
-    # grouping, not this. Not added to every other collection: they're
-    # small enough that one flat list is still perfectly easy to scan.
+    # Grouped by the existing Location field so the sidebar list shows
+    # a collapsible group per street instead of one long list, with no
+    # new field for anyone to fill in. Only works as cleanly as
+    # Location itself is worded consistently for the same street (e.g.
+    # always "Melton Road," not sometimes with ", Thurmaston" tacked
+    # on) — if that turns out too fragmented in practice, the fix is a
+    # dedicated short "Street" field purely for grouping, not this.
+    # Same idea (view_groups on an existing field) also used on
+    # Events/Nature (Location) and People (the dedicated personName
+    # field, added specifically because Caption isn't consistent
+    # enough for this the way Location already is) — not added to the
+    # remaining seven collections, which are small/uniform enough that
+    # one flat list is still perfectly easy to scan.
     view_groups:
       - label: "Street"
         field: "location"
@@ -713,6 +734,7 @@ collections:
         public_folder: "/images/photos/streets"
         hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
       - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
       - label: "Category"
         name: "category"
         widget: "select"

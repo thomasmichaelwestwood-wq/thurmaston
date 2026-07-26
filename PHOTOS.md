@@ -44,6 +44,12 @@ occasions. If a photo could go either way, go with whichever it's more
 *about* — a photo of the fete committee lined up for a portrait is
 People, a photo of the fete itself in full swing is Events.
 
+**In the admin, People/Nature & Views/Events/Streets & Buildings are grouped**
+rather than one long list — People groups by "Person / family name"
+(fill that in, the same way each time for the same person), the other
+three by "Location". Worth filling in even if you'd otherwise skip it,
+just so photos of the same person/place end up sitting together.
+
 **An event with its own story and several photos** — Remembrance Day,
 the village fete, etc. — doesn't go through Drive or the ordinary
 Events folder at all. Log into `/admin` and use the **"Event Pages"**
