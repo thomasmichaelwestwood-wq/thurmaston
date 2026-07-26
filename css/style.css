@@ -1766,42 +1766,39 @@ a.chronology-year:hover { text-decoration: underline; }
   gap: 12px;
   margin-bottom: 20px;
 }
+/* Title sits below the photo, not overlaid on top of it — was an
+   absolutely-positioned label over the image (plus a darkening
+   gradient just so the text stayed legible over an unpredictable
+   photo); requested explicitly as clearer to read. Each tile is now a
+   flex column: .photo-filter-photo (the aspect-ratio image box —
+   js/photos.js sets its background-image, not the <a>'s own anymore)
+   above, .photo-filter-label (plain flow text, own solid background)
+   below. */
 .photo-filters a {
   position: relative;
-  display: block;
-  aspect-ratio: 3/2;
+  display: flex;
+  flex-direction: column;
   border: 3px solid transparent;
   border-radius: var(--radius-lg);
   overflow: hidden;
   text-decoration: none;
-  background-color: var(--green-100);
-  background-size: cover;
-  background-position: center;
   font-family: var(--font-body);
   box-shadow: var(--shadow);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.photo-filters a::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(20,30,22,0) 55%, rgba(17,26,19,0.55) 100%);
+.photo-filter-photo {
+  aspect-ratio: 3/2;
+  background-color: var(--green-100);
+  background-size: cover;
+  background-position: center;
 }
-.photo-filters a span {
-  position: absolute;
-  z-index: 1;
-  left: 10px;
-  bottom: 10px;
+.photo-filter-label {
   color: #fff;
+  background: var(--green-900);
   font-weight: 600;
   font-size: 0.85rem;
-  text-align: left;
-  background: rgba(20, 30, 22, 0.35);
-  backdrop-filter: var(--glass-blur-sm);
-  -webkit-backdrop-filter: var(--glass-blur-sm);
-  border: 1px solid rgba(255,255,255,0.25);
-  padding: 6px 14px;
-  border-radius: var(--radius-pill);
+  text-align: center;
+  padding: 10px 12px;
 }
 .photo-filters a:hover {
   border-color: rgba(255,255,255,0.6);

@@ -58,7 +58,11 @@ function initHero() {
       // already in the page stays as the fallback.
       if (heroPhotos && heroPhotos.length > 0) {
         var slide = hero.querySelector(".hero-slide");
-        if (slide) slide.style.backgroundImage = "url('" + heroPhotos[0].src + "')";
+        // JSON.stringify, not "'" + src + "'" — see js/photos.js's
+        // setCategoryTileImages for why a plain single-quoted string
+        // silently breaks (and silently no-ops, no console error) for
+        // any filename containing an apostrophe.
+        if (slide) slide.style.backgroundImage = "url(" + JSON.stringify(heroPhotos[0].src) + ")";
       }
     });
 }

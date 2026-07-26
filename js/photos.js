@@ -107,6 +107,17 @@ document.addEventListener("DOMContentLoaded", function () {
   // Each category tab shows its most recently uploaded photo as a
   // background image — allPhotos is newest-first, so the first match
   // per category found while scanning is the most recent one.
+  //
+  // Bug, fixed: building the CSS value as "url('" + src + "')" silently
+  // broke for any photo whose filename contains an apostrophe or single
+  // quote (a real, ordinary filename — "...Johnson's Bridge...", "'the
+  // plank'..." — not an edge case) — the embedded quote closes the CSS
+  // string early, the browser rejects the whole value as invalid, and
+  // el.style.backgroundImage = "<invalid>" just silently no-ops rather
+  // than throwing, so the tile quietly stayed blank with no console
+  // error at all. JSON.stringify(src) instead produces a properly
+  // double-quoted, correctly escaped CSS string no matter what
+  // punctuation the filename contains.
   function setCategoryTileImages() {
     if (!filterEl) return;
     var latestByCategory = {};
@@ -114,9 +125,13 @@ document.addEventListener("DOMContentLoaded", function () {
       if (!latestByCategory[photo.category]) latestByCategory[photo.category] = photo;
     });
     Array.prototype.forEach.call(filterEl.querySelectorAll("[data-category]"), function (btn) {
+      // The image lives on its own inner .photo-filter-photo element,
+      // not the <a> itself — the label sits below it in normal flow
+      // (not overlaid on top of the photo), so each needs its own box.
+      var photoEl = btn.querySelector(".photo-filter-photo") || btn;
       var photo = latestByCategory[btn.dataset.category];
       if (photo) {
-        btn.style.backgroundImage = "url('" + photo.src + "')";
+        photoEl.style.backgroundImage = "url(" + JSON.stringify(photo.src) + ")";
       } else if (btn.dataset.category === "events") {
         // Event Pages (data/events/<id>.json, aggregated into
         // data/events.json — see the admin's "Event Pages" collection)
@@ -130,7 +145,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // recently added" convention every other tile already follows.
         fetch("data/events.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (events) {
           var withPhotos = events.find(function (e) { return e.photos && e.photos.length; });
-          if (withPhotos) btn.style.backgroundImage = "url('" + withPhotos.photos[0] + "')";
+          if (withPhotos) photoEl.style.backgroundImage = "url(" + JSON.stringify(withPhotos.photos[0]) + ")";
         });
       }
     });

@@ -37,6 +37,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
     tilesEl.innerHTML = ordered.map(renderTile).join("");
 
+    // Set after insertion (not inlined into the HTML string above) so
+    // a cover photo's own filename can never break anything — see the
+    // comment on js/photos.js's setCategoryTileImages for why a plain
+    // "url('" + src + "')" string silently breaks (no console error,
+    // just a blank tile) for any filename containing an apostrophe.
+    Array.prototype.forEach.call(tilesEl.querySelectorAll("a[data-cover]"), function (a) {
+      var cover = a.dataset.cover;
+      if (cover) a.querySelector(".photo-filter-photo").style.backgroundImage = "url(" + JSON.stringify(cover) + ")";
+    });
+
     if (toolbarEl && ordered.length > 1) {
       toolbarEl.hidden = false;
       wireCheckboxSelectAll(".pick-checkbox", selectAllBtn, selectNoneBtn);
@@ -48,13 +58,13 @@ document.addEventListener("DOMContentLoaded", function () {
     var cover = event.photos && event.photos[0];
     var count = (event.photos || []).length;
     var meta = [event.date, count + (count === 1 ? " photo" : " photos")].filter(Boolean).join(" · ");
-    var bg = cover ? "background-image:url('" + escapeAttr(cover) + "')" : "";
     return (
       '<div class="pick-photo-item">' +
         '<input type="checkbox" class="pick-checkbox" data-id="' + escapeAttr(event.id) + '" checked>' +
-        '<a href="event.html?event=' + encodeURIComponent(event.id) + '" style="' + bg + '">' +
-          "<span>" + escapeHtml(event.name) +
-            '<small style="display:block;font-weight:400;font-size:0.75rem;opacity:0.9;margin-top:2px">' + escapeHtml(meta) + "</small></span>" +
+        '<a href="event.html?event=' + encodeURIComponent(event.id) + '" data-cover="' + escapeAttr(cover || "") + '">' +
+          '<span class="photo-filter-photo"></span>' +
+          '<span class="photo-filter-label">' + escapeHtml(event.name) +
+            '<small style="display:block;font-weight:400;font-size:0.75rem;opacity:0.85;margin-top:2px">' + escapeHtml(meta) + "</small></span>" +
         "</a>" +
       "</div>"
     );
