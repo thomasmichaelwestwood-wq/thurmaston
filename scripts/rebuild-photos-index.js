@@ -37,6 +37,19 @@
  *    is reopened, instead of looking blank forever until someone
  *    fills it in by hand.
  *
+ *    ref also re-syncs to match a *replaced* photo, using a second
+ *    hidden field (refSource) that records which filename ref was last
+ *    auto-generated from. Why this exists: duplicating an entry in the
+ *    CMS (to reuse a similar photo's fields) copies ref's value as-is,
+ *    including into an entry whose photo is then swapped for a
+ *    completely different upload — without refSource, that duplicated
+ *    entry would keep showing the ORIGINAL photo's ref forever, since
+ *    "only fill in if blank" never fires once a value already exists.
+ *    ref is only auto-refreshed when it still equals its own
+ *    refSource — i.e. nothing has touched it by hand since it was last
+ *    machine-generated — so a genuinely hand-typed ref (e.g. "014
+ *    Garden Centre" instead of a raw filename) is never overwritten.
+ *
  * data/events/*.json (a whole occasion, description plus several
  * photos in one entry — see the "Event Pages" admin collection) is a
  * separate concept with its own aggregate and its own rebuild script,
@@ -167,13 +180,35 @@ const photos = files.map((filePath) => {
     photo.addedAt = new Date().toISOString();
     dirty = true;
   }
-  if (!photo.ref && photo.src) {
+  if (typeof photo.src === "string") {
+    let derivedRef;
     try {
-      photo.ref = decodeURIComponent(path.basename(photo.src));
+      derivedRef = decodeURIComponent(path.basename(photo.src));
     } catch (e) {
-      photo.ref = path.basename(photo.src);
+      derivedRef = path.basename(photo.src);
     }
-    dirty = true;
+    if (!photo.ref) {
+      // Brand-new entry (or a genuinely blank ref) — fill both in.
+      photo.ref = derivedRef;
+      photo.refSource = derivedRef;
+      dirty = true;
+    } else if (photo.refSource && photo.ref === photo.refSource && derivedRef !== photo.refSource) {
+      // ref still matches what it was last machine-generated from, so
+      // nobody's hand-edited it since — safe to re-sync to whatever
+      // photo is actually here now (the duplicate-then-replace case).
+      photo.ref = derivedRef;
+      photo.refSource = derivedRef;
+      dirty = true;
+    } else if (!photo.refSource && photo.ref === derivedRef) {
+      // A pre-existing entry from before refSource existed, whose ref
+      // already happens to match its own filename — it was auto-filled
+      // under the old rule, not hand-typed, so it's safe to backfill
+      // refSource retroactively (lets a future photo swap on this same
+      // entry be caught next time). If ref does NOT match, treat it as
+      // a hand-typed value and leave both fields alone.
+      photo.refSource = derivedRef;
+      dirty = true;
+    }
   }
   if (dirty) {
     fs.writeFileSync(filePath, JSON.stringify(photo, null, 2) + "\n");
