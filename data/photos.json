@@ -113,7 +113,8 @@
   },
   {
     "src": "/images/photos/nature/116 Johnson's Bridge & the plank MOT 1-60 c1905.jpg",
-    "caption": "'The Plank' near Johnson's Bridge, Watermead Park",
+    "caption": "'The Plank' near Johnson's Bridge.",
+    "personName": "",
     "category": "nature",
     "date": "c1905",
     "credit": "THG",
@@ -121,11 +122,11 @@
     "history": "'The Plank' near Johnson's Bridge, Johnson's Bridge spans the Grand Union Canal, The River Soar flows to the left under 'The Plank'.",
     "consentNoted": true,
     "ref": "116 Johnson's Bridge & the plank MOT 1-60 c1905.jpg",
+    "refSource": "116 Johnson's Bridge & the plank MOT 1-60 c1905.jpg",
     "placeId": "",
     "id": "20260725193412-the-plank",
     "addedAt": "2026-07-26T06:32:54.089Z",
     "numberedPeople": "",
-    "refSource": "116 Johnson's Bridge & the plank MOT 1-60 c1905.jpg",
     "lat": 52.68346889232541,
     "lng": -1.101045635804306
   },
