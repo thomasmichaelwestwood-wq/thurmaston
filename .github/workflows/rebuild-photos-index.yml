@@ -48,51 +48,73 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Rebuild data/photos.json from data/photos/*.json
-        run: node scripts/rebuild-photos-index.js
-
-      - name: Rebuild data/events.json from data/events/*.json
-        run: node scripts/rebuild-events-index.js
-
-      - name: Rebuild data/cemetery.json from data/graves/*.json
-        run: node scripts/rebuild-cemetery-index.js
-
-      - name: Commit and push if changed
+      - name: Rebuild indexes, commit, and push (retrying against fresh data on conflict)
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # images/photos/ is included alongside the data/ paths because
-          # rebuild-photos-index.js can physically relocate a mis-filed
-          # photo's actual image file (moving it to match its category) —
-          # leaving that file unstaged here (deleted from its old path,
-          # untracked at its new one) is what broke every run from
-          # 2026-07-26 onward: the commit below would succeed but only
-          # capture the data/ index, so the working tree still had
-          # unstaged changes and `git pull --rebase` failed with "You
-          # have unstaged changes", over and over, on the same mis-filed
-          # images every retry.
-          git add data/photos.json data/photos/ data/events.json data/cemetery.json images/photos/
-          # data/events/ and data/graves/ may not exist at all yet (no
-          # Event Pages / Graves ever created) — a plain `git add
-          # data/events/` on a nonexistent path is fatal ("did not
-          # match any files"), unlike the always-present data/photos/
-          # above, so each is only added when actually there.
-          if [ -d data/events ]; then
-            git add data/events/
-          fi
-          if [ -d data/graves ]; then
-            git add data/graves/
-          fi
-          if git diff --cached --quiet; then
-            echo "No changes to commit"
-            exit 0
-          fi
-          git commit -m "Rebuild data/photos.json index"
+
+          # The whole rebuild-commit-push cycle is retried, not just the
+          # push — several rapid-fire CMS saves to the SAME entry (a
+          # real case: 5 quick edits in a row while someone was refining
+          # a caption) each queue their own run of this workflow
+          # (concurrency below serialises them, but each one still starts
+          # from whatever origin/main looked like when IT was triggered,
+          # which can already be behind by the time it's this run's turn).
+          # data/photos.json is regenerated whole from scratch every run,
+          # so two runs' independent regenerations of the full aggregate
+          # don't line up as a clean line-based merge even when they
+          # touch different photos — git rebase hits a genuine, real
+          # CONFLICT (not just unstaged changes like the images/photos/
+          # bug above), and retrying the *same* stale commit against the
+          # same conflict forever can never succeed. Re-running the
+          # rebuild scripts fresh against the just-pulled origin/main
+          # instead converges: if nothing else has changed, this
+          # reproduces exactly what's already on main (nothing to
+          # commit, done); if something else landed while we were
+          # retrying, it's picked up naturally instead of being fought
+          # over in a conflicted rebase.
           for i in 1 2 3 4 5; do
+            node scripts/rebuild-photos-index.js
+            node scripts/rebuild-events-index.js
+            node scripts/rebuild-cemetery-index.js
+
+            # images/photos/ is included alongside the data/ paths
+            # because rebuild-photos-index.js can physically relocate a
+            # mis-filed photo's actual image file (moving it to match
+            # its category) — leaving that file unstaged here (deleted
+            # from its old path, untracked at its new one) is what broke
+            # every run from 2026-07-26 onward: the commit below would
+            # succeed but only capture the data/ index, so the working
+            # tree still had unstaged changes and `git pull --rebase`
+            # failed with "You have unstaged changes", over and over, on
+            # the same mis-filed images every retry.
+            git add data/photos.json data/photos/ data/events.json data/cemetery.json images/photos/
+            # data/events/ and data/graves/ may not exist at all yet (no
+            # Event Pages / Graves ever created) — a plain `git add
+            # data/events/` on a nonexistent path is fatal ("did not
+            # match any files"), unlike the always-present data/photos/
+            # above, so each is only added when actually there.
+            if [ -d data/events ]; then
+              git add data/events/
+            fi
+            if [ -d data/graves ]; then
+              git add data/graves/
+            fi
+
+            if git diff --cached --quiet; then
+              echo "No changes to commit"
+              exit 0
+            fi
+
+            git commit -m "Rebuild data/photos.json index"
+
             if git pull --rebase origin main && git push origin main; then
               exit 0
             fi
-            echo "Push attempt $i failed, retrying..."
+
+            echo "Push attempt $i failed, re-pulling latest and regenerating from scratch before retrying..."
+            git rebase --abort 2>/dev/null || true
+            git reset --hard origin/main
             sleep 3
           done
           echo "Failed to push after retries"
