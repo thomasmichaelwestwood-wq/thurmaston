@@ -1,13 +1,15 @@
 {
   "src": "/images/photos/streets/2011_0427-harrow-inn-2-.jpg",
   "caption": "The Harrow Inn",
+  "personName": "",
+  "category": "streets",
   "date": "2011",
-  "ref": "2011_0427-harrow-inn-2-.jpg",
-  "addedAt": "2026-07-17T16:37:04.570Z",
-  "location": "The Harrow Inn, Melton Road, Thurmaston",
-  "consentNoted": true,
   "credit": "Mick Westwood",
   "coords": "52.675845164913916, -1.101645487350448",
-  "category": "streets",
-  "refSource": "2011_0427-harrow-inn-2-.jpg"
+  "location": "",
+  "history": "",
+  "consentNoted": true,
+  "ref": "2011_0427-harrow-inn-2-.jpg",
+  "refSource": "2011_0427-harrow-inn-2-.jpg",
+  "addedAt": "2026-07-17T16:37:04.570Z"
 }
