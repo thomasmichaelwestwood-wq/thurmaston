@@ -152,7 +152,8 @@
   },
   {
     "src": "/images/photos/streets/096 Black horse Pook MOT 1-8.jpg",
-    "caption": "Black horse, Main Street",
+    "caption": "Black Horse, Main Street",
+    "personName": "",
     "category": "streets",
     "date": "c1914",
     "credit": "Thurmaston Heritage Group",
@@ -160,6 +161,7 @@
     "history": "The Black Horse was demolished around 1938 and over the following years the site was used for a temporary air raid shelter during WW2, followed by Ryder's Waste Paper Depot and Sunny Textiles, a textile business which burnt down in 2003. Private houses, a car bodyworks workshop and a new complex of flats now occupy the site of The Black Horse and named Black Horse Court.\nThis picture shows Edward Ballard's name above the door, dates from around the First World War. The cottages to the left, once occupied by the Palmer and Fox families, are up for sale while telegraph poles show the means of communication before the arrival of the telephone in the 1920s.",
     "consentNoted": true,
     "ref": "096 Black Horse",
+    "refSource": "",
     "placeId": "Black Horse",
     "id": "20260723200807-black-horse-main-street-thurmaston",
     "addedAt": "2026-07-23T20:08:25.004Z",
