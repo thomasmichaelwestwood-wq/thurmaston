@@ -61,7 +61,17 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/photos.json data/photos/ data/events.json data/cemetery.json
+          # images/photos/ is included alongside the data/ paths because
+          # rebuild-photos-index.js can physically relocate a mis-filed
+          # photo's actual image file (moving it to match its category) —
+          # leaving that file unstaged here (deleted from its old path,
+          # untracked at its new one) is what broke every run from
+          # 2026-07-26 onward: the commit below would succeed but only
+          # capture the data/ index, so the working tree still had
+          # unstaged changes and `git pull --rebase` failed with "You
+          # have unstaged changes", over and over, on the same mis-filed
+          # images every retry.
+          git add data/photos.json data/photos/ data/events.json data/cemetery.json images/photos/
           # data/events/ and data/graves/ may not exist at all yet (no
           # Event Pages / Graves ever created) — a plain `git add
           # data/events/` on a nonexistent path is fatal ("did not
