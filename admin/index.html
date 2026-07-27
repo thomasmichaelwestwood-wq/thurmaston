@@ -14,9 +14,15 @@
      default, since History routinely holds several paragraphs. Safe
      even if Sveltia's internal markup ever changes: an unmatched
      selector just does nothing, it can't break the admin the way a
-     failed widget registration can. -->
+     failed widget registration can.
+
+     text-align: left also overrides Sveltia's own default of justifying
+     a <textarea>'s contents (stretching each line's word-spacing to
+     hit both edges) — requested because that made a several-paragraph
+     History entry hard to read while editing it, same box every "text"
+     field (not just History) uses. -->
 <style>
-textarea { min-height: 220px !important; }
+textarea { min-height: 220px !important; text-align: left !important; }
 </style>
 </head>
 <body>
