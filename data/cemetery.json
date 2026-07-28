@@ -39,6 +39,19 @@
     "pinY": 68
   },
   {
+    "name": "john smith",
+    "number": "007",
+    "dates": "1892-1945",
+    "whatThreeWords": "",
+    "inscription": "",
+    "notes": "",
+    "photo": "",
+    "addedAt": "2026-07-28T11:04:25.190Z",
+    "id": "20260728120425-john-smith",
+    "pinX": 51.3,
+    "pinY": 18.33
+  },
+  {
     "name": "Margaret Ellen Cartwright",
     "number": "",
     "dates": "1903–1981",
