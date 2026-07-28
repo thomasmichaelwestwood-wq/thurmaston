@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "name": "Arthur James Whitfield",
+    "number": "",
+    "dates": "1889–1962",
+    "whatThreeWords": "",
+    "inscription": "",
+    "notes": "Example/placeholder entry added to demonstrate the cemetery map feature — a fictional name, not a real grave. Replace or delete once real grave entries are being added, and set a real what3words address via /admin/pin-grave.html once the aerial photo and reference points are set up.",
+    "photo": "",
+    "addedAt": "2026-07-28T12:00:01.000Z",
+    "id": "20260728120001-arthur-whitfield",
+    "pinX": 30,
+    "pinY": 22
+  },
+  {
+    "name": "Florence May Bennett",
+    "number": "",
+    "dates": "1911–1998",
+    "whatThreeWords": "",
+    "inscription": "",
+    "notes": "Example/placeholder entry added to demonstrate the cemetery map feature — a fictional name, not a real grave. Replace or delete once real grave entries are being added, and set a real what3words address via /admin/pin-grave.html once the aerial photo and reference points are set up.",
+    "photo": "",
+    "addedAt": "2026-07-28T12:00:04.000Z",
+    "id": "20260728120004-florence-bennett",
+    "pinX": 74,
+    "pinY": 70
+  },
+  {
+    "name": "Herbert William Doyle",
+    "number": "",
+    "dates": "1875–1944",
+    "whatThreeWords": "",
+    "inscription": "",
+    "notes": "Example/placeholder entry added to demonstrate the cemetery map feature — a fictional name, not a real grave. Replace or delete once real grave entries are being added, and set a real what3words address via /admin/pin-grave.html once the aerial photo and reference points are set up.",
+    "photo": "",
+    "addedAt": "2026-07-28T12:00:03.000Z",
+    "id": "20260728120003-herbert-doyle",
+    "pinX": 28,
+    "pinY": 68
+  },
+  {
+    "name": "Margaret Ellen Cartwright",
+    "number": "",
+    "dates": "1903–1981",
+    "whatThreeWords": "",
+    "inscription": "",
+    "notes": "Example/placeholder entry added to demonstrate the cemetery map feature — a fictional name, not a real grave. Replace or delete once real grave entries are being added, and set a real what3words address via /admin/pin-grave.html once the aerial photo and reference points are set up.",
+    "photo": "",
+    "addedAt": "2026-07-28T12:00:02.000Z",
+    "id": "20260728120002-margaret-cartwright",
+    "pinX": 72,
+    "pinY": 24
+  }
+]

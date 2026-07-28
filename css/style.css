@@ -796,6 +796,62 @@ h1, h2, h3, h4 {
   font-size: 0.85rem;
 }
 
+/* cemetery-map.html — same aerial photo as .cemetery-overview above,
+   but full-width and carrying one pin per grave with a Position on the
+   cemetery map set (js/cemetery-map.js), rather than being a static
+   banner image. Pin markers are plain <a> tags positioned by percent
+   (admin/pin-grave.html is what produces that x%/y% — see its own
+   comment for why a custom CMS widget isn't possible here), same
+   "click-to-place, percent-of-image" convention as
+   js/place.js's renderNumberedPeople markers. */
+.cemetery-map-wrap {
+  position: relative;
+  display: block;
+  line-height: 0;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.cemetery-map-wrap img { width: 100%; display: block; }
+.cemetery-map-pin {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border-radius: 50%;
+  background: var(--gold-600);
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+.cemetery-map-pin:hover,
+.cemetery-map-pin:focus-visible {
+  background: var(--green-700);
+  outline: none;
+}
+.cemetery-map-pin-label {
+  position: absolute;
+  bottom: 130%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--green-900);
+  color: #fff;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  box-shadow: var(--shadow);
+}
+.cemetery-map-pin:hover .cemetery-map-pin-label,
+.cemetery-map-pin:focus-visible .cemetery-map-pin-label {
+  opacity: 1;
+}
+
 .cemetery-directory-list { list-style: none; padding: 0; margin: 0; }
 .cemetery-directory-list li {
   display: flex;

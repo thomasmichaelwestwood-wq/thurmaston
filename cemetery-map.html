@@ -2,9 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Cemetery | Memories of Thurmaston</title>
+<title>Cemetery Map | Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A directory of headstones in Thurmaston's cemetery, Leicestershire — search a name to find its grave number and what3words location.">
+<meta name="description" content="An aerial map of Thurmaston's cemetery, Leicestershire, with pinned grave locations and what3words links.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -33,34 +33,19 @@
 <main id="main">
   <section class="page-hero">
     <div class="container">
-      <div class="breadcrumb"><a href="index.html">Home</a> / <span>Cemetery</span></div>
-      <h1>Cemetery</h1>
-      <p>A directory of headstones in Thurmaston's cemetery. Search a name below, or browse the full list — each entry shows the grave number and its what3words location.</p>
+      <div class="breadcrumb"><a href="index.html">Home</a> / <a href="cemetery.html">Cemetery</a> / <span>Cemetery Map</span></div>
+      <h1>Cemetery Map</h1>
+      <p>An aerial view of the cemetery with grave locations pinned on it. Click a pin to see that grave's details, photo and what3words location. Only graves whose exact spot has been recorded appear here — see the <a href="cemetery.html">full directory</a> for everyone else.</p>
     </div>
   </section>
 
   <section class="content-section container">
-    <figure class="cemetery-overview" id="cemetery-overview" hidden>
-      <img id="cemetery-overview-img" alt="Aerial view of Thurmaston cemetery">
-      <figcaption id="cemetery-overview-caption"></figcaption>
-    </figure>
-
-    <p><a class="btn btn-outline" href="cemetery-map.html">View graves on the cemetery map →</a></p>
-
-    <label for="cemetery-search-input" class="category-search-label">Search for a name</label>
-    <input type="text" id="cemetery-search-input" class="photo-search-input photo-search-input-wide" placeholder="Search by name…" autocomplete="off">
-    <ul id="cemetery-search-results" class="home-search-results"></ul>
-
-    <h2 style="margin-top:32px">Full directory</h2>
-    <div class="pick-toolbar" id="cemetery-pick-toolbar" hidden>
-      <div class="pick-toolbar-actions">
-        <button type="button" class="chip" id="cemetery-select-all">Select all</button>
-        <button type="button" class="chip" id="cemetery-select-none">Select none</button>
-      </div>
-      <button type="button" class="btn btn-primary" id="cemetery-download-pdf-btn">Download selected as PDF</button>
+    <div class="cemetery-map-wrap" id="cemetery-map-wrap" hidden>
+      <img id="cemetery-map-img" alt="Aerial view of Thurmaston cemetery">
+      <div id="cemetery-map-pins"></div>
     </div>
-    <ul class="cemetery-directory-list" id="cemetery-directory"></ul>
-    <p class="place-not-found" id="cemetery-empty" hidden>No graves have been added yet — check back soon.</p>
+    <p class="place-not-found" id="cemetery-map-empty" hidden>No graves have been pinned on the map yet — check the <a href="cemetery.html">full directory</a> instead.</p>
+    <p class="place-not-found" id="cemetery-map-no-photo" hidden>The cemetery's aerial photo hasn't been added yet — check the <a href="cemetery.html">full directory</a> instead.</p>
   </section>
 </main>
 
@@ -107,10 +92,7 @@
 
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
-<script src="vendor/jspdf/jspdf.umd.min.js"></script>
-<script src="vendor/qrcode-generator/qrcode.js"></script>
-<script src="js/pdf-helpers.js"></script>
 <script src="js/photos.js"></script>
-<script src="js/cemetery.js"></script>
+<script src="js/cemetery-map.js"></script>
 </body>
 </html>
