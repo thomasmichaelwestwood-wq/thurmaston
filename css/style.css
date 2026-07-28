@@ -851,6 +851,28 @@ h1, h2, h3, h4 {
 .cemetery-map-pin:focus-visible .cemetery-map-pin-label {
   opacity: 1;
 }
+/* Result of typing a name into the "Find a name on the map" search box
+   (js/cemetery-map.js) — a plain gold dot is easy to lose among a busy
+   real aerial photo full of actual headstones, so a match gets sized
+   up, ringed, and its label forced visible (not just on hover) for a
+   few seconds rather than relying on the visitor to spot a 16px dot
+   themselves. */
+.cemetery-map-pin.highlighted {
+  width: 26px;
+  height: 26px;
+  margin-left: -13px;
+  margin-top: -13px;
+  background: #a33;
+  z-index: 2;
+  animation: cemetery-pin-pulse 1s ease-in-out 3;
+}
+.cemetery-map-pin.highlighted .cemetery-map-pin-label {
+  opacity: 1;
+}
+@keyframes cemetery-pin-pulse {
+  0%, 100% { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 0 rgba(163, 51, 51, 0.6); }
+  50% { box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5), 0 0 0 10px rgba(163, 51, 51, 0); }
+}
 
 .cemetery-directory-list { list-style: none; padding: 0; margin: 0; }
 .cemetery-directory-list li {
