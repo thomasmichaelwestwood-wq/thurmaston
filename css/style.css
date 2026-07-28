@@ -701,6 +701,14 @@ h1, h2, h3, h4 {
 .page-hero .container { max-width: 900px; }
 .page-hero h1 { color: #fff; margin-bottom: 6px; }
 .page-hero p { color: #d9e6db; margin: 0; max-width: 640px; }
+/* An inline link inside the hero paragraph (e.g. cemetery-map.html's
+   "see the full directory") otherwise inherits the site's default
+   link colours (--green-700 normal, --gold-600 on hover) — both were
+   built assuming a light page background, so on this dark green glass
+   panel the normal state is nearly invisible and gold reads poorly
+   against green. White, in both states, actually shows up. */
+.page-hero a { color: #fff; }
+.page-hero a:hover { color: #fff; opacity: 0.8; }
 
 .breadcrumb {
   font-size: 0.85rem;
