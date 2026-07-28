@@ -1,15 +1,17 @@
-// Cemetery landing page (cemetery.html) — an optional overview photo
-// (data/cemetery-overview.json, a single-file CMS collection so it's
-// just an image upload + caption, no gallery needed) plus the full
-// alphabetical directory (data/cemetery.json, built from the admin's
-// "Graves" collection). Uses the shared CEMETERY_DATA_PROMISE
-// (js/main.js) rather than its own fetch, same reasoning as
+// Cemetery landing page (cemetery.html) — the full alphabetical
+// directory (data/cemetery.json, built from the admin's "Graves"
+// collection). Uses the shared CEMETERY_DATA_PROMISE (js/main.js)
+// rather than its own fetch, same reasoning as
 // js/chronology.js/CHRONOLOGY_DATA_PROMISE — initSearch() is already
 // fetching this file for the site search index.
+//
+// The aerial overview photo (data/cemetery-overview.json) used to also
+// show as a static banner here, but its only real purpose is showing
+// where each grave actually is — moved to live solely on
+// cemetery-map.html (js/cemetery-map.js), which is what the pins need
+// it for; showing the same photo again here with no pins on it was
+// redundant.
 document.addEventListener("DOMContentLoaded", function () {
-  var overviewEl = document.getElementById("cemetery-overview");
-  var overviewImg = document.getElementById("cemetery-overview-img");
-  var overviewCaption = document.getElementById("cemetery-overview-caption");
   var directoryEl = document.getElementById("cemetery-directory");
   var emptyEl = document.getElementById("cemetery-empty");
   var toolbarEl = document.getElementById("cemetery-pick-toolbar");
@@ -17,17 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
   var selectNoneBtn = document.getElementById("cemetery-select-none");
   var downloadPdfBtn = document.getElementById("cemetery-download-pdf-btn");
   if (!directoryEl) return;
-
-  fetch("data/cemetery-overview.json")
-    .then(function (res) { return res.ok ? res.json() : null; })
-    .catch(function () { return null; })
-    .then(function (overview) {
-      if (overview && overview.photo) {
-        overviewImg.src = overview.photo;
-        if (overview.caption) overviewCaption.textContent = overview.caption;
-        overviewEl.hidden = false;
-      }
-    });
 
   if (typeof CEMETERY_DATA_PROMISE === "undefined") return;
   var allGraves = [];

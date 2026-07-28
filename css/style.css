@@ -781,25 +781,10 @@ h1, h2, h3, h4 {
 
 /* ---------- Cemetery directory ---------- */
 
-.cemetery-overview {
-  margin: 0 0 28px;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--glass-border);
-}
-.cemetery-overview img { width: 100%; display: block; }
-.cemetery-overview figcaption {
-  padding: 10px 14px;
-  background: var(--glass-bg-strong);
-  color: var(--ink-soft);
-  font-size: 0.85rem;
-}
-
-/* cemetery-map.html — same aerial photo as .cemetery-overview above,
-   but full-width and carrying one pin per grave with a Position on the
-   cemetery map set (js/cemetery-map.js), rather than being a static
-   banner image. Pin markers are plain <a> tags positioned by percent
+/* cemetery-map.html — the cemetery's aerial photo (data/cemetery-
+   overview.json), full-width and carrying one pin per grave with a
+   Position on the cemetery map set (js/cemetery-map.js). Pin markers
+   are plain <a> tags positioned by percent
    (admin/pin-grave.html is what produces that x%/y% — see its own
    comment for why a custom CMS widget isn't possible here), same
    "click-to-place, percent-of-image" convention as

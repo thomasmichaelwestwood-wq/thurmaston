@@ -40,16 +40,16 @@
   </section>
 
   <section class="content-section container">
-    <label for="cemetery-map-search-input" class="category-search-label">Find a name on the map</label>
-    <input type="text" id="cemetery-map-search-input" class="photo-search-input photo-search-input-wide" placeholder="Type a name to jump to it on the map…" autocomplete="off">
-    <ul id="cemetery-map-search-results" class="home-search-results"></ul>
-
-    <div class="cemetery-map-wrap" id="cemetery-map-wrap" hidden style="margin-top:20px">
+    <div class="cemetery-map-wrap" id="cemetery-map-wrap" hidden>
       <img id="cemetery-map-img" alt="Aerial view of Thurmaston cemetery">
       <div id="cemetery-map-pins"></div>
     </div>
     <p class="place-not-found" id="cemetery-map-empty" hidden>No graves have been pinned on the map yet — check the <a href="cemetery.html">full directory</a> instead.</p>
     <p class="place-not-found" id="cemetery-map-no-photo" hidden>The cemetery's aerial photo hasn't been added yet — check the <a href="cemetery.html">full directory</a> instead.</p>
+
+    <label for="cemetery-map-search-input" class="category-search-label" style="margin-top:20px">Find a name on the map</label>
+    <input type="text" id="cemetery-map-search-input" class="photo-search-input photo-search-input-wide" placeholder="Type a name to jump to it on the map…" autocomplete="off">
+    <ul id="cemetery-map-search-results" class="home-search-results"></ul>
   </section>
 </main>
 

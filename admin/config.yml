@@ -145,7 +145,7 @@ collections:
 
   - name: "cemetery_overview"
     label: "Cemetery Overview Photo"
-    description: "The single overview photo shown at the top of /cemetery.html — e.g. an aerial/drone shot of the cemetery. Optional; the page works fine without one."
+    description: "The single aerial/drone photo shown on /cemetery-map.html, with a pin for every grave whose location has been recorded. Optional; that page works fine without one, just without any pins to show."
     files:
       - name: "cemetery_overview"
         label: "Cemetery Overview Photo"

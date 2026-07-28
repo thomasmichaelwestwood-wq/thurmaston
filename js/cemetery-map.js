@@ -1,21 +1,24 @@
 // Cemetery Map (cemetery-map.html) — the cemetery's aerial overview
-// photo (data/cemetery-overview.json, same file cemetery.html's own
-// banner uses) with a pin per grave that has a Position on the
-// cemetery map set (admin/pin-grave.html is what produces that value —
-// see its own comment for why this can't be a normal CMS widget).
-// Uses the shared CEMETERY_DATA_PROMISE (js/main.js) rather than its
-// own fetch of data/cemetery.json, same reasoning as js/cemetery.js.
+// photo (data/cemetery-overview.json — this is now the only page that
+// shows it; it used to also appear as a static banner on cemetery.html,
+// removed from there since a photo with no pins on it served no real
+// purpose on that page) with a pin per grave that has a Position on
+// the cemetery map set (admin/pin-grave.html is what produces that
+// value — see its own comment for why this can't be a normal CMS
+// widget). Uses the shared CEMETERY_DATA_PROMISE (js/main.js) rather
+// than its own fetch of data/cemetery.json, same reasoning as
+// js/cemetery.js.
 //
-// The "Find a name on the map" search box at the top of the page is
-// deliberately its own small search, not the shared wireSearchBox used
-// everywhere else on the site (js/main.js) — that one searches the
-// WHOLE site (photos, events, chronology…) and links off to whatever
-// page matched, which is right for the header search but wrong here:
-// asked for explicitly as "typing a name shows you on the map where it
-// is," so this one only ever considers graves that actually have a pin
-// (nothing to show on the map for one that doesn't), and selecting a
-// result scrolls to and highlights that pin in place rather than
-// navigating anywhere.
+// The map comes first on the page, with the "Find a name on the map"
+// search box below it (requested explicitly: seeing the map/pins is
+// the first thing that should happen, search is secondary) — deliberately
+// its own small search, not the shared wireSearchBox used everywhere
+// else on the site (js/main.js) — that one searches the WHOLE site
+// (photos, events, chronology…) and links off to whatever page matched,
+// which is right for the header search but wrong here: this one only
+// ever considers graves that actually have a pin (nothing to show on
+// the map for one that doesn't), and selecting a result scrolls to and
+// highlights that pin in place rather than navigating anywhere.
 document.addEventListener("DOMContentLoaded", function () {
   var wrapEl = document.getElementById("cemetery-map-wrap");
   var imgEl = document.getElementById("cemetery-map-img");
