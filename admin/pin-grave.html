@@ -2,39 +2,42 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Pin a grave | Memories of Thurmaston</title>
+<title>Add a grave | Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<!-- Standalone tool, not part of Sveltia CMS — same reasoning as
-     admin/number-photo.html: Sveltia doesn't support custom field
-     types yet, so there's no way to build a "click on the photo to
-     place a marker" widget inside the CMS form itself. This runs
-     entirely in the browser (the aerial photo is chosen from your own
-     computer, nothing is uploaded here) and produces two small values
-     per grave — a pin position and (optionally) an exact what3words
-     address — for you to paste into that grave's own entry in the
-     normal Graves collection, in its "Position on the cemetery map"
-     and "what3words address" fields.
+<!-- Standalone tool, not part of Sveltia CMS — same "no custom widget
+     API yet" reasoning as admin/number-photo.html, but this one goes a
+     step further: it also writes the finished grave entry straight to
+     GitHub itself, via a personal access token pasted in once and kept
+     only in this browser (localStorage) — never sent anywhere except
+     GitHub's own API. That's what makes this one-step (fill in the
+     details, click the photo, press Save) rather than "compute a
+     value, then go paste it into a separate CMS page," which is what
+     an earlier version of this tool did and was reported as too much
+     back-and-forth.
 
-     Two one-time setup steps, both optional, both remembered in this
-     browser (localStorage) so you only do them once:
-      1. A free what3words API key (what3words.com's developer/API
-         section) — only used here, in your browser, never sent
-         anywhere public. Without one, this tool still works, it just
-         can't look up the exact what3words address for you — you'd
-         look that up yourself at what3words.com same as before.
-      2. 2–3 reference points: real-world GPS coordinates for spots you
-         can point to on the photo (e.g. a corner building, a road
-         junction) — found once via Google Maps (right-click the spot,
-         the lat/long is at the top of the menu). These let the tool
-         work out the real-world location of anywhere else you click.
-         3 points give a more accurate result than 2 (it can correct
-         for the photo not being perfectly north-aligned); 2 still
-         works, just assumes no rotation/skew.
+     That write access is real, not decorative — it can create files in
+     this repo exactly as if you'd saved them through the CMS. Two
+     things make the blast radius small if the token ever leaked:
+      1. Use a GitHub *fine-grained* personal access token (not a
+         classic one), scoped to ONLY this repository, with ONLY
+         "Contents: Read and write" permission, and a real expiry date.
+         A classic token grants access to everything on your account —
+         don't use one here.
+      2. It never leaves your browser except to talk to api.github.com
+         and (if set up) api.what3words.com directly — this page has
+         no server of its own.
 
-     NOTE: the what3words lookup below is written against their
-     documented REST API shape, but hasn't been exercised against a
-     real key/account from this environment — check the first couple
-     of lookups actually return sensible words before relying on it. -->
+     Without a token, this still works as a plain pin-position/what3words
+     calculator (the same fallback the previous version of this tool
+     was) — it just can't save anything for you, and shows copy-paste
+     values + a link to the matching admin page instead.
+
+     NOTE: the what3words lookup is written against their documented
+     REST API shape, and the GitHub write against GitHub's documented
+     Contents API — neither has been exercised against a real
+     token/account from this sandbox (no way to drive a real GitHub
+     login here). Check the first save/lookup actually works before
+     relying on it for real grave entries. -->
 <style>
   :root { --green-900: #1f4d3a; --green-700: #2c6b4f; --gold-600: #b9822f; --cream: #faf6ee; --line: #ddd6c4; }
   * { box-sizing: border-box; }
@@ -47,31 +50,36 @@
   }
   h1 { color: var(--green-900); font-size: 1.4rem; margin: 0 0 6px; }
   h2 { color: var(--green-900); font-size: 1.05rem; margin: 0 0 10px; }
-  p.lede { color: #52584c; margin: 0 0 20px; max-width: 640px; line-height: 1.5; }
+  p.lede { color: #52584c; margin: 0 0 20px; max-width: 700px; line-height: 1.5; }
   .panel {
     background: #fff;
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 18px;
     margin-bottom: 20px;
-    max-width: 900px;
+    max-width: 960px;
   }
   label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 0.85rem; }
-  input[type="text"], input[type="number"], input[type="file"] {
+  input[type="text"], input[type="file"], textarea {
     padding: 7px 9px;
     border: 1px solid var(--line);
     border-radius: 6px;
     font-size: 0.85rem;
+    font-family: inherit;
   }
-  input[type="text"], input[type="number"] { width: 100%; max-width: 220px; }
+  input[type="text"] { width: 100%; max-width: 320px; }
+  textarea { width: 100%; max-width: 600px; min-height: 70px; }
+  .field { margin-bottom: 14px; }
+  .field-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .field-row .field { flex: 1 1 220px; }
   .btn {
     display: inline-block;
     background: var(--green-900);
     color: #fff;
     border: none;
-    padding: 7px 14px;
+    padding: 8px 16px;
     border-radius: 20px;
-    font-size: 0.82rem;
+    font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
     margin-right: 8px;
@@ -86,6 +94,7 @@
   .ref-row:last-child { border-bottom: none; }
   .ref-row .ref-label { font-weight: 600; font-size: 0.85rem; width: 70px; flex: none; }
   .ref-row .ref-status { font-size: 0.78rem; color: #888; flex: 1 1 140px; }
+  .ref-row input[type="text"] { max-width: 110px; }
   #stage-wrap {
     position: relative;
     display: inline-block;
@@ -107,30 +116,39 @@
     cursor: pointer;
   }
   .marker.ref-marker { background: #2b6ea8; width: 20px; height: 20px; margin-left: -10px; margin-top: -10px; }
+  .marker.current { background: #a33; }
   .marker:hover { background: #a33; }
-  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-  th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid #f0ece1; vertical-align: top; }
-  th { color: #52584c; font-weight: 600; }
-  td.mono { font-family: ui-monospace, "SF Mono", Menlo, monospace; }
-  .copy-btn { background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 8px; font-size: 0.75rem; cursor: pointer; }
-  .copy-btn:hover { background: #f0ece1; }
+  ul.grave-list { list-style: none; margin: 0; padding: 0; max-height: 160px; overflow-y: auto; font-size: 0.82rem; }
+  ul.grave-list li { padding: 4px 0; border-bottom: 1px solid #f4f0e6; display: flex; justify-content: space-between; gap: 10px; }
+  ul.grave-list li:last-child { border-bottom: none; }
+  ul.grave-list .pinned { color: var(--green-700); font-size: 0.75rem; }
+  ul.grave-list .not-pinned { color: #999; font-size: 0.75rem; }
   .hint { color: #888; font-size: 0.78rem; margin-top: 6px; }
   .status-pending { color: #b9822f; }
-  .status-error { color: #a33; }
-  .status-ok { color: var(--green-700); }
+  .status-error { color: #a33; font-weight: 600; }
+  .status-ok { color: var(--green-700); font-weight: 600; }
+  .readout { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 0.82rem; background: #f7f4ec; border-radius: 6px; padding: 6px 10px; display: inline-block; margin-top: 4px; }
 </style>
 </head>
 <body>
 
-<h1>Pin a grave on the cemetery map</h1>
-<p class="lede">Choose the cemetery's aerial photo (the same one uploaded as the Cemetery overview), click each grave's exact spot and name it, then copy the results into that grave's own entry in the admin — the "Position on the cemetery map" field always, and the "what3words address" field too if a lookup succeeded.</p>
+<h1>Add a grave to the cemetery map</h1>
+<p class="lede">Fill in what you know, click the exact spot on the aerial photo, then press "Save this grave" — it's written straight to the site, no separate admin page needed. If no GitHub token is set up below, it falls back to giving you values to copy into the Graves collection in <code>/admin/</code> instead.</p>
 
 <details class="panel" id="setup-panel">
-  <summary>One-time setup (what3words key + reference points)</summary>
+  <summary>One-time setup (GitHub token, what3words key, reference points)</summary>
 
-  <label for="api-key-input">what3words API key (optional)</label>
-  <input type="text" id="api-key-input" placeholder="Leave blank to skip automatic what3words lookup">
-  <p class="hint">Free from what3words.com's developer/API section. Stored only in this browser.</p>
+  <div class="field">
+    <label for="github-token-input">GitHub personal access token</label>
+    <input type="text" id="github-token-input" placeholder="Leave blank to fall back to copy-paste mode" style="max-width:420px">
+    <p class="hint">Use a <strong>fine-grained</strong> token (github.com → Settings → Developer settings → Personal access tokens → Fine-grained), scoped to only this repository, with only "Contents: Read and write" permission, and a real expiry date. Stored only in this browser — never sent anywhere except GitHub's own API.</p>
+  </div>
+
+  <div class="field">
+    <label for="api-key-input">what3words API key (optional)</label>
+    <input type="text" id="api-key-input" placeholder="Leave blank to skip automatic what3words lookup">
+    <p class="hint">Free from what3words.com's developer/API section.</p>
+  </div>
 
   <h2 style="margin-top:18px">Reference points</h2>
   <p class="hint" style="margin-top:0">Pick 2–3 spots you can point to precisely on the photo (a corner building, a road junction). For each: click "Set point on photo", then click that exact spot, then type its real latitude/longitude (found by right-clicking the spot on Google Maps).</p>
@@ -140,60 +158,106 @@
 <div class="panel">
   <label for="file-input">Choose the cemetery aerial photo from your computer</label>
   <input type="file" id="file-input" accept="image/*">
-  <p class="hint">Nothing is uploaded anywhere here — this only runs in your browser. Upload the photo itself via the Cemetery collection's overview photo field as usual.</p>
+  <p class="hint">This is only for clicking on here — the photo shown on the live site is whatever's uploaded via the Cemetery collection's overview photo field in <code>/admin/</code> (a one-time step, separate from this tool).</p>
+</div>
+
+<div class="panel" id="graves-panel" hidden>
+  <h2>Graves already added</h2>
+  <ul class="grave-list" id="grave-list"></ul>
+  <p class="hint" id="grave-list-empty" hidden>None yet — the first one you save will appear here.</p>
 </div>
 
 <div class="panel" id="stage-panel" hidden>
+  <div class="field-row">
+    <div class="field">
+      <label for="grave-name-input">Name(s) on the headstone</label>
+      <input type="text" id="grave-name-input" placeholder="e.g. John Smith">
+    </div>
+    <div class="field">
+      <label for="grave-number-input">Grave number</label>
+      <input type="text" id="grave-number-input">
+    </div>
+    <div class="field">
+      <label for="grave-dates-input">Dates</label>
+      <input type="text" id="grave-dates-input" placeholder="e.g. 1892–1964">
+    </div>
+  </div>
+  <div class="field">
+    <label for="grave-inscription-input">Inscription (optional)</label>
+    <textarea id="grave-inscription-input"></textarea>
+  </div>
+  <div class="field">
+    <label for="grave-notes-input">Notes (optional)</label>
+    <textarea id="grave-notes-input"></textarea>
+  </div>
+  <div class="field">
+    <label for="grave-photo-input">Photo of the headstone (optional)</label>
+    <input type="file" id="grave-photo-input" accept="image/*">
+  </div>
+
   <div id="stage-wrap">
     <img id="stage-img" alt="Cemetery aerial photo">
   </div>
-  <p class="hint" id="mode-hint">Type the grave's name below, then click its spot on the photo.</p>
-  <div style="margin-top:10px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-    <div>
-      <label for="pin-name-input" style="margin-bottom:2px">Name for next pin</label>
-      <input type="text" id="pin-name-input" placeholder="e.g. John Smith">
-    </div>
-  </div>
-</div>
+  <p class="hint" id="mode-hint">Fill in the name above, then click this grave's exact spot on the photo.</p>
 
-<div class="panel" id="output-panel" hidden>
-  <h2>Placed pins</h2>
-  <table>
-    <thead><tr><th>Name</th><th>Pin position</th><th>what3words</th><th></th></tr></thead>
-    <tbody id="output-body"></tbody>
-  </table>
-  <p class="hint">Copy each row's Pin position (and what3words, if resolved) into that grave's own entry in the admin.</p>
+  <div id="pin-readout" hidden style="margin-top:10px">
+    <div class="readout" id="pin-position-readout"></div>
+    <div id="w3w-readout" style="margin-top:4px"></div>
+  </div>
+
+  <div style="margin-top:16px">
+    <button type="button" class="btn" id="save-btn" disabled>Save this grave</button>
+    <button type="button" class="btn secondary" id="reset-btn">Clear form</button>
+  </div>
+  <p class="hint" id="save-status"></p>
 </div>
 
 <script>
 (function () {
   var STORAGE_KEY = "thurmaston-pin-grave-setup";
+  var OWNER = "thomasmichaelwestwood-wq";
+  var REPO = "thurmaston";
+  var BRANCH = "main";
 
+  var githubTokenInput = document.getElementById("github-token-input");
   var apiKeyInput = document.getElementById("api-key-input");
   var refRowsEl = document.getElementById("ref-rows");
   var fileInput = document.getElementById("file-input");
   var stagePanel = document.getElementById("stage-panel");
   var stageWrap = document.getElementById("stage-wrap");
   var stageImg = document.getElementById("stage-img");
-  var pinNameInput = document.getElementById("pin-name-input");
   var modeHint = document.getElementById("mode-hint");
-  var outputPanel = document.getElementById("output-panel");
-  var outputBody = document.getElementById("output-body");
+  var nameInput = document.getElementById("grave-name-input");
+  var numberInput = document.getElementById("grave-number-input");
+  var datesInput = document.getElementById("grave-dates-input");
+  var inscriptionInput = document.getElementById("grave-inscription-input");
+  var notesInput = document.getElementById("grave-notes-input");
+  var photoInput = document.getElementById("grave-photo-input");
+  var pinReadout = document.getElementById("pin-readout");
+  var pinPositionReadout = document.getElementById("pin-position-readout");
+  var w3wReadout = document.getElementById("w3w-readout");
+  var saveBtn = document.getElementById("save-btn");
+  var resetBtn = document.getElementById("reset-btn");
+  var saveStatus = document.getElementById("save-status");
+  var gravesPanel = document.getElementById("graves-panel");
+  var graveListEl = document.getElementById("grave-list");
+  var graveListEmptyEl = document.getElementById("grave-list-empty");
 
-  // Reference points: up to 3, each { px, py, lat, lng } (px/py in
-  // percent, set only once its "Set point on photo" button has been
-  // used and the image clicked; lat/lng typed directly).
   var refPoints = [null, null, null];
-  var armedRefIndex = -1; // which reference row is waiting for the next click
-  var pins = []; // { name, x, y, w3w: null | "pending" | words | { error } }
+  var armedRefIndex = -1;
+  var currentPin = null; // { x, y, lat, lng, w3w }
+  var existingGraves = [];
 
   loadSetup();
   renderRefRows();
+  githubTokenInput.addEventListener("input", saveSetup);
   apiKeyInput.addEventListener("input", saveSetup);
+  loadExistingGraves();
 
   function loadSetup() {
     try {
       var saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}");
+      githubTokenInput.value = saved.githubToken || "";
       apiKeyInput.value = saved.apiKey || "";
       if (Array.isArray(saved.refPoints)) {
         refPoints = [0, 1, 2].map(function (i) { return saved.refPoints[i] || null; });
@@ -202,7 +266,32 @@
   }
 
   function saveSetup() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ apiKey: apiKeyInput.value.trim(), refPoints: refPoints }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      githubToken: githubTokenInput.value.trim(),
+      apiKey: apiKeyInput.value.trim(),
+      refPoints: refPoints
+    }));
+  }
+
+  function loadExistingGraves() {
+    fetch("../data/cemetery.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (graves) {
+      existingGraves = graves;
+      renderGraveList();
+    });
+  }
+
+  function renderGraveList() {
+    gravesPanel.hidden = false;
+    if (existingGraves.length === 0) {
+      graveListEmptyEl.hidden = false;
+      graveListEl.innerHTML = "";
+      return;
+    }
+    graveListEmptyEl.hidden = true;
+    graveListEl.innerHTML = existingGraves.map(function (g) {
+      var pinned = typeof g.pinX === "number" && typeof g.pinY === "number";
+      return "<li><span>" + escapeHtml(g.name) + "</span><span class=\"" + (pinned ? "pinned" : "not-pinned") + "\">" + (pinned ? "On the map" : "Not pinned yet") + "</span></li>";
+    }).join("");
   }
 
   function renderRefRows() {
@@ -230,7 +319,6 @@
       var latInput = document.createElement("input");
       latInput.type = "text";
       latInput.placeholder = "Latitude";
-      latInput.style.maxWidth = "110px";
       latInput.value = refPoints[i] && refPoints[i].lat != null ? refPoints[i].lat : "";
       latInput.addEventListener("input", function () {
         refPoints[i] = refPoints[i] || {};
@@ -242,7 +330,6 @@
       var lngInput = document.createElement("input");
       lngInput.type = "text";
       lngInput.placeholder = "Longitude";
-      lngInput.style.maxWidth = "110px";
       lngInput.value = refPoints[i] && refPoints[i].lng != null ? refPoints[i].lng : "";
       lngInput.addEventListener("input", function () {
         refPoints[i] = refPoints[i] || {};
@@ -267,7 +354,7 @@
     if (!file) return;
     stageImg.src = URL.createObjectURL(file);
     stagePanel.hidden = false;
-    renderRefRows(); // enables the "Set point on photo" buttons
+    renderRefRows();
     renderMarkers();
   });
 
@@ -289,30 +376,23 @@
       return;
     }
 
-    var name = pinNameInput.value.trim();
-    if (!name) {
-      modeHint.textContent = "Type the grave's name first, then click its spot.";
-      modeHint.className = "hint status-error";
-      pinNameInput.focus();
-      return;
-    }
-    modeHint.textContent = "Type the grave's name below, then click its spot on the photo.";
-    modeHint.className = "hint";
-
-    var pin = { name: name, x: round2(x), y: round2(y), w3w: null };
-    pins.push(pin);
-    pinNameInput.value = "";
-    pinNameInput.focus();
+    currentPin = { x: round2(x), y: round2(y), w3w: null };
     renderMarkers();
-    renderOutput();
-    tryLookupW3W(pin);
+    renderPinReadout();
+    updateSaveEnabled();
+    tryLookupW3W();
   });
+
+  nameInput.addEventListener("input", updateSaveEnabled);
+
+  function updateSaveEnabled() {
+    saveBtn.disabled = !nameInput.value.trim() || !currentPin;
+  }
 
   function round2(n) { return Math.round(n * 100) / 100; }
 
   function renderMarkers() {
     Array.prototype.forEach.call(stageWrap.querySelectorAll(".marker"), function (el) { el.remove(); });
-
     refPoints.forEach(function (p, i) {
       if (!p || p.px == null) return;
       var m = document.createElement("div");
@@ -322,31 +402,16 @@
       m.style.top = p.py + "%";
       stageWrap.appendChild(m);
     });
-
-    pins.forEach(function (p, i) {
-      var m = document.createElement("div");
-      m.className = "marker";
-      m.title = p.name;
-      m.style.left = p.x + "%";
-      m.style.top = p.y + "%";
-      m.addEventListener("click", function (e) {
-        e.stopPropagation();
-        pins.splice(i, 1);
-        renderMarkers();
-        renderOutput();
-      });
-      stageWrap.appendChild(m);
-    });
+    if (currentPin) {
+      var m2 = document.createElement("div");
+      m2.className = "marker current";
+      m2.title = nameInput.value.trim() || "This grave";
+      m2.style.left = currentPin.x + "%";
+      m2.style.top = currentPin.y + "%";
+      stageWrap.appendChild(m2);
+    }
   }
 
-  // Two ways to turn a click position into a real-world lat/lng,
-  // depending how many reference points have both their photo spot
-  // AND their lat/lng filled in:
-  //  - 3 points: a proper affine transform (handles the photo not
-  //    being perfectly north-aligned/undistorted).
-  //  - 2 points: a similarity transform (uniform scale + rotation) —
-  //    less accurate for a skewed photo, but far better than nothing.
-  //  - fewer than 2: no georeferencing possible, pin position only.
   function usableRefPoints() {
     return refPoints.filter(function (p) { return p && p.px != null && p.lat != null && p.lng != null && !isNaN(p.lat) && !isNaN(p.lng); });
   }
@@ -359,27 +424,18 @@
   }
 
   function affineTransform(pts, x, y) {
-    // Solve lat = A*px + B*py + C and lng = D*px + E*py + F from 3
-    // (px, py) -> (lat, lng) correspondences, sharing one 3x3 system.
-    var m = [
-      [pts[0].px, pts[0].py, 1],
-      [pts[1].px, pts[1].py, 1],
-      [pts[2].px, pts[2].py, 1]
-    ];
+    var m = [[pts[0].px, pts[0].py, 1], [pts[1].px, pts[1].py, 1], [pts[2].px, pts[2].py, 1]];
     var lats = [pts[0].lat, pts[1].lat, pts[2].lat];
     var lngs = [pts[0].lng, pts[1].lng, pts[2].lng];
     var latCoeffs = solve3x3(m, lats);
     var lngCoeffs = solve3x3(m, lngs);
     if (!latCoeffs || !lngCoeffs) return null;
-    return {
-      lat: latCoeffs[0] * x + latCoeffs[1] * y + latCoeffs[2],
-      lng: lngCoeffs[0] * x + lngCoeffs[1] * y + lngCoeffs[2]
-    };
+    return { lat: latCoeffs[0] * x + latCoeffs[1] * y + latCoeffs[2], lng: lngCoeffs[0] * x + lngCoeffs[1] * y + lngCoeffs[2] };
   }
 
   function solve3x3(m, b) {
     var det = det3(m);
-    if (Math.abs(det) < 1e-12) return null; // reference points are collinear or duplicated
+    if (Math.abs(det) < 1e-12) return null;
     var mA = [[b[0], m[0][1], m[0][2]], [b[1], m[1][1], m[1][2]], [b[2], m[2][1], m[2][2]]];
     var mB = [[m[0][0], b[0], m[0][2]], [m[1][0], b[1], m[1][2]], [m[2][0], b[2], m[2][2]]];
     var mC = [[m[0][0], m[0][1], b[0]], [m[1][0], m[1][1], b[1]], [m[2][0], m[2][1], b[2]]];
@@ -398,90 +454,180 @@
     var dpx = p2.px - p1.px, dpy = p2.py - p1.py;
     var dqx = p2.lat - p1.lat, dqy = p2.lng - p1.lng;
     var denom = dpx * dpx + dpy * dpy;
-    if (denom < 1e-9) return null; // the two reference points are (almost) the same spot
+    if (denom < 1e-9) return null;
     var a = (dqx * dpx + dqy * dpy) / denom;
     var b = (dqy * dpx - dqx * dpy) / denom;
     var dx = x - p1.px, dy = y - p1.py;
-    return {
-      lat: a * dx - b * dy + p1.lat,
-      lng: b * dx + a * dy + p1.lng
-    };
+    return { lat: a * dx - b * dy + p1.lat, lng: b * dx + a * dy + p1.lng };
   }
 
-  function tryLookupW3W(pin) {
+  function renderPinReadout() {
+    pinReadout.hidden = !currentPin;
+    if (!currentPin) return;
+    pinPositionReadout.textContent = "Pin position: " + currentPin.x + ", " + currentPin.y;
+    if (currentPin.w3w === "pending") {
+      w3wReadout.innerHTML = '<span class="status-pending">Looking up what3words…</span>';
+    } else if (currentPin.w3w && currentPin.w3w.error) {
+      w3wReadout.innerHTML = '<span class="status-error">what3words: ' + escapeHtml(currentPin.w3w.error) + "</span>";
+    } else if (currentPin.w3w) {
+      w3wReadout.innerHTML = '<span class="status-ok">what3words: ' + escapeHtml(currentPin.w3w) + "</span>";
+    } else {
+      w3wReadout.innerHTML = '<span class="hint">No what3words lookup (set an API key + reference points above to get one automatically).</span>';
+    }
+  }
+
+  function tryLookupW3W() {
     var apiKey = apiKeyInput.value.trim();
-    var latLng = pixelToLatLng(pin.x, pin.y);
+    var latLng = pixelToLatLng(currentPin.x, currentPin.y);
     if (!apiKey || !latLng) {
-      pin.w3w = null; // no key, or not enough reference points yet — pin position only
-      renderOutput();
+      currentPin.w3w = null;
+      renderPinReadout();
       return;
     }
-    pin.w3w = "pending";
-    renderOutput();
+    currentPin.w3w = "pending";
+    renderPinReadout();
     var url = "https://api.what3words.com/v3/convert-to-3wa?coordinates=" + latLng.lat + "," + latLng.lng + "&key=" + encodeURIComponent(apiKey) + "&format=json";
     fetch(url).then(function (res) { return res.json(); }).then(function (data) {
-      if (data && data.words) {
-        pin.w3w = data.words;
-      } else {
-        pin.w3w = { error: (data && data.error && data.error.message) || "Lookup failed" };
-      }
-      renderOutput();
+      currentPin.w3w = (data && data.words) ? data.words : { error: (data && data.error && data.error.message) || "Lookup failed" };
+      renderPinReadout();
     }).catch(function (e) {
-      pin.w3w = { error: e.message || "Network error" };
-      renderOutput();
+      currentPin.w3w = { error: e.message || "Network error" };
+      renderPinReadout();
     });
   }
 
-  function renderOutput() {
-    if (pins.length === 0) {
-      outputPanel.hidden = true;
+  resetBtn.addEventListener("click", function () {
+    nameInput.value = "";
+    numberInput.value = "";
+    datesInput.value = "";
+    inscriptionInput.value = "";
+    notesInput.value = "";
+    photoInput.value = "";
+    currentPin = null;
+    saveStatus.textContent = "";
+    renderMarkers();
+    renderPinReadout();
+    updateSaveEnabled();
+  });
+
+  saveBtn.addEventListener("click", function () {
+    var token = githubTokenInput.value.trim();
+    if (!token) {
+      fallbackToCopyMode();
       return;
     }
-    outputPanel.hidden = false;
-    outputBody.innerHTML = pins.map(function (p, i) {
-      var posStr = p.x + ", " + p.y;
-      var w3wCell;
-      if (p.w3w === "pending") {
-        w3wCell = '<span class="status-pending">Looking up…</span>';
-      } else if (p.w3w && p.w3w.error) {
-        w3wCell = '<span class="status-error">' + escapeHtml(p.w3w.error) + '</span>';
-      } else if (p.w3w) {
-        w3wCell = '<span class="status-ok">' + escapeHtml(p.w3w) + '</span> <button type="button" class="copy-btn" data-copy="' + escapeAttr(p.w3w) + '">Copy</button>';
-      } else {
-        w3wCell = '<span class="hint">—</span>';
-      }
-      return (
-        "<tr>" +
-          "<td>" + escapeHtml(p.name) + "</td>" +
-          '<td class="mono">' + posStr + ' <button type="button" class="copy-btn" data-copy="' + escapeAttr(posStr) + '">Copy</button></td>' +
-          "<td>" + w3wCell + "</td>" +
-          '<td><button type="button" class="copy-btn" data-remove="' + i + '">Remove</button></td>' +
-        "</tr>"
-      );
-    }).join("");
+    doGithubSave(token);
+  });
 
-    Array.prototype.forEach.call(outputBody.querySelectorAll("[data-copy]"), function (btn) {
-      btn.addEventListener("click", function () {
-        navigator.clipboard.writeText(btn.getAttribute("data-copy")).then(function () {
-          var original = btn.textContent;
-          btn.textContent = "Copied!";
-          setTimeout(function () { btn.textContent = original; }, 1500);
+  // No token set up — same behaviour the earlier version of this tool
+  // had: show values to copy by hand instead of failing outright.
+  function fallbackToCopyMode() {
+    var pos = currentPin.x + ", " + currentPin.y;
+    var w3w = (currentPin.w3w && typeof currentPin.w3w === "string") ? currentPin.w3w : "";
+    var msg = "No GitHub token set up. Pin position: \"" + pos + "\"" + (w3w ? (" — what3words: \"" + w3w + "\"") : "") + ". Copy these into a new entry in the Graves collection at /admin/.";
+    saveStatus.textContent = msg;
+    saveStatus.className = "hint status-pending";
+    navigator.clipboard.writeText(pos).catch(function () {});
+  }
+
+  function slugify(str) {
+    return String(str).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60) || "grave";
+  }
+
+  function timestampPrefix() {
+    var d = new Date();
+    function pad(n) { return String(n).padStart(2, "0"); }
+    return "" + d.getFullYear() + pad(d.getMonth() + 1) + pad(d.getDate()) + pad(d.getHours()) + pad(d.getMinutes()) + pad(d.getSeconds());
+  }
+
+  // UTF-8-safe base64 (plain btoa() mangles anything outside Latin-1,
+  // which a name/inscription with an accented letter or curly quote
+  // would trip over).
+  function utf8ToBase64(str) {
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+
+  function githubPutFile(path, base64Content, message, token) {
+    return fetch("https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + path, {
+      method: "PUT",
+      headers: {
+        "Authorization": "token " + token,
+        "Accept": "application/vnd.github+json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ message: message, content: base64Content, branch: BRANCH })
+    }).then(function (res) {
+      if (!res.ok) {
+        return res.json().catch(function () { return {}; }).then(function (data) {
+          throw new Error((data && data.message) || ("GitHub API returned " + res.status));
         });
-      });
+      }
+      return res.json();
     });
-    Array.prototype.forEach.call(outputBody.querySelectorAll("[data-remove]"), function (btn) {
-      btn.addEventListener("click", function () {
-        pins.splice(parseInt(btn.getAttribute("data-remove"), 10), 1);
-        renderMarkers();
-        renderOutput();
+  }
+
+  function doGithubSave(token) {
+    saveBtn.disabled = true;
+    saveStatus.textContent = "Saving…";
+    saveStatus.className = "hint status-pending";
+
+    var name = nameInput.value.trim();
+    var slug = timestampPrefix() + "-" + slugify(name);
+    var jsonPath = "data/graves/" + slug + ".json";
+
+    var photoFile = photoInput.files && photoInput.files[0];
+
+    (photoFile ? readFileAsDataUrl(photoFile) : Promise.resolve(null)).then(function (dataUrl) {
+      var photoFieldValue = "";
+      var uploadPhoto = Promise.resolve();
+      if (dataUrl && photoFile) {
+        var base64 = dataUrl.split(",")[1];
+        var safeFilename = slugify(photoFile.name.replace(/\.[^.]+$/, "")) + (photoFile.name.match(/\.[^.]+$/) || [".jpg"])[0];
+        var imagePath = "images/graves/" + safeFilename;
+        photoFieldValue = "/" + imagePath;
+        uploadPhoto = githubPutFile(imagePath, base64, "Add grave headstone photo for " + name, token);
+      }
+
+      return uploadPhoto.then(function () {
+        var entry = {
+          name: name,
+          number: numberInput.value.trim(),
+          dates: datesInput.value.trim(),
+          whatThreeWords: (currentPin.w3w && typeof currentPin.w3w === "string") ? currentPin.w3w : "",
+          pinPosition: currentPin.x + ", " + currentPin.y,
+          inscription: inscriptionInput.value.trim(),
+          notes: notesInput.value.trim(),
+          photo: photoFieldValue,
+          addedAt: new Date().toISOString()
+        };
+        var jsonContent = JSON.stringify(entry, null, 2) + "\n";
+        return githubPutFile(jsonPath, utf8ToBase64(jsonContent), "Create Cemetery “" + name + "”", token);
       });
+    }).then(function () {
+      saveStatus.textContent = "Saved — " + name + " will appear on the site within about a minute, once the site rebuilds.";
+      saveStatus.className = "hint status-ok";
+      existingGraves.push({ name: name, pinX: currentPin.x, pinY: currentPin.y });
+      renderGraveList();
+      resetBtn.click();
+    }).catch(function (e) {
+      saveStatus.textContent = "Save failed: " + e.message + " — check the token has Contents: Read and write on this repo, and hasn't expired.";
+      saveStatus.className = "hint status-error";
+      saveBtn.disabled = false;
+    });
+  }
+
+  function readFileAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () { resolve(reader.result); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
     });
   }
 
   function escapeHtml(str) {
     return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
-  function escapeAttr(str) { return escapeHtml(str); }
 })();
 </script>
 </body>
