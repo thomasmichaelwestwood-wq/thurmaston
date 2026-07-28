@@ -19,7 +19,7 @@
  *  - pinPosition ("34.2, 56.7", percent-of-photo x/y, the same
  *    copy-paste-one-string convention as photos' own `coords` field —
  *    see rebuild-photos-index.js's parseCoords) is parsed into numeric
- *    pinX/pinY for the aggregate, so cemetery-map.html can position a
+ *    pinX/pinY for the aggregate, so cemetery.html can position a
  *    marker with plain CSS `left`/`top` percentages without every page
  *    that reads this file needing to re-parse the string itself.
  *    admin/pin-grave.html (a standalone click-to-place tool, same

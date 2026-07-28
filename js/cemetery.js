@@ -1,17 +1,31 @@
-// Cemetery landing page (cemetery.html) — the full alphabetical
-// directory (data/cemetery.json, built from the admin's "Graves"
-// collection). Uses the shared CEMETERY_DATA_PROMISE (js/main.js)
-// rather than its own fetch, same reasoning as
-// js/chronology.js/CHRONOLOGY_DATA_PROMISE — initSearch() is already
-// fetching this file for the site search index.
+// Cemetery page (cemetery.html) — the cemetery's aerial photo with a
+// pin per grave that has a Position on the cemetery map set
+// (admin/pin-grave.html is what produces that value — see its own
+// comment for why this can't be a normal CMS widget), one search box,
+// and the full alphabetical directory below. Uses the shared
+// CEMETERY_DATA_PROMISE (js/main.js) rather than its own fetch of
+// data/cemetery.json, same reasoning as js/chronology.js.
 //
-// The aerial overview photo (data/cemetery-overview.json) used to also
-// show as a static banner here, but its only real purpose is showing
-// where each grave actually is — moved to live solely on
-// cemetery-map.html (js/cemetery-map.js), which is what the pins need
-// it for; showing the same photo again here with no pins on it was
-// redundant.
+// This used to be two separate pages (cemetery.html for the directory,
+// cemetery-map.html for the map) with two separate search boxes —
+// folded back into one page and one search after it turned out to be
+// more complexity than it was worth: two pages to link between, two
+// near-identical "type a name" boxes with different behaviour
+// depending which page you happened to be on. One search now covers
+// every grave (not just pinned ones, which is all the map-only search
+// used to consider): a match with a map position scrolls to and
+// highlights that pin (same effect as before); a match without one
+// highlights its row in the full directory below instead, since that's
+// the only place it can be shown. Either way you land somewhere real,
+// never a dead end.
 document.addEventListener("DOMContentLoaded", function () {
+  var wrapEl = document.getElementById("cemetery-map-wrap");
+  var imgEl = document.getElementById("cemetery-map-img");
+  var pinsEl = document.getElementById("cemetery-map-pins");
+  var mapEmptyEl = document.getElementById("cemetery-map-empty");
+  var noPhotoEl = document.getElementById("cemetery-map-no-photo");
+  var searchInput = document.getElementById("cemetery-search-input");
+  var searchResults = document.getElementById("cemetery-search-results");
   var directoryEl = document.getElementById("cemetery-directory");
   var emptyEl = document.getElementById("cemetery-empty");
   var toolbarEl = document.getElementById("cemetery-pick-toolbar");
@@ -20,14 +34,36 @@ document.addEventListener("DOMContentLoaded", function () {
   var downloadPdfBtn = document.getElementById("cemetery-download-pdf-btn");
   if (!directoryEl) return;
 
-  if (typeof CEMETERY_DATA_PROMISE === "undefined") return;
   var allGraves = [];
+  var highlightTimeout = null;
+
+  fetch("data/cemetery-overview.json")
+    .then(function (res) { return res.ok ? res.json() : null; })
+    .catch(function () { return null; })
+    .then(function (overview) {
+      if (overview && overview.photo) {
+        imgEl.src = overview.photo;
+        wrapEl.hidden = false;
+      } else {
+        noPhotoEl.hidden = false;
+      }
+    });
+
+  if (typeof CEMETERY_DATA_PROMISE === "undefined") return;
   CEMETERY_DATA_PROMISE.then(function (graves) {
     allGraves = graves;
     if (graves.length === 0) {
       emptyEl.hidden = false;
       return;
     }
+
+    var pinned = graves.filter(function (g) { return typeof g.pinX === "number" && typeof g.pinY === "number"; });
+    if (pinned.length > 0) {
+      pinsEl.innerHTML = pinned.map(renderPin).join("");
+    } else if (imgEl.src) {
+      mapEmptyEl.hidden = false;
+    }
+
     directoryEl.innerHTML = graves.map(renderRow).join("");
 
     if (graves.length > 1) {
@@ -35,12 +71,22 @@ document.addEventListener("DOMContentLoaded", function () {
       wireCheckboxSelectAll(".pick-checkbox", selectAllBtn, selectNoneBtn);
       wireDownloadPdf();
     }
+
+    wireSearch();
   });
+
+  function renderPin(grave) {
+    return (
+      '<a class="cemetery-map-pin" href="grave.html?grave=' + encodeURIComponent(grave.id) + '" data-grave-id="' + escapeAttr(grave.id) + '" style="left:' + grave.pinX + '%;top:' + grave.pinY + '%">' +
+        '<span class="cemetery-map-pin-label">' + escapeHtml(grave.name) + "</span>" +
+      "</a>"
+    );
+  }
 
   function renderRow(grave) {
     var meta = [grave.number ? "No. " + grave.number : null, grave.dates].filter(Boolean).join(" · ");
     return (
-      '<li>' +
+      '<li data-grave-id="' + escapeAttr(grave.id) + '">' +
         '<input type="checkbox" class="pick-checkbox" data-id="' + escapeAttr(grave.id) + '" checked>' +
         '<a href="grave.html?grave=' + encodeURIComponent(grave.id) + '">' +
           '<span class="cemetery-directory-name">' + escapeHtml(grave.name) + "</span>" +
@@ -51,6 +97,94 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   function escapeAttr(str) { return escapeHtml(str); }
+
+  function wireSearch() {
+    if (!searchInput || !searchResults) return;
+    searchInput.addEventListener("input", function () { renderSearchResults(searchInput.value.trim()); });
+    searchInput.addEventListener("keydown", function (e) {
+      if (e.key !== "Enter") return;
+      var q = searchInput.value.trim().toLowerCase();
+      if (!q) return;
+      var matches = allGraves.filter(function (g) { return g.name.toLowerCase().indexOf(q) !== -1; });
+      if (matches.length >= 1) {
+        e.preventDefault();
+        jumpToGrave(matches[0]);
+      }
+    });
+  }
+
+  function renderSearchResults(query) {
+    searchResults.innerHTML = "";
+    if (!query) return;
+
+    var q = query.toLowerCase();
+    var matches = allGraves.filter(function (g) { return g.name.toLowerCase().indexOf(q) !== -1; });
+
+    if (matches.length === 0) {
+      var empty = document.createElement("li");
+      empty.className = "search-empty";
+      empty.textContent = "No grave found for “" + query + "”.";
+      searchResults.appendChild(empty);
+      return;
+    }
+
+    matches.slice(0, 15).forEach(function (grave) {
+      var li = document.createElement("li");
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.style.width = "100%";
+      btn.style.textAlign = "left";
+      btn.style.background = "none";
+      btn.style.border = "none";
+      btn.style.font = "inherit";
+      btn.style.cursor = "pointer";
+      var meta = [grave.number ? "No. " + grave.number : null, grave.dates].filter(Boolean).join(" · ");
+      btn.innerHTML =
+        '<span class="result-title">' + escapeHtml(grave.name) + "</span>" +
+        (meta ? '<div class="result-excerpt">' + escapeHtml(meta) + "</div>" : "");
+      btn.addEventListener("click", function () { jumpToGrave(grave); });
+      li.appendChild(btn);
+      searchResults.appendChild(li);
+    });
+  }
+
+  // A match with a map position scrolls to and highlights its pin
+  // (the more useful destination — you can see roughly where it is
+  // among neighbouring graves); a match without one highlights its row
+  // in the full directory below instead, since there's nothing to show
+  // it on the map. Either way, something on the page lights up rather
+  // than the search just closing with no visible effect.
+  function jumpToGrave(grave) {
+    searchResults.innerHTML = "";
+    searchInput.value = grave.name;
+
+    if (highlightTimeout) clearTimeout(highlightTimeout);
+    Array.prototype.forEach.call(document.querySelectorAll(".highlighted"), function (el) {
+      el.classList.remove("highlighted");
+    });
+
+    var hasPin = typeof grave.pinX === "number" && typeof grave.pinY === "number";
+    var pin = hasPin ? pinsEl.querySelector('[data-grave-id="' + cssEscape(grave.id) + '"]') : null;
+    var row = directoryEl.querySelector('[data-grave-id="' + cssEscape(grave.id) + '"]');
+
+    if (pin) {
+      pin.classList.add("highlighted");
+      pin.scrollIntoView({ behavior: "smooth", block: "center", inline: "center" });
+      if (row) row.classList.add("highlighted");
+      highlightTimeout = setTimeout(function () {
+        pin.classList.remove("highlighted");
+        if (row) row.classList.remove("highlighted");
+      }, 4000);
+    } else if (row) {
+      row.classList.add("highlighted");
+      row.scrollIntoView({ behavior: "smooth", block: "center" });
+      highlightTimeout = setTimeout(function () { row.classList.remove("highlighted"); }, 4000);
+    }
+  }
+
+  function cssEscape(str) {
+    return String(str).replace(/["\\]/g, "\\$&");
+  }
 
   function wireDownloadPdf() {
     downloadPdfBtn.onclick = function () {
@@ -156,5 +290,9 @@ document.addEventListener("DOMContentLoaded", function () {
       y = addPdfParagraph(doc, grave.notes, margin, y, maxWidth);
     }
     return y + 4;
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
   }
 });

@@ -131,7 +131,7 @@ collections:
         name: "pinPosition"
         widget: "string"
         required: false
-        hint: "Where this grave sits on the aerial photo shown on /cemetery-map.html, as \"x, y\" (percent across, percent down) — e.g. \"34.2, 56.7\". Don't type this by hand: open /admin/pin-grave.html, click the exact spot on the photo, and paste the result here. Leave blank to leave this grave off the map (it'll still show in the ordinary directory and search)."
+        hint: "Where this grave sits on the aerial photo shown on /cemetery.html, as \"x, y\" (percent across, percent down) — e.g. \"34.2, 56.7\". Don't type this by hand: open /admin/pin-grave.html, click the exact spot on the photo, and paste the result here. Leave blank to leave this grave off the map (it'll still show in the ordinary directory and search)."
       - { label: "Inscription", name: "inscription", widget: "text", required: false, hint: "The wording on the headstone, if you'd like to record it in full." }
       - { label: "Notes", name: "notes", widget: "text", required: false, hint: "Anything else worth recording — family, history, how the grave was located." }
       - label: "Photo of the headstone"
@@ -145,7 +145,7 @@ collections:
 
   - name: "cemetery_overview"
     label: "Cemetery Overview Photo"
-    description: "The single aerial/drone photo shown on /cemetery-map.html, with a pin for every grave whose location has been recorded. Optional; that page works fine without one, just without any pins to show."
+    description: "The single aerial/drone photo shown on /cemetery.html, with a pin for every grave whose location has been recorded. Optional; that page works fine without one, just without any pins to show."
     files:
       - name: "cemetery_overview"
         label: "Cemetery Overview Photo"

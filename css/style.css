@@ -654,6 +654,19 @@ h1, h2, h3, h4 {
 }
 .btn-outline:hover { background: #fff; color: var(--green-900); }
 
+/* .btn-outline (above) is a translucent glass button designed for the
+   dark hero background — used against cemetery.html's ordinary light
+   page background it read as a near-invisible white-on-white button.
+   A solid fill with a white border reads clearly on light backgrounds
+   instead, requested explicitly as "green with white outline". */
+.btn-green-outline {
+  background: var(--green-900);
+  border-color: #fff;
+  box-shadow: var(--shadow);
+  color: #fff;
+}
+.btn-green-outline:hover { background: var(--green-700); }
+
 .btn-facebook {
   display: inline-flex;
   align-items: center;
@@ -873,8 +886,14 @@ h1, h2, h3, h4 {
   align-items: center;
   gap: 8px;
   border-bottom: 1px solid var(--line);
+  transition: background 0.3s ease;
 }
 .cemetery-directory-list li:last-child { border-bottom: none; }
+/* A search result without a map pin (js/cemetery.js's jumpToGrave)
+   highlights its row here instead — same idea as .cemetery-map-pin.
+   highlighted above (a brief, unmissable flash), just for the case
+   where there's nothing to show on the map. */
+.cemetery-directory-list li.highlighted { background: rgba(185, 130, 47, 0.18); }
 .cemetery-directory-list li input[type="checkbox"] {
   flex-shrink: 0;
   width: 18px;

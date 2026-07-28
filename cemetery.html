@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <title>Cemetery | Memories of Thurmaston</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="A directory of headstones in Thurmaston's cemetery, Leicestershire — search a name to find its grave number and what3words location.">
+<meta name="description" content="An aerial map and full directory of headstones in Thurmaston's cemetery, Leicestershire — search a name to find its grave number, map location and what3words address.">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -22,7 +22,7 @@
     <button class="nav-toggle" aria-expanded="false" aria-controls="main-nav"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg> Menu</button>
     <nav class="main-nav" id="main-nav" aria-label="Main">
       <a href="index.html">Home</a>
-      <a href="cemetery-map.html">Cemetery</a>
+      <a href="cemetery.html" aria-current="page">Cemetery</a>
       <a href="contact.html">Contact</a>
       <a href="/admin/">Admin</a>
     </nav>
@@ -35,18 +35,25 @@
     <div class="container">
       <div class="breadcrumb"><a href="index.html">Home</a> / <span>Cemetery</span></div>
       <h1>Cemetery</h1>
-      <p>A directory of headstones in Thurmaston's cemetery. Search a name below, or browse the full list — each entry shows the grave number and its what3words location.</p>
+      <p>An aerial view of the cemetery with grave locations pinned on it, a search box to find a name, and the full alphabetical directory below. Only graves whose exact spot has been recorded get a pin — everyone else still appears in the directory.</p>
     </div>
   </section>
 
   <section class="content-section container">
-    <p><a class="btn btn-outline" href="cemetery-map.html">View graves on the cemetery map →</a></p>
+    <div class="cemetery-map-wrap" id="cemetery-map-wrap" hidden>
+      <img id="cemetery-map-img" alt="Aerial view of Thurmaston cemetery">
+      <div id="cemetery-map-pins"></div>
+    </div>
+    <p class="place-not-found" id="cemetery-map-empty" hidden>No graves have a map location recorded yet.</p>
+    <p class="place-not-found" id="cemetery-map-no-photo" hidden>The cemetery's aerial photo hasn't been added yet.</p>
 
-    <label for="cemetery-search-input" class="category-search-label">Search for a name</label>
+    <label for="cemetery-search-input" class="category-search-label" style="margin-top:20px">Search for a name</label>
     <input type="text" id="cemetery-search-input" class="photo-search-input photo-search-input-wide" placeholder="Search by name…" autocomplete="off">
     <ul id="cemetery-search-results" class="home-search-results"></ul>
 
-    <h2 style="margin-top:32px">Full directory</h2>
+    <p><a class="btn btn-green-outline" href="#cemetery-directory-heading" id="cemetery-directory-jump" style="margin-top:16px">Browse the full directory ↓</a></p>
+
+    <h2 id="cemetery-directory-heading" style="margin-top:32px">Full directory</h2>
     <div class="pick-toolbar" id="cemetery-pick-toolbar" hidden>
       <div class="pick-toolbar-actions">
         <button type="button" class="chip" id="cemetery-select-all">Select all</button>
@@ -72,7 +79,7 @@
           <li><a href="index.html#photos">Photo Archive</a></li>
           <li><a href="map.html">Interactive Map</a></li>
           <li><a href="chronology.html">Village Chronology</a></li>
-          <li><a href="cemetery-map.html">Cemetery</a></li>
+          <li><a href="cemetery.html">Cemetery</a></li>
         </ul>
       </div>
       <div>
