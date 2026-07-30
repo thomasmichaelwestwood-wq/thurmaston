@@ -6,7 +6,6 @@
     "category": "schools",
     "date": "1963/4",
     "credit": "THG",
-    "coords": "",
     "location": "",
     "history": "Back Row: Ann Wigston, Lorna Adcock, Rosemary Freeman, Joy Soden, Glynis Moore, Maureen Barwell. Middle row: Kathryn Bowley, Margaret Dexter, Rita Hawkins, Dianne Carruthers.\nFront row: Angela Morris, Denise Payne, Lynn Bright",
     "consentNoted": true,
@@ -15,7 +14,9 @@
     "placeId": "",
     "id": "20260730193925-roundhill-class",
     "addedAt": "2026-07-30T19:42:52.305Z",
-    "numberedPeople": ""
+    "numberedPeople": "",
+    "lat": 52.687407330481626,
+    "lng": -1.0921992180287767
   },
   {
     "src": "/images/photos/schools/2136 2020_0915_085212 Old School building.jpg",
