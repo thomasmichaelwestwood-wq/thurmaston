@@ -173,6 +173,7 @@ var CATEGORY_FOLDERS = {
   "Churches & Religious Buildings": "churches",
   "Groups & Organisations": "groups",
   "Industry": "industry",
+  "Maps": "maps",
   "Schools": "schools",
   "Sports": "sports"
 };

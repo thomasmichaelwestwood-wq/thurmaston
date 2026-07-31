@@ -12,6 +12,7 @@ const MAP_CATEGORIES = {
   churches: { label: "Churches & Religious Buildings", color: "#8c5a3c" },
   groups:   { label: "Groups & Organisations", color: "#4a90a4" },
   industry: { label: "Industry", color: "#5a5a5a" },
+  maps:     { label: "Maps", color: "#3d4f91" },
   schools:  { label: "Schools", color: "#d17a22" },
   sports:   { label: "Sports", color: "#b23a6b" },
   photo:    { label: "Photo", color: "#2f6f9e" }

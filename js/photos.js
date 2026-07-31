@@ -8,6 +8,7 @@ const PHOTO_CATEGORIES = {
   churches: { label: "Churches & Religious Buildings" },
   groups: { label: "Groups & Organisations" },
   industry: { label: "Industry" },
+  maps: { label: "Maps" },
   schools: { label: "Schools" },
   sports: { label: "Sports" }
 };

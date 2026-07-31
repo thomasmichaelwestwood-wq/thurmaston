@@ -67,6 +67,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -189,6 +190,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -277,6 +279,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -338,6 +341,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -392,6 +396,61 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
+          - { label: "Nature & Views", value: "nature" }
+          - { label: "Other", value: "other" }
+          - { label: "People", value: "people" }
+          - { label: "Schools", value: "schools" }
+          - { label: "Sports", value: "sports" }
+          - { label: "Streets & Buildings", value: "streets" }
+        hint: "Which collection this photo belongs to. Filed under the wrong one? Change this and save — the live site updates immediately (category page, photo filters, map pin colour all read this field directly), and the photo's file relocates itself into the correct collection automatically within about a minute, the same background job that already rebuilds the photo archive after any edit."
+      - { label: "Date", name: "date", widget: "string", hint: "Shown under the photo, e.g. \"Added July 2026\" — replace with a real date if one becomes known, e.g. \"c.1936\"." }
+      - { label: "Credit", name: "credit", widget: "string", required: false, hint: "Who took or contributed the photo, if known." }
+      - label: "Google Maps coordinates"
+        name: "coords"
+        widget: "string"
+        required: false
+        hint: "On Google Maps, right-click the exact spot — the coordinates appear at the top of the menu that pops up. Click them to copy, then paste here, e.g. \"52.679363, -1.097994\". This puts the photo on the map automatically, using this photo's own caption/date/credit — and it's also how the site automatically links this photo to every other photo of the exact same place, even if their Location text below is worded differently. Always add these when you can, rather than just typing something into Location. No need to also add a Map Pin for it — that's only for a pin that needs its own separate name/description. Leave blank if the location genuinely isn't known."
+        pattern: ['^$|-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?', "Must be two numbers separated by a comma, e.g. 52.679363, -1.097994"]
+      - { label: "Location", name: "location", widget: "string", required: false, hint: "e.g. \"Garden Street\" — leave blank if not known. Just descriptive text shown next to the photo — set Google Maps coordinates above to actually place it on the map." }
+      - { label: "History", name: "history", widget: "text", required: false, hint: "What's known about this photo — shown in full when the photo is opened." }
+      - { label: "Consent noted", name: "consentNoted", widget: "boolean", default: false, hint: "Tick once you've confirmed it's OK to show identifiable people in this photo." }
+      - { label: "Internal — reference code", name: "ref", widget: "string", required: false, hint: "Shown as a small \"Ref:\" tag on the photo. For Drive-synced photos this is filled in automatically from Dad's original filing name. For a photo added here, it's filled in automatically from the uploaded file's name if you leave this blank — and if you duplicate this entry and then upload a different photo into the copy, this updates to match the new file too, as long as you haven't typed your own value in here." }
+      - { label: "Internal — ref auto-source", name: "refSource", widget: "string", required: false, hint: "Never shown on the site — you shouldn't need to touch this. Tracks which uploaded file the Ref above was last generated from, so that replacing the photo (including after duplicating this entry) can safely update Ref to match the new file, without ever overwriting a Ref you've typed in by hand. Leave blank on a new photo." }
+      - { label: "Same place as another photo (if it won't link up on its own)", name: "placeId", widget: "string", required: false, hint: "Use this only when a photo of a place won't automatically link up with another photo of the exact same place — most often an old photo from when a street had a different name (Melton Road used to be Main Street), where you don't have map coordinates for the old photo, so its Location text alone can't match a modern one. Type anything here — a building's name is easiest — and type the exact same words on every photo of that place, to link them together no matter what their coordinates or Location say. Leave blank on every ordinary photo — most photos never need this." }
+      - { label: "Internal ID", name: "id", widget: "string", required: false, hint: "Never shown on the site. Leave blank — it's set automatically from this entry's filename when the site rebuilds." }
+      - { label: "Internal — added", name: "addedAt", widget: "string", required: false, hint: "Controls sort order in the archive (newest first). Leave blank on a new photo — it's filled in automatically." }
+      - { label: "Numbered people (JSON)", name: "numberedPeople", widget: "text", required: false, hint: "Only for a group photo where people have been numbered for identification. Use the numbering tool at /admin/number-photo.html to click each person and copy the resulting JSON here. Leave blank otherwise." }
+
+  - name: "photos_maps"
+    label: "Maps"
+    description: "Every photo in the Maps category, one entry per photo. Photos still sync in automatically from Google Drive as before — but you can also add one straight from here: upload the image, then fill in what you know. Edit caption, credit, location, and history freely on any photo; leave fields marked \"Internal\" alone unless you know what you're doing."
+    folder: "data/photos/maps"
+    create: true
+    delete: true
+    slug: "{{year}}{{month}}{{day}}{{hour}}{{minute}}{{second}}-{{slug}}"
+    extension: "json"
+    format: "json"
+    identifier_field: "caption"
+    fields:
+      - label: "Photo"
+        name: "src"
+        widget: "image"
+        media_folder: "/images/photos/maps"
+        public_folder: "/images/photos/maps"
+        hint: "For a new photo: upload the image file here. For an existing one, this shows the current image — leave it alone unless you're replacing the file."
+      - { label: "Caption", name: "caption", widget: "string", hint: "The photo's name, shown on the site. Usually fine as synced — tweak it if it reads oddly." }
+      - { label: "Person / family name", name: "personName", widget: "string", required: false, hint: "Only if this is a portrait of someone — type their name (or the family's name for a group photo), the same way every time (e.g. always \"Owen Hartshorn\", not sometimes \"O. Hartshorn\"), so photos of the same person land in the same group in the People collection. Leave blank otherwise — this is just for organising, not shown on the site." }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        default: "maps"
+        options:
+          - { label: "Aerial", value: "aerial" }
+          - { label: "Churches & Religious Buildings", value: "churches" }
+          - { label: "Events", value: "events" }
+          - { label: "Groups & Organisations", value: "groups" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -449,6 +508,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -503,6 +563,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -559,6 +620,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -613,6 +675,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -691,6 +754,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }
@@ -760,6 +824,7 @@ collections:
           - { label: "Events", value: "events" }
           - { label: "Groups & Organisations", value: "groups" }
           - { label: "Industry", value: "industry" }
+          - { label: "Maps", value: "maps" }
           - { label: "Nature & Views", value: "nature" }
           - { label: "Other", value: "other" }
           - { label: "People", value: "people" }

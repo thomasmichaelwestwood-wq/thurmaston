@@ -68,11 +68,11 @@ const OUTPUT = path.join(ROOT, "data", "photos.json");
 // (see the Category-mismatch block below).
 const SRC_PATTERN = /^\/images\/photos\/([^/]+)\/([^/]+)$/;
 
-// Matches admin/config.yml's 11 photos_* collection folders exactly —
+// Matches admin/config.yml's 12 photos_* collection folders exactly —
 // the only categories a photo's Category field (a select dropdown,
 // not free text) could ever actually contain.
 const KNOWN_CATEGORIES = new Set([
-  "aerial", "churches", "events", "groups", "industry",
+  "aerial", "churches", "events", "groups", "industry", "maps",
   "nature", "other", "people", "schools", "sports", "streets"
 ]);
 
