@@ -1,5 +1,24 @@
 [
   {
+    "src": "/images/photos/aerial/391 Aerial of bypass (Leicester Mercury) MOT 2-36 MOT 2-37.jpg",
+    "caption": "Aerial photograph of bypass",
+    "personName": "",
+    "category": "aerial",
+    "date": "1961",
+    "credit": "Leicester Mercury",
+    "location": "",
+    "history": "From the air\nThis 1961 picture appeared in the Leicester Evening Mail, its caption read: ‘Dominating this view is the new dual carriageway by-pass which cuts out the bottleneck formed by the narrow main road of the village. Near the top of the picture can be seen the footbridge which caused much criticism when it was built.’\nThis criticism related to the siting of the footbridge because not all residents agreed with its position.",
+    "consentNoted": false,
+    "ref": "391",
+    "refSource": "",
+    "placeId": "",
+    "id": "20260801061243-aerial-photograph-of-bypass",
+    "addedAt": "2026-08-01T06:13:05.985Z",
+    "numberedPeople": "",
+    "lat": 52.677941050892265,
+    "lng": -1.0994098701214157
+  },
+  {
     "src": "/images/photos/groups/284 Methodist Play (Contrast) MOT 1-56.jpg",
     "caption": "Methodist Church Drama Group",
     "personName": "",
@@ -386,7 +405,7 @@
     "location": "",
     "history": "'The Plank' near Johnson's Bridge, Johnson's Bridge spans the Grand Union Canal, The River Soar flows to the left under 'The Plank'.",
     "consentNoted": true,
-    "ref": "116",
+    "ref": "116 Johnson's Bridge & the plank MOT 1-60 c1905.jpg",
     "refSource": "116 Johnson's Bridge & the plank MOT 1-60 c1905.jpg",
     "placeId": "",
     "id": "20260725193412-the-plank",
