@@ -173,6 +173,73 @@ h1, h2, h3, h4 {
 }
 .skip-link:focus { left: 0; }
 
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+/* ---------- Coming-soon gate (index.html only) ---------- */
+/* Hidden-by-default-until-unlocked, not shown-by-default-until-locked —
+   fails safe if js/coming-soon.js somehow doesn't run (e.g. blocked),
+   the real homepage just never appears rather than briefly flashing. */
+#site-real-content { display: none; }
+html.unlocked #site-real-content { display: block; }
+html.unlocked #coming-soon-gate { display: none; }
+
+#coming-soon-gate {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, var(--green-900), var(--green-700));
+}
+.coming-soon-inner {
+  max-width: 420px;
+  width: 100%;
+  text-align: center;
+  color: #fff;
+}
+.coming-soon-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  font-weight: 700;
+  font-size: 1.4rem;
+  margin-bottom: 18px;
+}
+.coming-soon-inner h1 {
+  margin: 0 0 12px;
+  font-size: clamp(1.8rem, 1.3rem + 2vw, 2.4rem);
+}
+.coming-soon-inner p { color: rgba(255, 255, 255, 0.85); margin: 0 0 24px; }
+#coming-soon-form {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+#coming-soon-password {
+  padding: 10px 16px;
+  border-radius: var(--radius-pill);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  min-width: 180px;
+  font-size: 16px;
+}
+#coming-soon-password::placeholder { color: rgba(255, 255, 255, 0.6); }
+#coming-soon-error { color: #ffb4b4; margin: 14px 0 0; font-size: 0.9rem; }
+
 /* ---------- Header ---------- */
 
 .site-header {

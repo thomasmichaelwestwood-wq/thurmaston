@@ -11,6 +11,27 @@
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
+<script src="js/coming-soon.js"></script>
+
+<!-- Coming-soon holding page — shown by default, hidden once the
+     password below is entered (see js/coming-soon.js). This is the
+     homepage only; every other page on the site is unaffected and
+     still reachable directly if you have a link to it. -->
+<div id="coming-soon-gate">
+  <div class="coming-soon-inner">
+    <span class="coming-soon-mark">Th</span>
+    <h1>Memories of Thurmaston</h1>
+    <p>Our village photo archive and local history site is on its way — check back soon.</p>
+    <form id="coming-soon-form">
+      <label for="coming-soon-password" class="visually-hidden">Password</label>
+      <input type="password" id="coming-soon-password" placeholder="Password" autocomplete="off">
+      <button type="submit" class="btn btn-primary">Enter</button>
+    </form>
+    <p id="coming-soon-error" hidden>Incorrect password — try again.</p>
+  </div>
+</div>
+
+<div id="site-real-content">
 <a class="skip-link" href="#main">Skip to content</a>
 
 <header class="site-header">
@@ -148,6 +169,7 @@
         <h4>Get in touch</h4>
         <ul>
           <li><a href="contact.html">Contact us</a></li>
+          <li><a href="submit-event-photos.html">Share event photos</a></li>
           <li><a class="footer-fb-link" href="https://www.facebook.com/memoriesofthurmaston/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="12" fill="#1877F2"/><path d="M14 8h-1.5c-.8 0-1 .3-1 1v1.5H14l-.2 2H11.5V19H9v-6.5H7.5V10H9V8.5C9 6.6 10 5 12.3 5H14v3z" fill="#fff"/></svg>Memories of Thurmaston (Facebook) ↗</a></li>
           <li><a href="/admin/" target="_blank" rel="noopener">Admin</a></li>
         </ul>
@@ -167,6 +189,7 @@
     </div>
     <ul id="site-search-results"></ul>
   </div>
+</div>
 </div>
 
 <script src="js/search-index.js"></script>
