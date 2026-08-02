@@ -449,8 +449,10 @@ function appendMetadataEntry(shortId, slug, filename, caption, ref, category, pl
 function ghGet(path, token, owner, repo) {
   var url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path;
   var res = UrlFetchApp.fetch(url, {
-    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" }
+    headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" },
+    muteHttpExceptions: true
   });
+  checkGhResponse(res, "GET", path);
   return JSON.parse(res.getContentText());
 }
 
@@ -458,12 +460,29 @@ function ghPut(path, base64Content, message, token, owner, repo, sha) {
   var url = "https://api.github.com/repos/" + owner + "/" + repo + "/contents/" + path;
   var payload = { message: message, content: base64Content, branch: "main" };
   if (sha) payload.sha = sha;
-  UrlFetchApp.fetch(url, {
+  var res = UrlFetchApp.fetch(url, {
     method: "put",
     contentType: "application/json",
     headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" },
-    payload: JSON.stringify(payload)
+    payload: JSON.stringify(payload),
+    muteHttpExceptions: true
   });
+  checkGhResponse(res, "PUT", path);
+}
+
+// UrlFetchApp throws on a non-2xx response by default, but with a bare
+// "returned code 403" message and no body — not enough to tell "bad
+// token" from "wrong repo" from "token can read but can't write" from
+// the Apps Script Executions log alone. muteHttpExceptions (both
+// callers above) plus this shared check surfaces GitHub's own error
+// message instead, e.g. "Resource not accessible by personal access
+// token" for a read-only token being used somewhere that needs write.
+function checkGhResponse(res, method, path) {
+  var code = res.getResponseCode();
+  if (code >= 200 && code < 300) return;
+  throw new Error(
+    "GitHub " + method + " " + path + " failed (HTTP " + code + "): " + res.getContentText()
+  );
 }
 
 /**
