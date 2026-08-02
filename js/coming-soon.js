@@ -13,13 +13,19 @@
 // beyond this one file.
 var COMING_SOON_PASSWORD = "thurmaston2026";
 
-// Deliberately doesn't remember an unlock across visits right now
-// (requested explicitly: "I want the coming soon to appear every time
-// for now") — a correct password only reveals the real homepage for
-// the current page view; reloading or coming back later always shows
-// the gate again. Was previously remembered via localStorage; if that's
-// wanted back later, re-add a localStorage.getItem/.setItem pair around
-// the "unlocked" class below.
+// sessionStorage, not localStorage — remembers the unlock for as long
+// as this browser tab/window stays open (reloading, clicking around,
+// coming back to the tab later all skip the gate), but asks again once
+// the tab's actually closed and reopened. Landed here after first
+// trying "always ask" (too annoying to re-type constantly) and,
+// earlier, "remember forever" (asked to turn off) — this is the
+// middle ground that was actually wanted: not re-typed every reload,
+// but not a permanent bypass sitting in the browser indefinitely either.
+(function () {
+  if (sessionStorage.getItem("thurmaston-unlocked") === "1") {
+    document.documentElement.classList.add("unlocked");
+  }
+})();
 
 document.addEventListener("DOMContentLoaded", function () {
   var form = document.getElementById("coming-soon-form");
@@ -30,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (input.value === COMING_SOON_PASSWORD) {
+      sessionStorage.setItem("thurmaston-unlocked", "1");
       document.documentElement.classList.add("unlocked");
       error.hidden = true;
     } else {
