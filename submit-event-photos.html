@@ -40,55 +40,64 @@
   </section>
 
   <section class="content-section container">
-    <div class="card" style="max-width:640px;margin:0 auto">
+    <div style="max-width:520px;margin:0 auto">
       <!--
-        This iframe embeds a Google Form. Google Forms saves any
-        uploaded files straight into a Drive folder you choose — no
-        code, no API keys, and it's a natural inbox for the team to
-        check submissions before anything goes public.
+        A plain Netlify Form — no Google account needed to submit, no
+        custom backend to run or maintain. Netlify automatically finds
+        this form (because of the data-netlify="true" attribute) the
+        next time the site deploys, and starts collecting submissions
+        (including the uploaded photos) into Site settings > Forms in
+        your Netlify dashboard — nothing else to configure.
 
-        To wire this page up to a real form:
-          1. In Google Drive, create (or open) the folder you want
-             submissions to land in — e.g. inside the same folder as
-             the site's other automation.
-          2. In Google Forms, create a new form with whatever fields
-             you want (Name, Which event, Photos — use a "File upload"
-             question for the photos themselves, and turn on "Allow
-             only specific file types" > Image if you want to keep it
-             to photos).
-          3. On the File upload question, Google Forms will ask which
-             Drive folder to store uploads in — point it at the folder
-             from step 1 (or let it create its own subfolder there).
-          4. Send → the embed icon (<>) → copy the src URL from the
-             <iframe> snippet it gives you → paste it below as
-             EMBED_URL.
-          5. Also grab the plain "Send via link" URL for FALLBACK_URL
-             below (the "Open in a new tab" link), for anyone whose
-             browser blocks the embedded version.
+        This deliberately does NOT use fetch()/AJAX to submit — Netlify
+        Forms' file-upload handling only works reliably with an
+        ordinary full-page form POST, not a JS-intercepted one. The
+        "thanks" message below is shown by checking for ?submitted=true
+        in the URL, which is where the action="" below sends the
+        browser back to once Netlify's finished processing the upload.
 
-        Note: Google Forms' file-upload question requires the person
-        submitting to be signed into a Google account — most people
-        are, and it also cuts down on spam, but worth knowing.
+        Reviewing submissions: Netlify's free tier includes 100 form
+        submissions a month; each photo counts toward Netlify's
+        bandwidth/storage rather than a Drive folder — if a submission
+        is worth keeping, save its photos into Drive/the CMS by hand
+        from the Netlify dashboard, the same "review, then decide"
+        step this was built for either way.
       -->
-      <p id="submit-form-placeholder">
-        This form isn't connected yet — see the comment in this page's
-        source for the 5-step setup (create a Google Form with a File
-        upload question pointed at a Drive folder, then paste its
-        embed URL in here).
-      </p>
-      <iframe
-        id="submit-form-embed"
-        title="Share your event photos"
-        src=""
-        data-embed-url="REPLACE_WITH_YOUR_GOOGLE_FORM_EMBED_URL"
-        width="100%"
-        height="900"
-        style="border:0;border-radius:var(--radius);display:none"
-        loading="lazy">
-      </iframe>
-      <p style="margin-top:16px">
-        <a id="submit-form-fallback" class="btn btn-primary" href="#" data-fallback-url="REPLACE_WITH_YOUR_GOOGLE_FORM_SHARE_URL" style="display:none" target="_blank" rel="noopener">Open the form in a new tab →</a>
-      </p>
+      <form
+        id="event-photos-form"
+        name="event-photos"
+        method="POST"
+        data-netlify="true"
+        netlify-honeypot="bot-field"
+        enctype="multipart/form-data"
+        action="/submit-event-photos.html?submitted=true"
+        class="stack card">
+        <input type="hidden" name="form-name" value="event-photos">
+        <p class="visually-hidden">
+          <label>Don't fill this out if you're human: <input name="bot-field"></label>
+        </p>
+        <div>
+          <label for="ep-name">Your name</label>
+          <input type="text" id="ep-name" name="name" required>
+        </div>
+        <div>
+          <label for="ep-event">Which event?</label>
+          <input type="text" id="ep-event" name="event" required placeholder="e.g. Village Fete 2026">
+        </div>
+        <div>
+          <label for="ep-notes">Anything else you'd like to tell us? (optional)</label>
+          <textarea id="ep-notes" name="notes" rows="4"></textarea>
+        </div>
+        <div>
+          <label for="ep-photos">Photos</label>
+          <input type="file" id="ep-photos" name="photos" accept="image/*" multiple required>
+        </div>
+        <button class="btn btn-primary" type="submit" style="align-self:flex-start">Submit photos</button>
+      </form>
+      <div id="event-photos-thanks" class="card" hidden>
+        <h3>Thanks — got it!</h3>
+        <p style="margin:0">Your photos are in. We'll have a look through and add the best of them to the right Event Page.</p>
+      </div>
     </div>
   </section>
 </main>
@@ -139,26 +148,16 @@
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
 <script>
-  // Only switches the placeholder text for the real embed once a real
-  // URL has been pasted into the two data- attributes above — keeps
-  // the page honest (a broken/blank iframe would look like a bug) until
-  // the Google Form actually exists. See the HTML comment above the
-  // iframe for the 5-step setup.
+  // Netlify redirects the browser back here with ?submitted=true once
+  // it's finished processing the form POST (see the form's own
+  // action="" above) — swap the form for a plain thank-you message
+  // rather than leaving an already-submitted form sitting on screen.
   (function () {
-    var iframe = document.getElementById("submit-form-embed");
-    var fallback = document.getElementById("submit-form-fallback");
-    var placeholder = document.getElementById("submit-form-placeholder");
-    var embedUrl = iframe.dataset.embedUrl;
-    var fallbackUrl = fallback.dataset.fallbackUrl;
-    if (embedUrl && embedUrl.indexOf("REPLACE_WITH") !== 0) {
-      iframe.src = embedUrl;
-      iframe.style.display = "block";
-      placeholder.hidden = true;
-    }
-    if (fallbackUrl && fallbackUrl.indexOf("REPLACE_WITH") !== 0) {
-      fallback.href = fallbackUrl;
-      fallback.style.display = "inline-block";
-    }
+    if (new URLSearchParams(location.search).get("submitted") !== "true") return;
+    var form = document.getElementById("event-photos-form");
+    var thanks = document.getElementById("event-photos-thanks");
+    if (form) form.hidden = true;
+    if (thanks) thanks.hidden = false;
   })();
 </script>
 </body>
