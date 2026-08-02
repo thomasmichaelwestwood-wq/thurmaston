@@ -33,30 +33,16 @@ textarea { min-height: 220px !important; text-align: left !important; }
      elements that were already there. -->
 <a href="/index.html" id="back-to-site-link" style="position:fixed;bottom:16px;left:16px;z-index:99999;background:#1f4d3a;color:#fff;padding:8px 16px;border-radius:8px;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.3);">← Back to site</a>
 <!-- Same "plain DOM element floated above the CMS" trick as the "Back
-     to site" link above — a small status badge showing when the daily
-     GitHub → Google Drive backup (automation/drive-photo-sync.gs.js's
-     backupToDrive) last ran. That script writes data/backup-status.json
-     back to GitHub after each backup (the one exception to the backup
-     being strictly one-way) purely so this badge has something to
-     read — plain fetch, no Drive/Sheets API access needed here. -->
-<div id="backup-status-badge" style="position:fixed;bottom:16px;right:16px;z-index:99999;background:rgba(31,77,58,0.85);color:#fff;padding:8px 16px;border-radius:8px;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.3);">Checking backup status…</div>
-<script>
-  fetch("../data/backup-status.json")
-    .then(function (res) { return res.ok ? res.json() : null; })
-    .catch(function () { return null; })
-    .then(function (status) {
-      var el = document.getElementById("backup-status-badge");
-      if (!status || !status.lastBackedUp) {
-        el.textContent = "No backup recorded yet";
-        return;
-      }
-      var d = new Date(status.lastBackedUp);
-      var label = isNaN(d.getTime())
-        ? status.lastBackedUp
-        : d.toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
-      el.textContent = "Last backed up: " + label;
-    });
-</script>
+     to site" link above. Used to be a small badge that read a status
+     file (data/backup-status.json) written back to GitHub by
+     automation/drive-photo-sync.gs.js's backupToDrive after each run —
+     dropped in favour of a plain link straight to the backup sheet
+     itself: no GitHub-write step to keep working, no stale/missing
+     status file to debug, and Google Sheets' own "last edited" info
+     (File > Version history, or just the timestamp Sheets shows) is
+     already a perfectly good answer to "when did this last run,"
+     without needing this admin page to know anything about it. -->
+<a href="https://docs.google.com/spreadsheets/d/1cICYBsuKctqDjPHRs7WYuhMOp9jFudQvi1g6tJgIBm8/edit" id="backup-sheet-link" target="_blank" rel="noopener" style="position:fixed;bottom:16px;right:16px;z-index:99999;background:rgba(31,77,58,0.85);color:#fff;padding:8px 16px;border-radius:8px;font:600 13px/1.2 -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.3);">View backup sheet ↗</a>
 <!-- Sveltia CMS — switched from Decap CMS specifically because Decap's
      media library doesn't reliably support selecting/uploading several
      images at once (confirmed both in testing and in Decap's own open
