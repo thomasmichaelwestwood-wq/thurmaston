@@ -13,15 +13,13 @@
 // beyond this one file.
 var COMING_SOON_PASSWORD = "thurmaston2026";
 
-// Runs immediately, before the rest of the page parses, so a returning
-// visitor who already unlocked this browser doesn't see a flash of the
-// coming-soon page before the real homepage swaps in — see the
-// html.unlocked rule in css/style.css, which is what this class drives.
-(function () {
-  if (localStorage.getItem("thurmaston-unlocked") === "1") {
-    document.documentElement.classList.add("unlocked");
-  }
-})();
+// Deliberately doesn't remember an unlock across visits right now
+// (requested explicitly: "I want the coming soon to appear every time
+// for now") — a correct password only reveals the real homepage for
+// the current page view; reloading or coming back later always shows
+// the gate again. Was previously remembered via localStorage; if that's
+// wanted back later, re-add a localStorage.getItem/.setItem pair around
+// the "unlocked" class below.
 
 document.addEventListener("DOMContentLoaded", function () {
   var form = document.getElementById("coming-soon-form");
@@ -32,7 +30,6 @@ document.addEventListener("DOMContentLoaded", function () {
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     if (input.value === COMING_SOON_PASSWORD) {
-      localStorage.setItem("thurmaston-unlocked", "1");
       document.documentElement.classList.add("unlocked");
       error.hidden = true;
     } else {
