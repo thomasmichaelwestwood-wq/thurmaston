@@ -220,6 +220,7 @@ html.unlocked #coming-soon-gate { display: none; }
 .coming-soon-inner h1 {
   margin: 0 0 12px;
   font-size: clamp(1.8rem, 1.3rem + 2vw, 2.4rem);
+  color: #fff;
 }
 .coming-soon-inner p { color: rgba(255, 255, 255, 0.85); margin: 0 0 24px; }
 #coming-soon-form {
