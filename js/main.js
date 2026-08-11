@@ -33,6 +33,19 @@ var CEMETERY_DATA_PROMISE = fetch("data/cemetery.json")
   .then(function (res) { return res.ok ? res.json() : []; })
   .catch(function () { return []; });
 
+// A bulk import of Thurmaston cemetery's historical burial register
+// (2,710 entries as of the spreadsheet this was built from —
+// scripts/import-burial-records.js) — deliberately not a CMS
+// collection or a browsable directory page of its own ("this file
+// doesn't need to appear on the website, however i want it embedding
+// in the search"), just searchable by name like everything else, each
+// landing on its own burial-record.html?id=N page. Same shared-promise
+// pattern as CEMETERY_DATA_PROMISE above — fetched once, consumed by
+// initSearch() (below) and by js/burial-record.js's own per-record page.
+var BURIAL_RECORDS_DATA_PROMISE = fetch("data/burial-records.json")
+  .then(function (res) { return res.ok ? res.json() : []; })
+  .catch(function () { return []; });
+
 function initNavToggle() {
   var toggle = document.querySelector(".nav-toggle");
   var nav = document.querySelector(".main-nav");
@@ -129,11 +142,12 @@ function initSearch() {
   var photoEntries = [];
   var chronologyEntries = [];
   var cemeteryEntries = [];
+  var burialEntries = [];
   var boxes = [];
   var searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined") ? SITE_SEARCH_INDEX.slice() : [];
 
   function rebuildIndex() {
-    searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries, chronologyEntries, cemeteryEntries);
+    searchIndex = (typeof SITE_SEARCH_INDEX !== "undefined" ? SITE_SEARCH_INDEX : []).concat(photoEntries, chronologyEntries, cemeteryEntries, burialEntries);
     boxes.forEach(function (box) { box.refresh(); });
   }
 
@@ -191,6 +205,23 @@ function initSearch() {
         category: "Cemetery",
         excerpt: [g.number ? "Grave " + g.number : null, g.dates].filter(Boolean).join(" · "),
         keywords: [g.inscription, g.notes].filter(Boolean).join(" ")
+      };
+    });
+    rebuildIndex();
+  });
+
+  // Every burial register entry, individually, by name — same "type a
+  // name, land on its own page" point as the Cemetery entries above,
+  // just a much larger bulk-imported set (see BURIAL_RECORDS_DATA_PROMISE)
+  // rather than individually curated headstones.
+  BURIAL_RECORDS_DATA_PROMISE.then(function (records) {
+    burialEntries = records.map(function (r) {
+      return {
+        title: r.name,
+        url: "burial-record.html?id=" + encodeURIComponent(r.id),
+        category: "Burial Record",
+        excerpt: [r.graveNo ? "Grave " + r.graveNo : null, [r.burialDate, r.year].filter(Boolean).join(" ")].filter(Boolean).join(" · "),
+        keywords: r.note || ""
       };
     });
     rebuildIndex();
