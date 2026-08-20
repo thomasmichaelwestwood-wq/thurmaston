@@ -1,5 +1,23 @@
 [
   {
+    "src": "/images/photos/aerial/ChurchTowerViewtitles.jpg",
+    "caption": "A view from Thurmaston Church Tower, circa 1920.",
+    "personName": "",
+    "category": "aerial",
+    "date": "c1920",
+    "credit": "",
+    "coords": "",
+    "location": "",
+    "history": "A view from Thurmaston Church Tower, circa 1920.\nThe field upon which Forest Avenue was laid-out can be clearly seen behind the White Hart and in front of Glebe Farm. Did you live in any of the houses that can be seen in the picture? Do you know their history? What were they like to live in?",
+    "consentNoted": true,
+    "ref": "Mark",
+    "refSource": "",
+    "placeId": "",
+    "id": "20260820105556-a-view-from-thurmaston-church-tower-circa-1920.",
+    "addedAt": "2026-08-20T10:56:13.874Z",
+    "numberedPeople": ""
+  },
+  {
     "src": "/images/photos/schools/201 Old School (National School) 1925 MOT 1-43 No'd.jpg",
     "caption": "National School - Class of 1925",
     "personName": "",
@@ -262,7 +280,7 @@
     "lng": -1.0999277756990145
   },
   {
-    "src": "/images/photos/aerial/1303 Old School (National School) 1992 MOT 1-41.jpg",
+    "src": "/images/photos/schools/1303 Old School (National School) 1992 MOT 1-41.jpg",
     "caption": "Thurmaston National School",
     "personName": "",
     "category": "schools",
