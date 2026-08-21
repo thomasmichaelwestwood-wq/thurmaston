@@ -174,6 +174,7 @@ var CATEGORY_FOLDERS = {
   "Groups & Organisations": "groups",
   "Industry": "industry",
   "Maps": "maps",
+  "Military": "military",
   "Schools": "schools",
   "Sports": "sports"
 };

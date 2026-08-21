@@ -13,6 +13,7 @@ const MAP_CATEGORIES = {
   groups:   { label: "Groups & Organisations", color: "#4a90a4" },
   industry: { label: "Industry", color: "#5a5a5a" },
   maps:     { label: "Maps", color: "#3d4f91" },
+  military: { label: "Military", color: "#6b6b2e" },
   schools:  { label: "Schools", color: "#d17a22" },
   sports:   { label: "Sports", color: "#b23a6b" },
   photo:    { label: "Photo", color: "#2f6f9e" }

@@ -9,6 +9,7 @@ const PHOTO_CATEGORIES = {
   groups: { label: "Groups & Organisations" },
   industry: { label: "Industry" },
   maps: { label: "Maps" },
+  military: { label: "Military" },
   schools: { label: "Schools" },
   sports: { label: "Sports" }
 };
