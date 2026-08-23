@@ -687,7 +687,8 @@
   },
   {
     "src": "/images/photos/aerial/151 DCE aerial.jpg",
-    "caption": "Aerial view of site on Humberstone Lane prior to the building of DCE in 1954",
+    "caption": "Humberstone Lane prior to the building of DCE",
+    "personName": "",
     "category": "aerial",
     "date": "1954",
     "credit": "",
@@ -695,9 +696,11 @@
     "history": "Aerial view of site on Humberstone Lane prior to the building of DCE in 1954",
     "consentNoted": true,
     "ref": "151",
+    "refSource": "",
     "placeId": "",
     "id": "20260717074344-aerial-view-of-site-on-humberstone-lane-prior-to-the-building-of-dce-in-1954",
     "addedAt": "2026-07-17T07:44:06.431Z",
+    "numberedPeople": "",
     "lat": 52.671468577391316,
     "lng": -1.0914779119776936
   },
