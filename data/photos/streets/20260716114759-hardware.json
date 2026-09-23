@@ -1,14 +1,18 @@
 {
   "src": "/images/photos/streets/008-hardware-rotated-mot-1-67.jpg",
   "caption": "Thurmaston Hardware",
+  "personName": "",
+  "category": "streets",
   "date": "1966",
-  "addedAt": "2026-07-16T11:48:18.494Z",
-  "history": "Ran by Eileen & Des Hartop great for screws!",
-  "location": "Melton Road",
-  "consentNoted": false,
   "credit": "Jeff Hartop",
   "coords": "52.68019766945202, -1.0978456163713783",
-  "category": "streets",
-  "ref": "008-hardware-rotated-mot-1-67.jpg",
-  "refSource": "008-hardware-rotated-mot-1-67.jpg"
+  "location": "Melton Road",
+  "history": "Ran by Eileen & Des Hartop great for screws!",
+  "consentNoted": false,
+  "ref": "008",
+  "refSource": "008-hardware-rotated-mot-1-67.jpg",
+  "placeId": "",
+  "id": "",
+  "addedAt": "2026-07-16T11:48:18.494Z",
+  "numberedPeople": ""
 }
