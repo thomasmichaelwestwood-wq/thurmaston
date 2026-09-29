@@ -70,5 +70,17 @@
     "photo": "/images/cemetery/Bates Louis.JPG",
     "addedAt": "2026-09-29T19:13:31.853Z",
     "id": "20260929191314-lewis-bates"
+  },
+  {
+    "name": "William Bentley",
+    "number": "D1055",
+    "dates": "Died 8 Sept 1947 aged 87",
+    "whatThreeWords": "",
+    "pinPosition": "",
+    "inscription": "",
+    "notes": "",
+    "photo": "/images/cemetery/Bentley Gerald.JPG",
+    "addedAt": "2026-09-29T19:48:52.749Z",
+    "id": "20260929194833-william-bentley"
   }
 ]
