@@ -93,7 +93,7 @@
       <div class="cms-field">
         <label for="photo-file">Photo of the headstone</label>
         <input type="file" id="photo-file" accept="image/*">
-        <button type="button" class="cms-btn cms-btn-secondary" id="photo-google-btn" style="margin-top:10px">Choose from Google Photos</button>
+        <button type="button" class="cms-btn cms-btn-secondary" id="photo-drive-btn" style="margin-top:10px">Choose from Google Drive</button>
         <div id="photo-preview-wrap" style="margin-top:12px" hidden>
           <img id="photo-preview" alt="" style="max-width:200px;border-radius:12px;display:block">
         </div>
@@ -115,7 +115,7 @@
     <div class="cms-field">
       <label for="overview-file">Photo</label>
       <input type="file" id="overview-file" accept="image/*">
-      <button type="button" class="cms-btn cms-btn-secondary" id="overview-google-btn" style="margin-top:10px">Choose from Google Photos</button>
+      <button type="button" class="cms-btn cms-btn-secondary" id="overview-drive-btn" style="margin-top:10px">Choose from Google Drive</button>
       <div id="overview-preview-wrap" style="margin-top:12px" hidden>
         <img id="overview-preview" alt="" style="max-width:320px;border-radius:12px;display:block">
       </div>
@@ -132,7 +132,7 @@
 <script src="../admin/cms-auth.js"></script>
 <script src="../admin/cms-core.js"></script>
 <script src="../admin/geo-helpers.js"></script>
-<script src="../admin/google-photos-picker.js"></script>
+<script src="../admin/google-drive-picker.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var token = cmsRequireAuth();
@@ -456,13 +456,13 @@
       });
     });
 
-    document.getElementById("photo-google-btn").addEventListener("click", function () {
-      var btn = document.getElementById("photo-google-btn");
+    document.getElementById("photo-drive-btn").addEventListener("click", function () {
+      var btn = document.getElementById("photo-drive-btn");
       var originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Waiting for you to choose…";
       cmsHideError();
-      googlePhotosPickOne().then(function (picked) {
+      googleDrivePickOne().then(function (picked) {
         btn.disabled = false;
         btn.textContent = originalText;
         if (!picked) return; // cancelled — nothing to do
@@ -473,7 +473,7 @@
       }).catch(function (err) {
         btn.disabled = false;
         btn.textContent = originalText;
-        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Photos. Please try again.");
+        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Drive. Please try again.");
       });
     });
 
@@ -583,13 +583,13 @@
       });
     });
 
-    document.getElementById("overview-google-btn").addEventListener("click", function () {
-      var btn = document.getElementById("overview-google-btn");
+    document.getElementById("overview-drive-btn").addEventListener("click", function () {
+      var btn = document.getElementById("overview-drive-btn");
       var originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Waiting for you to choose…";
       cmsHideError();
-      googlePhotosPickOne().then(function (picked) {
+      googleDrivePickOne().then(function (picked) {
         btn.disabled = false;
         btn.textContent = originalText;
         if (!picked) return; // cancelled — nothing to do
@@ -600,7 +600,7 @@
       }).catch(function (err) {
         btn.disabled = false;
         btn.textContent = originalText;
-        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Photos. Please try again.");
+        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Drive. Please try again.");
       });
     });
 
