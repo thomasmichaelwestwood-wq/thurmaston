@@ -1,5 +1,24 @@
 [
   {
+    "src": "/images/photos/streets/20261021122753-black-horse-pub.jpg",
+    "caption": "Black Horse Pub",
+    "personName": "Fox?",
+    "category": "streets",
+    "date": "c1900",
+    "credit": "",
+    "location": "Main Street",
+    "history": "test",
+    "consentNoted": true,
+    "ref": "001 Black Horse MOT 1 1-2",
+    "refSource": "001 Black Horse MOT 1 1-2.jpg",
+    "placeId": "",
+    "id": "20261021122753-black-horse-pub",
+    "addedAt": "2026-10-21T11:27:54.756Z",
+    "numberedPeople": "",
+    "lat": 52.6789918611773,
+    "lng": -1.0992554159385832
+  },
+  {
     "src": "/images/photos/streets/20261021122521-black-horse-pub.jpg",
     "caption": "Black Horse Pub",
     "personName": "Fox family - unverified",
