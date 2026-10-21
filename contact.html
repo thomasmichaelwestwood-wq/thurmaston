@@ -43,7 +43,25 @@
     <div class="content-grid">
       <div>
         <h2>Send a message</h2>
-        <form class="stack card" action="#" method="post">
+        <!--
+          A plain Netlify Form, same proven pattern as
+          submit-event-photos.html — no backend to run or maintain.
+          Netlify finds this form at deploy time (data-netlify="true")
+          and starts collecting submissions into Site settings > Forms
+          in the Netlify dashboard. A full-page POST (not fetch/AJAX),
+          same reason as that other form: simplest and most reliable
+          for Netlify Forms, and consistent with it rather than
+          introducing a second submission style for this one page.
+          Netlify emails a notification for each submission once an
+          email notification is added for this form in the dashboard
+          (Site settings > Forms > Form notifications) — not something
+          set from this HTML.
+        -->
+        <form id="contact-form" name="contact" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/contact.html?submitted=true" class="stack card">
+          <input type="hidden" name="form-name" value="contact">
+          <p class="visually-hidden">
+            <label>Don't fill this out if you're human: <input name="bot-field"></label>
+          </p>
           <div>
             <label for="c-name">Name</label>
             <input type="text" id="c-name" name="name" required>
@@ -67,14 +85,17 @@
             <textarea id="c-message" name="message" rows="6" required></textarea>
           </div>
           <button class="btn btn-primary" type="submit" style="align-self:flex-start">Send message</button>
-          <p style="font-size:0.8rem;color:var(--ink-soft);margin:0">This form isn't connected to a mailbox yet — wire it up to your preferred form handler (e.g. Netlify Forms, Formspree) before going live.</p>
         </form>
+        <div id="contact-thanks" class="card" hidden>
+          <h3>Thanks — message sent!</h3>
+          <p style="margin:0">We'll get back to you as soon as we can.</p>
+        </div>
       </div>
 
       <div>
         <h2>Other ways to reach us</h2>
         <ul class="info-list">
-          <li><span class="dt">Site team</span><span>Add your preferred village-site email address here once set up.</span></li>
+          <li><span class="dt">Site team</span><span><a href="mailto:thurmastonheritagegroup@gmail.com">thurmastonheritagegroup@gmail.com</a></span></li>
         </ul>
       </div>
     </div>
@@ -126,5 +147,17 @@
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
 <script src="js/photos.js"></script>
+<script>
+  // Netlify redirects the browser back here with ?submitted=true once
+  // it's finished processing the form POST (see the form's own
+  // action="" above) — same pattern as submit-event-photos.html.
+  (function () {
+    if (new URLSearchParams(location.search).get("submitted") !== "true") return;
+    var form = document.getElementById("contact-form");
+    var thanks = document.getElementById("contact-thanks");
+    if (form) form.hidden = true;
+    if (thanks) thanks.hidden = false;
+  })();
+</script>
 </body>
 </html>
