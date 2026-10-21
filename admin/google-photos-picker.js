@@ -65,13 +65,16 @@ function gppGetAccessToken() {
   });
 }
 
-function gppCreateSession(token, maxItemCount) {
-  var body = {};
-  if (maxItemCount) { body.pickingConfig = { maxItemCount: String(maxItemCount) }; }
+function gppCreateSession(token) {
+  // Deliberately sending an empty body — no pickingConfig/maxItemCount
+  // restriction. An earlier version capped single-photo picks at
+  // maxItemCount: "1", which is a less common code path through
+  // Google's API than an unrestricted session; removed while tracking
+  // down a real-world "Couldn't add photos" failure, to rule it out.
   return fetch("https://photospicker.googleapis.com/v1/sessions", {
     method: "POST",
     headers: { "Authorization": "Bearer " + token, "Content-Type": "application/json" },
-    body: JSON.stringify(body)
+    body: JSON.stringify({})
   }).then(function (res) {
     if (!res.ok) throw new Error("Couldn't connect to Google Photos. Please try again.");
     return res.json();
@@ -193,7 +196,7 @@ function googlePhotosPickOne() {
   var accessToken;
   return gppGetAccessToken().then(function (token) {
     accessToken = token;
-    return gppCreateSession(token, 1);
+    return gppCreateSession(token);
   }).then(function (session) {
     var popup = gppOpenPicker(session.pickerUri);
     return gppPollSession(session.id, accessToken, session.pollingConfig, popup).then(function (result) {
@@ -219,7 +222,7 @@ function googlePhotosPickMany() {
   var accessToken;
   return gppGetAccessToken().then(function (token) {
     accessToken = token;
-    return gppCreateSession(token, null);
+    return gppCreateSession(token);
   }).then(function (session) {
     var popup = gppOpenPicker(session.pickerUri);
     return gppPollSession(session.id, accessToken, session.pollingConfig, popup).then(function (result) {
