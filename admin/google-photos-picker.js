@@ -151,6 +151,23 @@ function gppListMediaItems(sessionId, token) {
   return fetchPage(null);
 }
 
+// Google's session can report mediaItemsSet: true an instant before the
+// picked item is actually queryable — without this, that race looked
+// exactly like "nothing was picked" and failed silently. Retries a
+// few times with a short wait before giving up.
+function gppListMediaItemsWithRetry(sessionId, token) {
+  var attempts = [0, 600, 1200, 2000, 2000]; // ms to wait before each attempt
+  function attempt(i) {
+    return new Promise(function (resolve) { setTimeout(resolve, attempts[i]); }).then(function () {
+      return gppListMediaItems(sessionId, token);
+    }).then(function (items) {
+      if (items.length || i === attempts.length - 1) return items;
+      return attempt(i + 1);
+    });
+  }
+  return attempt(0);
+}
+
 function gppDownloadViaFunction(baseUrl, token) {
   return fetch("/.netlify/functions/google-photos-download", {
     method: "POST",
@@ -204,9 +221,9 @@ function googlePhotosPickOne() {
         gppDeleteSession(session.id, accessToken);
         return null;
       }
-      return gppListMediaItems(session.id, accessToken).then(function (items) {
+      return gppListMediaItemsWithRetry(session.id, accessToken).then(function (items) {
         gppDeleteSession(session.id, accessToken);
-        if (!items.length) return null;
+        if (!items.length) throw new Error("Google said you picked a photo, but we couldn't find it. Please try again.");
         var item = items[0];
         return gppDownloadViaFunction(item.mediaFile.baseUrl, accessToken).then(function (downloaded) {
           return { base64: downloaded.base64, filename: item.mediaFile.filename || "google-photo.jpg" };
@@ -230,8 +247,9 @@ function googlePhotosPickMany() {
         gppDeleteSession(session.id, accessToken);
         return [];
       }
-      return gppListMediaItems(session.id, accessToken).then(function (items) {
+      return gppListMediaItemsWithRetry(session.id, accessToken).then(function (items) {
         gppDeleteSession(session.id, accessToken);
+        if (!items.length) throw new Error("Google said you picked some photos, but we couldn't find them. Please try again.");
         return gppDownloadSequentially(items, accessToken);
       });
     });
