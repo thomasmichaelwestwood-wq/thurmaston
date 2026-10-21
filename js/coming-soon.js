@@ -13,6 +13,10 @@
 // beyond this one file.
 var COMING_SOON_PASSWORD = "thurmaston2026";
 
+// Temporarily switched off — set back to true to bring the password
+// gate back for every visitor (no redeploy needed beyond this file).
+var COMING_SOON_ENABLED = false;
+
 // sessionStorage, not localStorage — remembers the unlock for as long
 // as this browser tab/window stays open (reloading, clicking around,
 // coming back to the tab later all skip the gate), but asks again once
@@ -22,12 +26,13 @@ var COMING_SOON_PASSWORD = "thurmaston2026";
 // middle ground that was actually wanted: not re-typed every reload,
 // but not a permanent bypass sitting in the browser indefinitely either.
 (function () {
-  if (sessionStorage.getItem("thurmaston-unlocked") === "1") {
+  if (!COMING_SOON_ENABLED || sessionStorage.getItem("thurmaston-unlocked") === "1") {
     document.documentElement.classList.add("unlocked");
   }
 })();
 
 document.addEventListener("DOMContentLoaded", function () {
+  if (!COMING_SOON_ENABLED) return;
   var form = document.getElementById("coming-soon-form");
   if (!form) return;
   var input = document.getElementById("coming-soon-password");
