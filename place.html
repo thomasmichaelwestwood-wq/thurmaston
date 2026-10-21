@@ -46,14 +46,32 @@
     <div class="place-photo-panel" id="place-photo-panel" hidden></div>
     <div class="place-history" id="place-history" hidden></div>
     <div class="place-actions" id="place-actions" hidden>
+      <a class="btn place-outline-btn" id="place-download-photo-btn" href="#" download>Download photo</a>
+      <button class="btn place-outline-btn place-download-pdf-btn" id="place-download-pdf-btn" type="button">View / Print PDF</button>
       <button class="btn btn-primary place-know-more-btn" id="place-know-more-btn" type="button">Know more about this photo?</button>
-      <button class="btn place-download-pdf-btn" id="place-download-pdf-btn" type="button">View / Print PDF</button>
     </div>
     <div class="place-content" id="place-content"></div>
     <div class="place-related" id="place-related" hidden></div>
     <p class="place-not-found" id="place-not-found" hidden>We couldn't find that photo. It may have been renamed or removed — <a href="index.html">back to the homepage</a>.</p>
   </section>
 </main>
+
+<!--
+  Never shown or filled in directly — this is purely so Netlify's
+  build-time form scanner finds and registers the "name-person" form
+  (Site settings > Forms in the Netlify dashboard) ahead of deploy.
+  js/place.js's inline "who is this?" popover (opened from a numbered
+  marker on a group photo) submits the real, user-filled version of
+  these same fields straight to Netlify via fetch — see
+  submitPersonName() — without ever showing this one.
+-->
+<form name="name-person" data-netlify="true" netlify-honeypot="bot-field" hidden>
+  <input type="hidden" name="form-name" value="name-person">
+  <input name="bot-field">
+  <input type="text" name="photo-id">
+  <input type="text" name="person-number">
+  <input type="text" name="name">
+</form>
 
 <div class="place-know-more-modal" id="place-know-more-modal">
   <div class="place-know-more-inner">

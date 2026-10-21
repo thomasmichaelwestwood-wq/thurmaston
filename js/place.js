@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   var knowMoreBtn = document.getElementById("place-know-more-btn");
   var knowMoreModal = document.getElementById("place-know-more-modal");
   var downloadPdfBtn = document.getElementById("place-download-pdf-btn");
+  var downloadPhotoBtn = document.getElementById("place-download-photo-btn");
   var relatedEl = document.getElementById("place-related");
   var backLinkEl = document.getElementById("place-back-link");
   var locationBannerEl = document.getElementById("place-location-banner");
@@ -88,6 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
       renderHistorySection(primaryPhoto);
       renderKnowMore(primaryPhoto);
       renderDownloadPdf(primaryPhoto, page);
+      renderDownloadPhoto(primaryPhoto);
       if (actionsEl) actionsEl.hidden = false;
       renderRelatedPhotos(primaryPhoto, photos);
       renderBackLink(primaryPhoto);
@@ -142,9 +144,10 @@ document.addEventListener("DOMContentLoaded", function () {
   // tool's own comment) and stored as a plain JSON string in the
   // photo's "Numbered people (JSON)" field: [{number, x, y}, ...],
   // x/y as percentages of the image so markers stay correctly placed
-  // at any display size. Each marker reuses the existing "Know more"
-  // popup rather than a second, separate submission mechanism — just
-  // pre-filled to say which numbered person the message is about.
+  // at any display size. Each marker opens a small inline popover
+  // right there on the photo (openNamePersonInline, below) — not the
+  // full "Know more" popup, which asks for an email address and a
+  // message just to type one name.
   function renderNumberedPeople(photo) {
     var mediaEl = photoPanelEl.querySelector(".place-photo-panel-media");
     if (!mediaEl || !photo.numberedPeople) return;
@@ -164,16 +167,113 @@ document.addEventListener("DOMContentLoaded", function () {
       marker.style.left = p.x + "%";
       marker.style.top = p.y + "%";
       marker.textContent = String(p.number);
-      marker.setAttribute("aria-label", "Who is number " + p.number + "? Tell us");
+      marker.setAttribute("aria-label", "Name number " + p.number);
       marker.addEventListener("click", function (e) {
         // Sits on top of the click-to-zoom image underneath it — stop
         // the click reaching that handler too, or a marker tap would
-        // both open this popup and the full-screen zoom overlay at once.
+        // both open this popover and the full-screen zoom overlay at once.
         e.stopPropagation();
-        openKnowMoreModal(photo, p.number);
+        openNamePersonInline(photo, p.number, marker, mediaEl);
       });
       mediaEl.appendChild(marker);
     });
+  }
+
+  // A simple inline "who is this?" popover, anchored right next to the
+  // marker that opened it — just a name field, no email, no message —
+  // the replacement for routing a numbered-person tap through the full
+  // "Know more" popup. Submits straight to Netlify Forms (the same
+  // proven, no-backend-needed pattern submit-event-photos.html already
+  // uses) as its own "name-person" form — see the hidden static copy
+  // of that form in place.html, which is only there so Netlify's
+  // build-time scanner finds and registers it; the real, filled-in
+  // version is this popover, submitted by fetch in submitPersonName().
+  var activeNamePopover = null;
+  var activeNamePopoverOutsideHandler = null;
+
+  function closeNamePopover() {
+    if (activeNamePopoverOutsideHandler) {
+      document.removeEventListener("click", activeNamePopoverOutsideHandler);
+      activeNamePopoverOutsideHandler = null;
+    }
+    if (activeNamePopover && activeNamePopover.parentNode) activeNamePopover.parentNode.removeChild(activeNamePopover);
+    activeNamePopover = null;
+  }
+
+  function openNamePersonInline(photo, personNumber, marker, mediaEl) {
+    // Tapping the same marker again, or a different one, just moves
+    // the popover rather than stacking a second one.
+    closeNamePopover();
+
+    var popover = document.createElement("div");
+    popover.className = "place-name-popover";
+    // Anchored just below the marker, clamped so it can't spill past
+    // either edge of the photo for a marker placed near its border.
+    var left = Math.min(Math.max(parseFloat(marker.style.left) || 0, 18), 82);
+    var top = Math.min((parseFloat(marker.style.top) || 0) + 6, 90);
+    popover.style.left = left + "%";
+    popover.style.top = top + "%";
+
+    var inputId = "place-name-input-" + personNumber;
+    popover.innerHTML =
+      '<form class="place-name-popover-form">' +
+        '<label for="' + inputId + '">Who is number ' + personNumber + '?</label>' +
+        '<input type="text" id="' + inputId + '" placeholder="Their name" autocomplete="off">' +
+        '<div class="place-name-popover-actions">' +
+          '<button type="submit" class="btn btn-primary">Submit</button>' +
+          '<button type="button" class="place-name-popover-cancel">Cancel</button>' +
+        "</div>" +
+      "</form>";
+    mediaEl.appendChild(popover);
+    activeNamePopover = popover;
+
+    var input = popover.querySelector("input");
+    input.focus();
+    input.addEventListener("keydown", function (e) {
+      if (e.key === "Escape") closeNamePopover();
+    });
+    popover.querySelector(".place-name-popover-cancel").addEventListener("click", closeNamePopover);
+    popover.querySelector("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var name = input.value.trim();
+      if (!name) { input.focus(); return; }
+      submitPersonName(photo, personNumber, name, popover);
+    });
+
+    // A tap anywhere else on the page closes it — deferred by a tick so
+    // the click that opened it (which already called stopPropagation on
+    // the marker itself) doesn't immediately close what it just opened.
+    setTimeout(function () {
+      activeNamePopoverOutsideHandler = function (e) {
+        if (popover.contains(e.target)) return;
+        closeNamePopover();
+      };
+      document.addEventListener("click", activeNamePopoverOutsideHandler);
+    }, 0);
+  }
+
+  function submitPersonName(photo, personNumber, name, popover) {
+    var submitBtn = popover.querySelector("button[type=submit]");
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending…";
+    var body = new URLSearchParams({
+      "form-name": "name-person",
+      "photo-id": photo.id,
+      "person-number": String(personNumber),
+      "name": name
+    });
+    fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
+      .then(function (res) {
+        if (!res.ok) throw new Error("Form submission failed");
+        popover.innerHTML = '<p class="place-name-popover-thanks">Thanks — we’ll take a look!</p>';
+        setTimeout(closeNamePopover, 2500);
+      })
+      .catch(function () {
+        popover.innerHTML =
+          '<p class="place-name-popover-thanks">Couldn’t send that — check your connection and try again.</p>' +
+          '<button type="button" class="place-name-popover-cancel">Close</button>';
+        popover.querySelector(".place-name-popover-cancel").addEventListener("click", closeNamePopover);
+      });
   }
 
   // Click the main photo to open it full-screen with zoom/pan — added
@@ -333,13 +433,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 
-  // Shared by the "Know more" button itself and by clicking a numbered
-  // person marker (renderNumberedPeople, above) — the latter just
-  // re-fills the form body first so the message is pre-tagged with
-  // which numbered person it's about.
-  function openKnowMoreModal(photo, personNumber) {
+  function openKnowMoreModal(photo) {
     if (!knowMoreModal) return;
-    knowMoreModal.querySelector(".place-know-more-body").innerHTML = renderSubmitForm(photo, personNumber);
+    knowMoreModal.querySelector(".place-know-more-body").innerHTML = renderSubmitForm(photo);
     knowMoreModal.classList.add("open");
   }
 
@@ -355,6 +451,18 @@ document.addEventListener("DOMContentLoaded", function () {
   // viewer tab rather than forcing a download — see openPdfInViewer in
   // js/pdf-helpers.js (shared with location.html's own "View / Print
   // PDF" for a place's whole timeline) for why and how.
+  // A plain link to the original image file — no processing, no popup,
+  // just the same file the <img> above already loads. The `download`
+  // attribute's filename is a readable one built from the caption
+  // (same slugifying helper the PDF button already uses), not the raw
+  // uploaded filename, which is often just a camera/Drive-assigned code.
+  function renderDownloadPhoto(photo) {
+    if (!downloadPhotoBtn) return;
+    downloadPhotoBtn.href = photo.src;
+    var ext = (photo.src.match(/\.[^.]+$/) || [".jpg"])[0];
+    downloadPhotoBtn.setAttribute("download", pdfFilenameBase(photo.caption || photo.id) + ext);
+  }
+
   function renderDownloadPdf(photo, page) {
     if (!downloadPdfBtn) return;
     downloadPdfBtn.onclick = function () {
@@ -471,20 +579,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Same fields as before — just now shown inside a popup instead of
   // always on the page. Still not wired to a backend, see the note in
-  // the form itself.
-  function renderSubmitForm(photo, personNumber) {
+  // the form itself. (Naming a numbered person in a group photo used
+  // to reuse this same popup, pre-filled — it now has its own much
+  // simpler, actually-working inline popover instead; see
+  // openNamePersonInline() below.)
+  function renderSubmitForm(photo) {
     var refValue = photo.ref || photo.caption || photo.id;
     var intro = "Have a date, a name, a story, or another photo of the same place? Tell us and we'll add it.";
-    if (personNumber) {
-      refValue += " — person #" + personNumber;
-      intro = "Know who number " + personNumber + " is? Tell us and we'll add it.";
-    }
     return (
       "<h4>Know more about this photo?</h4>" +
       "<p>" + escapeHtml(intro) + "</p>" +
       '<form class="stack" action="#" method="post">' +
         '<input type="hidden" name="photo-id" value="' + escapeAttr(photo.id) + '">' +
-        (personNumber ? '<input type="hidden" name="person-number" value="' + escapeAttr(String(personNumber)) + '">' : "") +
         "<div>" +
           '<label for="place-submit-ref">About this photo</label>' +
           '<input type="text" id="place-submit-ref" name="photo-ref" value="' + escapeAttr(refValue) + '" readonly>' +

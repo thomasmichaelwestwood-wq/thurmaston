@@ -1454,6 +1454,44 @@ a.chronology-year:hover { text-decoration: underline; }
   background: var(--green-700);
   outline: none;
 }
+
+/* Inline "who is this?" popover (js/place.js openNamePersonInline) —
+   opens right on the photo next to the marker that triggered it,
+   instead of the heavier "Know more" modal, which asks for an email
+   address and a message just to type in one name. */
+.place-name-popover {
+  position: absolute;
+  z-index: 10;
+  width: min(220px, 80%);
+  background: #fff;
+  color: var(--ink);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  padding: 12px 14px;
+}
+.place-name-popover-form { display: flex; flex-direction: column; gap: 8px; }
+.place-name-popover-form label { font-size: 0.8rem; font-weight: 600; }
+.place-name-popover-form input[type="text"] {
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.place-name-popover-actions { display: flex; gap: 8px; align-items: center; }
+.place-name-popover-actions .btn {
+  padding: 7px 14px;
+  font-size: 0.82rem;
+}
+.place-name-popover-cancel {
+  background: none;
+  border: none;
+  color: var(--ink-soft);
+  font-size: 0.82rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.place-name-popover-thanks { margin: 0; font-size: 0.88rem; font-weight: 600; }
 .place-photo-panel-info {
   flex: 1 1 260px;
   padding: 24px 26px;
@@ -2092,14 +2130,15 @@ a.chronology-year:hover { text-decoration: underline; }
   .place-actions .btn { width: 100%; text-align: center; }
 }
 /* .btn-outline is styled for the dark hero background — this section
-   of the page is light, so the download button gets its own outline
-   style rather than reusing that class here. */
-.place-download-pdf-btn {
+   of the page is light, so these secondary actions (download the
+   original photo, view/print it as a PDF) get their own outline style
+   rather than reusing that class here. */
+.place-outline-btn {
   background: transparent;
   border-color: var(--green-700);
   color: var(--green-700);
 }
-.place-download-pdf-btn:hover { background: var(--green-700); color: #fff; }
+.place-outline-btn:hover { background: var(--green-700); color: #fff; }
 .place-download-pdf-btn:disabled { opacity: 0.6; cursor: default; }
 
 .place-know-more-modal {
