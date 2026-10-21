@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Shared Memories | Memories of Thurmaston Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <a href="index.html">Memories of Thurmaston — Admin</a>
+  <button type="button" id="cms-signout-btn">Sign out</button>
+</header>
+
+<main class="cms-main">
+  <p class="cms-breadcrumb"><a href="index.html">← Back to the admin home</a></p>
+  <div id="cms-error-banner" hidden></div>
+
+  <h1>Shared memories</h1>
+  <p class="cms-intro">Short resident stories shown on the homepage.</p>
+
+  <div id="list-view">
+    <p><button type="button" class="cms-btn cms-btn-primary" id="add-btn">Add a new memory</button></p>
+    <ul class="cms-entry-list" id="entry-list"></ul>
+    <p class="cms-empty" id="list-empty" hidden>No shared memories yet.</p>
+  </div>
+
+  <div id="form-view" hidden>
+    <h2 id="form-heading">Add a new memory</h2>
+    <div class="cms-field">
+      <label for="title-input">Title</label>
+      <input type="text" id="title-input">
+    </div>
+    <div class="cms-field">
+      <label for="text-input">Memory</label>
+      <textarea id="text-input"></textarea>
+    </div>
+    <div class="cms-field">
+      <label for="photo-file">Photo (optional)</label>
+      <input type="file" id="photo-file" accept="image/*">
+      <div id="photo-preview-wrap" style="margin-top:12px" hidden>
+        <img id="photo-preview" alt="" style="max-width:200px;border-radius:14px;display:block">
+      </div>
+    </div>
+    <div class="cms-field">
+      <label for="meta-input">Label (optional)</label>
+      <input type="text" id="meta-input" placeholder="Shared memory">
+    </div>
+    <p>
+      <button type="button" class="cms-btn cms-btn-primary" id="save-entry-btn">Save</button>
+      <button type="button" class="cms-btn cms-btn-secondary" id="cancel-entry-btn">Cancel</button>
+    </p>
+  </div>
+  <p class="cms-status" id="save-status" hidden></p>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var token = cmsRequireAuth();
+    if (!token) return;
+    cmsInitShell();
+
+    var FILE_PATH = "data/memories.json";
+    var fileSha = null;
+    var entries = [];
+    var editingIndex = null;
+    var newPhotoBase64 = null, newPhotoFilename = null;
+
+    load();
+
+    function load() {
+      cmsGetFile(FILE_PATH, token).then(function (file) {
+        if (!file) { entries = []; fileSha = null; renderList(); return; }
+        fileSha = file.sha;
+        var data = JSON.parse(file.content);
+        entries = data.entries || [];
+        renderList();
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    function renderList() {
+      var listEl = document.getElementById("entry-list");
+      var emptyEl = document.getElementById("list-empty");
+      if (entries.length === 0) { listEl.innerHTML = ""; emptyEl.hidden = false; return; }
+      emptyEl.hidden = true;
+      listEl.innerHTML = entries.map(function (e, i) {
+        return (
+          '<li class="cms-entry-row">' +
+            (e.photo ? '<img src="' + escapeAttr("../" + String(e.photo).replace(/^\//, "")) + '" alt="" loading="lazy">' : "") +
+            '<span class="cms-entry-title">' + escapeHtml(e.title || "") + "</span>" +
+            '<a class="cms-entry-edit" href="#" data-index="' + i + '" data-action="edit">Edit</a>' +
+            '<a class="cms-entry-edit" href="#" data-index="' + i + '" data-action="remove" style="color:#9b2c2c">Remove</a>' +
+          "</li>"
+        );
+      }).join("");
+      Array.prototype.forEach.call(listEl.querySelectorAll("a"), function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          var i = Number(a.dataset.index);
+          if (a.dataset.action === "edit") startEdit(i); else removeEntry(i);
+        });
+      });
+    }
+
+    document.getElementById("add-btn").addEventListener("click", function () { startAdd(); });
+    document.getElementById("cancel-entry-btn").addEventListener("click", function () { showList(); });
+
+    function showList() { document.getElementById("list-view").hidden = false; document.getElementById("form-view").hidden = true; }
+    function showForm() { document.getElementById("list-view").hidden = true; document.getElementById("form-view").hidden = false; }
+
+    function resetFormFields() {
+      newPhotoBase64 = null; newPhotoFilename = null;
+      document.getElementById("title-input").value = "";
+      document.getElementById("text-input").value = "";
+      document.getElementById("meta-input").value = "";
+      document.getElementById("photo-file").value = "";
+      document.getElementById("photo-preview-wrap").hidden = true;
+    }
+
+    function startAdd() {
+      editingIndex = null;
+      document.getElementById("form-heading").textContent = "Add a new memory";
+      resetFormFields();
+      showForm();
+    }
+    function startEdit(i) {
+      editingIndex = i;
+      document.getElementById("form-heading").textContent = "Edit memory";
+      resetFormFields();
+      document.getElementById("title-input").value = entries[i].title || "";
+      document.getElementById("text-input").value = entries[i].text || "";
+      document.getElementById("meta-input").value = entries[i].meta || "";
+      if (entries[i].photo) {
+        document.getElementById("photo-preview").src = "../" + String(entries[i].photo).replace(/^\//, "");
+        document.getElementById("photo-preview-wrap").hidden = false;
+      }
+      showForm();
+    }
+
+    document.getElementById("photo-file").addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      newPhotoFilename = file.name;
+      cmsReadFileAsBase64(file).then(function (base64) {
+        newPhotoBase64 = base64;
+        var preview = document.getElementById("photo-preview");
+        preview.src = "data:" + (file.type || "image/jpeg") + ";base64," + base64;
+        document.getElementById("photo-preview-wrap").hidden = false;
+      });
+    });
+
+    document.getElementById("save-entry-btn").addEventListener("click", function () {
+      var title = document.getElementById("title-input").value.trim();
+      var text = document.getElementById("text-input").value.trim();
+      if (!title || !text) { cmsShowError("Please fill in both the title and the memory."); return; }
+      cmsHideError();
+
+      var saveBtn = document.getElementById("save-entry-btn");
+      saveBtn.disabled = true;
+
+      var existingPhoto = (editingIndex !== null) ? entries[editingIndex].photo : null;
+      var photoStep = Promise.resolve(existingPhoto);
+      if (newPhotoBase64) {
+        var ext = cmsFileExtension(newPhotoFilename) || ".jpg";
+        var imagePath = "images/memories/" + cmsTimestampSlug(title) + ext;
+        photoStep = cmsPutBinaryFile(imagePath, newPhotoBase64, "Add shared memory photo: " + title, token)
+          .then(function () { return "/" + imagePath; });
+      }
+
+      photoStep.then(function (photoSrc) {
+        var entry = {
+          meta: document.getElementById("meta-input").value.trim() || "Shared memory",
+          title: title,
+          text: text,
+          photo: photoSrc
+        };
+        if (editingIndex === null) entries.push(entry); else entries[editingIndex] = entry;
+        return saveWholeFile();
+      }).then(function () {
+        showList();
+        saveBtn.disabled = false;
+      }).catch(function (err) {
+        cmsShowError(cmsFriendlyError(err));
+        saveBtn.disabled = false;
+      });
+    });
+
+    function removeEntry(i) {
+      if (!confirm('Remove "' + (entries[i].title || "this memory") + '"? This can\'t be undone.')) return;
+      entries.splice(i, 1);
+      saveWholeFile().catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    function saveWholeFile() {
+      var statusEl = document.getElementById("save-status");
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+      var content = JSON.stringify({ entries: entries }, null, 2) + "\n";
+      return cmsPutTextFile(FILE_PATH, content, "Update Shared Memories", token, fileSha).then(function (result) {
+        if (result && result.content && result.content.sha) fileSha = result.content.sha;
+        statusEl.className = "cms-status cms-status-ok";
+        statusEl.textContent = "Saved.";
+        renderList();
+        setTimeout(function () { statusEl.hidden = true; }, 3000);
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(str) { return escapeHtml(str); }
+  });
+</script>
+</body>
+</html>

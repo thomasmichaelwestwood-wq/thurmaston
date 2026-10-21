@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Village Events | Memories of Thurmaston Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <a href="index.html">Memories of Thurmaston — Admin</a>
+  <button type="button" id="cms-signout-btn">Sign out</button>
+</header>
+
+<main class="cms-main">
+  <p class="cms-breadcrumb"><a href="index.html">← Back to the admin home</a></p>
+  <div id="cms-error-banner" hidden></div>
+
+  <!-- Step 1: browse existing events -->
+  <div id="browse-step">
+    <h1>Village events</h1>
+    <p><a class="cms-btn cms-btn-primary" href="events.html?add=1">Add a new event</a></p>
+    <ul class="cms-entry-list" id="browse-list"></ul>
+    <p class="cms-empty" id="browse-empty" hidden>No events have been added yet.</p>
+  </div>
+
+  <!-- Step 2: add/edit form -->
+  <div id="form-step" hidden>
+    <h1 id="form-heading"></h1>
+    <p><button type="button" class="cms-btn cms-btn-secondary" id="back-to-list-btn">← Back to the list</button></p>
+
+    <div class="cms-field">
+      <label for="name-input">Event name</label>
+      <input type="text" id="name-input" placeholder="e.g. Village Fete 2026">
+    </div>
+    <div class="cms-field">
+      <label for="date-input">Date</label>
+      <input type="text" id="date-input" placeholder="e.g. 14 June 2026">
+    </div>
+    <div class="cms-field">
+      <label for="description-input">Description</label>
+      <textarea id="description-input" placeholder="The story of this event"></textarea>
+    </div>
+    <div class="cms-field">
+      <label for="photos-file">Photos</label>
+      <input type="file" id="photos-file" accept="image/*" multiple>
+      <span class="cms-hint" id="existing-photos-hint" hidden>There are already photos here — choosing files adds to them (it won't remove the existing ones).</span>
+      <div id="photos-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"></div>
+    </div>
+
+    <details class="cms-more">
+      <summary>More details (optional)</summary>
+      <div class="cms-field">
+        <label for="location-input">Location</label>
+        <input type="text" id="location-input" placeholder="e.g. War Memorial, Melton Road">
+      </div>
+      <div class="cms-field">
+        <label for="coords-input">Google Maps coordinates</label>
+        <input type="text" id="coords-input" placeholder="e.g. 52.679363, -1.097994">
+        <span class="cms-hint">On Google Maps, right-click the exact spot and click the coordinates to copy them, then paste here.</span>
+      </div>
+      <div class="cms-field cms-checkbox-field">
+        <input type="checkbox" id="consent-input">
+        <label for="consent-input">I've confirmed it's OK to show identifiable people in these photos</label>
+      </div>
+    </details>
+
+    <p>
+      <button type="button" class="cms-btn cms-btn-primary" id="save-btn">Save this event</button>
+      <button type="button" class="cms-btn cms-btn-danger" id="delete-btn" hidden>Remove this event</button>
+    </p>
+    <p class="cms-status" id="save-status" hidden></p>
+  </div>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var token = cmsRequireAuth();
+    if (!token) return;
+    cmsInitShell();
+
+    var browseStep = document.getElementById("browse-step");
+    var formStep = document.getElementById("form-step");
+    var params = new URLSearchParams(location.search);
+    var editId = params.get("edit");
+    var addMode = params.get("add") === "1";
+
+    var currentEntry = null; // { sha, data, path } when editing
+    var newPhotosBase64 = []; // [{ filename, base64 }] staged for upload on save
+
+    if (editId) {
+      showFormStep();
+      loadEntryForEdit(editId);
+    } else if (addMode) {
+      showFormStep();
+      resetForm();
+    } else {
+      showBrowseStep();
+    }
+
+    function showBrowseStep() {
+      browseStep.hidden = false;
+      formStep.hidden = true;
+      loadBrowseList();
+    }
+    function showFormStep() {
+      browseStep.hidden = true;
+      formStep.hidden = false;
+      document.getElementById("form-heading").textContent = editId ? "Edit event" : "Add a new event";
+    }
+    document.getElementById("back-to-list-btn").addEventListener("click", function () {
+      location.href = "events.html";
+    });
+
+    function loadBrowseList() {
+      var listEl = document.getElementById("browse-list");
+      var emptyEl = document.getElementById("browse-empty");
+      listEl.innerHTML = "";
+      cmsListFolder("data/events", token).then(function (files) {
+        var jsonFiles = files.filter(function (f) { return f.type === "file" && /\.json$/i.test(f.name); });
+        if (jsonFiles.length === 0) { emptyEl.hidden = false; return; }
+        emptyEl.hidden = true;
+        return Promise.all(jsonFiles.map(function (f) {
+          return cmsGetFile(f.path, token).then(function (file) {
+            return { id: f.name.replace(/\.json$/, ""), data: JSON.parse(file.content) };
+          });
+        })).then(function (entries) {
+          listEl.innerHTML = entries.map(function (e) {
+            var cover = (e.data.photos || [])[0];
+            return (
+              '<li class="cms-entry-row">' +
+                (cover ? '<img src="' + escapeAttr("../" + String(cover).replace(/^\//, "")) + '" alt="" loading="lazy">' : "") +
+                '<span class="cms-entry-title">' + escapeHtml(e.data.name || "Untitled event") + "</span>" +
+                '<a class="cms-entry-edit" href="events.html?edit=' + encodeURIComponent(e.id) + '">Edit</a>' +
+              "</li>"
+            );
+          }).join("");
+        });
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    function resetForm() {
+      currentEntry = null;
+      newPhotosBase64 = [];
+      document.getElementById("name-input").value = "";
+      document.getElementById("date-input").value = "";
+      document.getElementById("description-input").value = "";
+      document.getElementById("location-input").value = "";
+      document.getElementById("coords-input").value = "";
+      document.getElementById("consent-input").checked = false;
+      document.getElementById("photos-file").value = "";
+      document.getElementById("existing-photos-hint").hidden = true;
+      document.getElementById("photos-preview").innerHTML = "";
+      document.getElementById("delete-btn").hidden = true;
+    }
+
+    function loadEntryForEdit(id) {
+      var path = "data/events/" + id + ".json";
+      cmsGetFile(path, token).then(function (file) {
+        if (!file) { cmsShowError("Couldn't find that event — it may have been removed already."); return; }
+        var data = JSON.parse(file.content);
+        currentEntry = { sha: file.sha, data: data, path: path };
+        resetForm();
+        document.getElementById("name-input").value = data.name || "";
+        document.getElementById("date-input").value = data.date || "";
+        document.getElementById("description-input").value = data.description || "";
+        document.getElementById("location-input").value = data.location || "";
+        document.getElementById("coords-input").value = data.coords || "";
+        document.getElementById("consent-input").checked = !!data.consentNoted;
+        document.getElementById("delete-btn").hidden = false;
+        if ((data.photos || []).length) {
+          document.getElementById("existing-photos-hint").hidden = false;
+          document.getElementById("photos-preview").innerHTML = data.photos.map(function (src) {
+            return '<img src="' + escapeAttr("../" + String(src).replace(/^\//, "")) + '" alt="" style="width:90px;height:90px;object-fit:cover;border-radius:10px">';
+          }).join("");
+        }
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    document.getElementById("photos-file").addEventListener("change", function (e) {
+      var files = Array.prototype.slice.call(e.target.files);
+      newPhotosBase64 = [];
+      var previewWrap = document.getElementById("photos-preview");
+      Promise.all(files.map(function (file) {
+        return cmsReadFileAsBase64(file).then(function (base64) {
+          newPhotosBase64.push({ filename: file.name, base64: base64, type: file.type || "image/jpeg" });
+          var img = document.createElement("img");
+          img.src = "data:" + (file.type || "image/jpeg") + ";base64," + base64;
+          img.style.width = "90px"; img.style.height = "90px"; img.style.objectFit = "cover"; img.style.borderRadius = "10px";
+          previewWrap.appendChild(img);
+        });
+      }));
+    });
+
+    document.getElementById("save-btn").addEventListener("click", function () {
+      var name = document.getElementById("name-input").value.trim();
+      if (!name) { cmsShowError("Please add an event name before saving."); return; }
+
+      var saveBtn = document.getElementById("save-btn");
+      var statusEl = document.getElementById("save-status");
+      saveBtn.disabled = true;
+      cmsHideError();
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+
+      var isNew = !currentEntry;
+      var slug = isNew ? cmsTimestampSlug(name) : currentEntry.path.split("/").pop().replace(/\.json$/, "");
+      var jsonPath = "data/events/" + slug + ".json";
+      var existingPhotos = currentEntry ? (currentEntry.data.photos || []) : [];
+
+      var uploadNewPhotos = Promise.all(newPhotosBase64.map(function (p, i) {
+        var ext = cmsFileExtension(p.filename) || ".jpg";
+        var imagePath = "images/events/" + slug + "-" + (existingPhotos.length + i + 1) + ext;
+        return cmsPutBinaryFile(imagePath, p.base64, "Add event photo: " + name, token).then(function () {
+          return "/" + imagePath;
+        });
+      }));
+
+      uploadNewPhotos.then(function (newSrcs) {
+        var entry = {
+          name: name,
+          date: document.getElementById("date-input").value.trim(),
+          description: document.getElementById("description-input").value.trim(),
+          coords: document.getElementById("coords-input").value.trim(),
+          location: document.getElementById("location-input").value.trim(),
+          photos: existingPhotos.concat(newSrcs),
+          consentNoted: document.getElementById("consent-input").checked,
+          addedAt: currentEntry ? currentEntry.data.addedAt : new Date().toISOString()
+        };
+        var content = JSON.stringify(entry, null, 2) + "\n";
+        var message = (isNew ? "Add event: " : "Update event: ") + name;
+        return cmsPutTextFile(jsonPath, content, message, token, currentEntry ? currentEntry.sha : null);
+      }).then(function () {
+        location.href = "events.html";
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        cmsShowError(cmsFriendlyError(err));
+        saveBtn.disabled = false;
+      });
+    });
+
+    document.getElementById("delete-btn").addEventListener("click", function () {
+      if (!currentEntry) return;
+      if (!confirm('Remove "' + (currentEntry.data.name || "this event") + '"? This can\'t be undone.')) return;
+      var deleteBtn = document.getElementById("delete-btn");
+      deleteBtn.disabled = true;
+      cmsHideError();
+      var name = currentEntry.data.name || "event";
+      cmsDeleteFile(currentEntry.path, currentEntry.sha, "Delete event: " + name, token).then(function () {
+        location.href = "events.html";
+      }).catch(function (err) {
+        deleteBtn.disabled = false;
+        cmsShowError(cmsFriendlyError(err));
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(str) { return escapeHtml(str); }
+  });
+</script>
+</body>
+</html>

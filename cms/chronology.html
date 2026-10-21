@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Village Chronology | Memories of Thurmaston Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <a href="index.html">Memories of Thurmaston — Admin</a>
+  <button type="button" id="cms-signout-btn">Sign out</button>
+</header>
+
+<main class="cms-main">
+  <p class="cms-breadcrumb"><a href="index.html">← Back to the admin home</a></p>
+  <div id="cms-error-banner" hidden></div>
+
+  <h1>Village Chronology</h1>
+  <p class="cms-intro">A year-by-year timeline of the village's history.</p>
+
+  <div id="list-view">
+    <p><button type="button" class="cms-btn cms-btn-primary" id="add-btn">Add a new entry</button></p>
+    <ul class="cms-entry-list" id="entry-list"></ul>
+    <p class="cms-empty" id="list-empty" hidden>No chronology entries yet.</p>
+  </div>
+
+  <div id="form-view" hidden>
+    <h2 id="form-heading">Add a new entry</h2>
+    <div class="cms-field">
+      <label for="year-input">Year</label>
+      <input type="text" id="year-input" placeholder="e.g. 1929, 1850s, or c1870">
+    </div>
+    <div class="cms-field">
+      <label for="text-input">What happened</label>
+      <textarea id="text-input"></textarea>
+    </div>
+    <p>
+      <button type="button" class="cms-btn cms-btn-primary" id="save-entry-btn">Save</button>
+      <button type="button" class="cms-btn cms-btn-secondary" id="cancel-entry-btn">Cancel</button>
+    </p>
+  </div>
+  <p class="cms-status" id="save-status" hidden></p>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var token = cmsRequireAuth();
+    if (!token) return;
+    cmsInitShell();
+
+    var FILE_PATH = "data/chronology.json";
+    var fileSha = null;
+    var entries = [];
+    var editingIndex = null; // null = adding new
+
+    load();
+
+    function load() {
+      cmsGetFile(FILE_PATH, token).then(function (file) {
+        if (!file) { entries = []; fileSha = null; renderList(); return; }
+        fileSha = file.sha;
+        var data = JSON.parse(file.content);
+        entries = data.entries || [];
+        renderList();
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    function renderList() {
+      var listEl = document.getElementById("entry-list");
+      var emptyEl = document.getElementById("list-empty");
+      if (entries.length === 0) {
+        listEl.innerHTML = "";
+        emptyEl.hidden = false;
+        return;
+      }
+      emptyEl.hidden = true;
+      listEl.innerHTML = entries.map(function (e, i) {
+        return (
+          '<li class="cms-entry-row">' +
+            '<span class="cms-entry-title">' + escapeHtml(e.year || "") + "</span>" +
+            '<span class="cms-entry-meta" style="flex:1 1 auto">' + escapeHtml((e.text || "").slice(0, 80)) + "</span>" +
+            '<a class="cms-entry-edit" href="#" data-index="' + i + '" data-action="edit">Edit</a>' +
+            '<a class="cms-entry-edit" href="#" data-index="' + i + '" data-action="remove" style="color:#9b2c2c">Remove</a>' +
+          "</li>"
+        );
+      }).join("");
+      Array.prototype.forEach.call(listEl.querySelectorAll("a"), function (a) {
+        a.addEventListener("click", function (e) {
+          e.preventDefault();
+          var i = Number(a.dataset.index);
+          if (a.dataset.action === "edit") startEdit(i); else removeEntry(i);
+        });
+      });
+    }
+
+    document.getElementById("add-btn").addEventListener("click", function () { startAdd(); });
+    document.getElementById("cancel-entry-btn").addEventListener("click", function () { showList(); });
+
+    function showList() {
+      document.getElementById("list-view").hidden = false;
+      document.getElementById("form-view").hidden = true;
+    }
+    function showForm() {
+      document.getElementById("list-view").hidden = true;
+      document.getElementById("form-view").hidden = false;
+    }
+
+    function startAdd() {
+      editingIndex = null;
+      document.getElementById("form-heading").textContent = "Add a new entry";
+      document.getElementById("year-input").value = "";
+      document.getElementById("text-input").value = "";
+      showForm();
+    }
+    function startEdit(i) {
+      editingIndex = i;
+      document.getElementById("form-heading").textContent = "Edit entry";
+      document.getElementById("year-input").value = entries[i].year || "";
+      document.getElementById("text-input").value = entries[i].text || "";
+      showForm();
+    }
+
+    document.getElementById("save-entry-btn").addEventListener("click", function () {
+      var year = document.getElementById("year-input").value.trim();
+      var text = document.getElementById("text-input").value.trim();
+      if (!year || !text) { cmsShowError("Please fill in both the year and what happened."); return; }
+      cmsHideError();
+      if (editingIndex === null) {
+        entries.push({ year: year, text: text });
+      } else {
+        entries[editingIndex] = { year: year, text: text };
+      }
+      saveWholeFile(function () { showList(); });
+    });
+
+    function removeEntry(i) {
+      if (!confirm('Remove the "' + (entries[i].year || "") + '" entry? This can\'t be undone.')) return;
+      entries.splice(i, 1);
+      saveWholeFile(function () {});
+    }
+
+    function saveWholeFile(onDone) {
+      var statusEl = document.getElementById("save-status");
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+      var content = JSON.stringify({ entries: entries }, null, 2) + "\n";
+      cmsPutTextFile(FILE_PATH, content, "Update Village Chronology", token, fileSha).then(function (result) {
+        if (result && result.content && result.content.sha) fileSha = result.content.sha;
+        statusEl.className = "cms-status cms-status-ok";
+        statusEl.textContent = "Saved.";
+        renderList();
+        onDone();
+        setTimeout(function () { statusEl.hidden = true; }, 3000);
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        cmsShowError(cmsFriendlyError(err));
+      });
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  });
+</script>
+</body>
+</html>

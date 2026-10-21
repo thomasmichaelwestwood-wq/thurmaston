@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin | Memories of Thurmaston</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <span>Memories of Thurmaston — Admin</span>
+  <button type="button" id="cms-signout-btn" hidden>Sign out</button>
+</header>
+
+<main class="cms-main">
+  <div id="cms-error-banner" hidden></div>
+
+  <div id="signin-view">
+    <h1>Sign in to make changes</h1>
+    <p class="cms-intro">Use the same GitHub account you've always signed in with.</p>
+    <button type="button" class="cms-btn cms-btn-primary" id="signin-btn">Sign in with GitHub</button>
+    <p class="cms-status" id="signin-status" hidden></p>
+  </div>
+
+  <div id="home-view" hidden>
+    <h1>What would you like to do?</h1>
+    <div class="cms-tiles">
+      <a class="cms-tile" href="photos.html">Add a photo</a>
+      <a class="cms-tile" href="photos.html?browse=1">Edit or remove a photo</a>
+      <a class="cms-tile" href="events.html">Village events</a>
+      <a class="cms-tile" href="chronology.html">Village Chronology</a>
+      <a class="cms-tile" href="cemetery.html">Cemetery</a>
+      <a class="cms-tile" href="memories.html">Shared memories</a>
+      <a class="cms-tile" href="cemetery.html?overview=1">Cemetery overview photo</a>
+    </div>
+  </div>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    cmsInitShell();
+    render();
+
+    function render() {
+      var token = cmsGetToken();
+      document.getElementById("signin-view").hidden = !!token;
+      document.getElementById("home-view").hidden = !token;
+      document.getElementById("cms-signout-btn").hidden = !token;
+    }
+
+    document.getElementById("signin-btn").addEventListener("click", function () {
+      var btn = document.getElementById("signin-btn");
+      var statusEl = document.getElementById("signin-status");
+      btn.disabled = true;
+      cmsHideError();
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Waiting for you to finish signing in…";
+      cmsSignIn().then(function (token) {
+        cmsSetToken(token);
+        statusEl.hidden = true;
+        render();
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        btn.disabled = false;
+        cmsShowError(err && err.message ? err.message : "Sign-in didn't complete. Please try again.");
+      });
+    });
+  });
+</script>
+</body>
+</html>

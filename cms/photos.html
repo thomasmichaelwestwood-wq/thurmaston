@@ -1,0 +1,421 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Photos | Memories of Thurmaston Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <a href="index.html">Memories of Thurmaston — Admin</a>
+  <button type="button" id="cms-signout-btn">Sign out</button>
+</header>
+
+<main class="cms-main">
+  <p class="cms-breadcrumb"><a href="index.html">← Back to the admin home</a></p>
+  <div id="cms-error-banner" hidden></div>
+
+  <!-- Step 1: choose a category -->
+  <div id="category-step">
+    <h1 id="category-heading">Which kind of photo is it?</h1>
+    <p class="cms-intro" id="category-intro"></p>
+    <div class="cms-category-grid" id="category-grid"></div>
+  </div>
+
+  <!-- Step 2a: browse a category's photos -->
+  <div id="browse-step" hidden>
+    <p><button type="button" class="cms-btn cms-btn-secondary" id="browse-back-btn">← Back to categories</button></p>
+    <h1 id="browse-heading"></h1>
+    <p class="cms-hint">A photo added in the last minute or so may not show here yet — the site takes a short while to rebuild its list after each save.</p>
+    <ul class="cms-entry-list" id="browse-list"></ul>
+    <p class="cms-empty" id="browse-empty" hidden>No photos in this category yet.</p>
+  </div>
+
+  <!-- Step 2b: add/edit form -->
+  <div id="form-step" hidden>
+    <p><button type="button" class="cms-btn cms-btn-secondary" id="form-back-btn">← Back</button></p>
+    <h1 id="form-heading"></h1>
+
+    <div class="cms-field">
+      <label for="photo-file">Photo</label>
+      <input type="file" id="photo-file" accept="image/*">
+      <div id="photo-preview-wrap" style="margin-top:12px" hidden>
+        <img id="photo-preview" alt="" style="max-width:260px;border-radius:12px;display:block">
+      </div>
+    </div>
+
+    <div class="cms-field">
+      <label for="caption-input">Caption</label>
+      <input type="text" id="caption-input" placeholder="What's this a photo of?">
+    </div>
+
+    <div id="numbering-section" hidden style="margin-bottom:24px">
+      <label>Is this a group photo?</label>
+      <p class="cms-hint" style="margin-top:0">If you'd like to name who's in it, tap each person on the photo below to add a numbered marker. Tap a marker to remove it. Skip this if it's not a group photo, or you don't want to number anyone.</p>
+      <div class="cms-stage-wrap" id="numbering-stage-wrap">
+        <img id="numbering-stage-img" alt="Tap to number people in this photo">
+      </div>
+    </div>
+
+    <details class="cms-more">
+      <summary>More details (optional)</summary>
+      <div class="cms-field">
+        <label for="person-input">Person / family name</label>
+        <input type="text" id="person-input" placeholder="Only if this is a portrait — type the name the same way every time">
+      </div>
+      <div class="cms-field">
+        <label for="date-input">Date</label>
+        <input type="text" id="date-input" placeholder="e.g. c.1936">
+      </div>
+      <div class="cms-field">
+        <label for="credit-input">Credit</label>
+        <input type="text" id="credit-input" placeholder="Who took or contributed this photo, if known">
+      </div>
+      <div class="cms-field">
+        <label for="coords-input">Google Maps coordinates</label>
+        <input type="text" id="coords-input" placeholder="e.g. 52.679363, -1.097994">
+        <span class="cms-hint">On Google Maps, right-click the exact spot and click the coordinates to copy them, then paste here.</span>
+      </div>
+      <div class="cms-field">
+        <label for="location-input">Location</label>
+        <input type="text" id="location-input" placeholder="e.g. Garden Street">
+      </div>
+      <div class="cms-field">
+        <label for="history-input">History</label>
+        <textarea id="history-input" placeholder="What's known about this photo"></textarea>
+      </div>
+      <div class="cms-field">
+        <label for="place-id-input">Same place as another photo (if it won't link up on its own)</label>
+        <input type="text" id="place-id-input" placeholder="Leave blank unless the automatic linking doesn't work for this one">
+      </div>
+      <div class="cms-field cms-checkbox-field">
+        <input type="checkbox" id="consent-input">
+        <label for="consent-input">I've confirmed it's OK to show identifiable people in this photo</label>
+      </div>
+    </details>
+
+    <p>
+      <button type="button" class="cms-btn cms-btn-primary" id="save-btn">Save this photo</button>
+      <button type="button" class="cms-btn cms-btn-danger" id="delete-btn" hidden>Remove this photo</button>
+    </p>
+    <p class="cms-status" id="save-status" hidden></p>
+  </div>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var token = cmsRequireAuth();
+    if (!token) return;
+    cmsInitShell();
+
+    var CATEGORIES = [
+      { value: "aerial", label: "Aerial" },
+      { value: "churches", label: "Churches & Religious Buildings" },
+      { value: "events", label: "Events" },
+      { value: "groups", label: "Groups & Organisations" },
+      { value: "industry", label: "Industry" },
+      { value: "maps", label: "Maps" },
+      { value: "military", label: "Military" },
+      { value: "nature", label: "Nature & Views" },
+      { value: "other", label: "Other" },
+      { value: "people", label: "People" },
+      { value: "schools", label: "Schools" },
+      { value: "sports", label: "Sports" },
+      { value: "streets", label: "Streets & Buildings" }
+    ];
+    function categoryLabel(value) {
+      var c = CATEGORIES.filter(function (c) { return c.value === value; })[0];
+      return c ? c.label : value;
+    }
+
+    var params = new URLSearchParams(location.search);
+    var browseMode = params.get("browse") === "1";
+    var urlCategory = params.get("category");
+    var urlEditId = params.get("edit");
+
+    var currentCategory = null;
+    var currentEntry = null; // { sha, data, path, id } when editing
+    var newPhotoBase64 = null, newPhotoFilename = null;
+    var markers = []; // [{ number, x, y }]
+
+    document.getElementById("category-intro").textContent = browseMode
+      ? "Pick a category to see its photos."
+      : "Pick the category this photo belongs in.";
+
+    renderCategoryGrid();
+
+    if (urlCategory && urlEditId) {
+      currentCategory = urlCategory;
+      showFormStep();
+      loadEntryForEdit(urlCategory, urlEditId);
+    } else {
+      showCategoryStep();
+    }
+
+    function renderCategoryGrid() {
+      var grid = document.getElementById("category-grid");
+      grid.innerHTML = "";
+      CATEGORIES.forEach(function (c) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.textContent = c.label;
+        btn.dataset.category = c.value;
+        btn.addEventListener("click", function () {
+          currentCategory = c.value;
+          if (browseMode) { showBrowseStep(); } else { resetForm(); showFormStep(); }
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    function hideAllSteps() {
+      document.getElementById("category-step").hidden = true;
+      document.getElementById("browse-step").hidden = true;
+      document.getElementById("form-step").hidden = true;
+    }
+    function showCategoryStep() { hideAllSteps(); document.getElementById("category-step").hidden = false; }
+    function showBrowseStep() {
+      hideAllSteps();
+      document.getElementById("browse-step").hidden = false;
+      document.getElementById("browse-heading").textContent = categoryLabel(currentCategory) + " photos";
+      loadBrowseList();
+    }
+    function showFormStep() {
+      hideAllSteps();
+      document.getElementById("form-step").hidden = false;
+      document.getElementById("form-heading").textContent = (currentEntry ? "Edit photo — " : "Add a photo — ") + categoryLabel(currentCategory);
+    }
+
+    document.getElementById("browse-back-btn").addEventListener("click", showCategoryStep);
+    document.getElementById("form-back-btn").addEventListener("click", function () {
+      if (browseMode && currentEntry) { showBrowseStep(); } else { showCategoryStep(); }
+    });
+
+    function loadBrowseList() {
+      var listEl = document.getElementById("browse-list");
+      var emptyEl = document.getElementById("browse-empty");
+      listEl.innerHTML = "";
+      fetch("../data/photos.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (all) {
+        var filtered = (all || []).filter(function (p) { return p.category === currentCategory; });
+        if (filtered.length === 0) { emptyEl.hidden = false; return; }
+        emptyEl.hidden = true;
+        listEl.innerHTML = filtered.map(function (p) {
+          return (
+            '<li class="cms-entry-row">' +
+              (p.src ? '<img src="' + escapeAttr("../" + String(p.src).replace(/^\//, "")) + '" alt="" loading="lazy">' : "") +
+              '<span class="cms-entry-title">' + escapeHtml(p.caption || "Untitled") + "</span>" +
+              '<a class="cms-entry-edit" href="photos.html?category=' + encodeURIComponent(currentCategory) + '&edit=' + encodeURIComponent(p.id) + '">Edit</a>' +
+            "</li>"
+          );
+        }).join("");
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    function resetForm() {
+      currentEntry = null;
+      newPhotoBase64 = null; newPhotoFilename = null;
+      markers = [];
+      document.getElementById("photo-file").value = "";
+      document.getElementById("photo-preview-wrap").hidden = true;
+      document.getElementById("numbering-section").hidden = true;
+      document.getElementById("caption-input").value = "";
+      document.getElementById("person-input").value = "";
+      document.getElementById("date-input").value = "";
+      document.getElementById("credit-input").value = "";
+      document.getElementById("coords-input").value = "";
+      document.getElementById("location-input").value = "";
+      document.getElementById("history-input").value = "";
+      document.getElementById("place-id-input").value = "";
+      document.getElementById("consent-input").checked = false;
+      document.getElementById("delete-btn").hidden = true;
+      renderNumberingMarkers();
+    }
+
+    function loadEntryForEdit(category, id) {
+      var path = "data/photos/" + category + "/" + id + ".json";
+      cmsGetFile(path, token).then(function (file) {
+        if (!file) { cmsShowError("Couldn't find that photo — it may have been removed already."); return; }
+        var data = JSON.parse(file.content);
+        currentEntry = { sha: file.sha, data: data, path: path, id: id };
+        resetForm();
+        currentEntry = { sha: file.sha, data: data, path: path, id: id }; // resetForm() above clears this — restore after
+        document.getElementById("form-heading").textContent = "Edit photo — " + categoryLabel(category);
+        document.getElementById("delete-btn").hidden = false;
+        document.getElementById("caption-input").value = data.caption || "";
+        document.getElementById("person-input").value = data.personName || "";
+        document.getElementById("date-input").value = data.date || "";
+        document.getElementById("credit-input").value = data.credit || "";
+        document.getElementById("coords-input").value = data.coords || "";
+        document.getElementById("location-input").value = data.location || "";
+        document.getElementById("history-input").value = data.history || "";
+        document.getElementById("place-id-input").value = data.placeId || "";
+        document.getElementById("consent-input").checked = !!data.consentNoted;
+        if (data.src) {
+          document.getElementById("photo-preview").src = "../" + String(data.src).replace(/^\//, "");
+          document.getElementById("photo-preview-wrap").hidden = false;
+          document.getElementById("numbering-stage-img").src = "../" + String(data.src).replace(/^\//, "");
+          document.getElementById("numbering-section").hidden = false;
+        }
+        if (data.numberedPeople) {
+          try { markers = JSON.parse(data.numberedPeople) || []; } catch (e) { markers = []; }
+          renderNumberingMarkers();
+        }
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    document.getElementById("photo-file").addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      newPhotoFilename = file.name;
+      cmsReadFileAsBase64(file).then(function (base64) {
+        newPhotoBase64 = base64;
+        var dataUrl = "data:" + (file.type || "image/jpeg") + ";base64," + base64;
+        document.getElementById("photo-preview").src = dataUrl;
+        document.getElementById("photo-preview-wrap").hidden = false;
+        document.getElementById("numbering-stage-img").src = dataUrl;
+        document.getElementById("numbering-section").hidden = false;
+      });
+    });
+
+    // --- Numbering (same output shape as the old number-photo.html tool: [{number, x, y}]) ---
+
+    document.getElementById("numbering-stage-wrap").addEventListener("click", function (e) {
+      if (e.target.classList.contains("cms-marker")) return;
+      var img = document.getElementById("numbering-stage-img");
+      var rect = img.getBoundingClientRect();
+      var x = ((e.clientX - rect.left) / rect.width) * 100;
+      var y = ((e.clientY - rect.top) / rect.height) * 100;
+      markers.push({ number: markers.length + 1, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
+      renderNumberingMarkers();
+    });
+
+    function removeMarker(index) {
+      markers.splice(index, 1);
+      markers.forEach(function (m, i) { m.number = i + 1; });
+      renderNumberingMarkers();
+    }
+
+    function renderNumberingMarkers() {
+      var wrap = document.getElementById("numbering-stage-wrap");
+      Array.prototype.forEach.call(wrap.querySelectorAll(".cms-marker"), function (el) { el.remove(); });
+      markers.forEach(function (m, i) {
+        var el = document.createElement("div");
+        el.className = "cms-marker";
+        el.textContent = String(m.number);
+        el.style.left = m.x + "%";
+        el.style.top = m.y + "%";
+        el.addEventListener("click", function (e) { e.stopPropagation(); removeMarker(i); });
+        wrap.appendChild(el);
+      });
+    }
+
+    // --- Save / delete ---
+
+    document.getElementById("save-btn").addEventListener("click", function () {
+      var caption = document.getElementById("caption-input").value.trim();
+      if (!caption) { cmsShowError("Please add a caption before saving."); return; }
+      var isNew = !currentEntry;
+      if (isNew && !newPhotoBase64) { cmsShowError("Please choose a photo before saving."); return; }
+      cmsHideError();
+
+      var saveBtn = document.getElementById("save-btn");
+      var statusEl = document.getElementById("save-status");
+      saveBtn.disabled = true;
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+
+      var category = currentCategory;
+      var slug = isNew ? cmsTimestampSlug(caption) : currentEntry.id;
+      var jsonPath = "data/photos/" + category + "/" + slug + ".json";
+
+      var photoStep;
+      if (newPhotoBase64) {
+        var ext = cmsFileExtension(newPhotoFilename) || ".jpg";
+        var imagePath = "images/photos/" + category + "/" + slug + ext;
+        var shaLookup = isNew ? Promise.resolve(null) : cmsGetFileSha(imagePath, token);
+        photoStep = shaLookup.then(function (sha) {
+          return cmsPutBinaryFile(imagePath, newPhotoBase64, "Add photo: " + caption, token, sha);
+        }).then(function () { return "/" + imagePath; });
+      } else {
+        photoStep = Promise.resolve(currentEntry.data.src || "");
+      }
+
+      photoStep.then(function (src) {
+        var entry = {
+          src: src,
+          caption: caption,
+          personName: document.getElementById("person-input").value.trim(),
+          category: category,
+          date: document.getElementById("date-input").value.trim(),
+          credit: document.getElementById("credit-input").value.trim(),
+          coords: document.getElementById("coords-input").value.trim(),
+          location: document.getElementById("location-input").value.trim(),
+          history: document.getElementById("history-input").value.trim(),
+          consentNoted: document.getElementById("consent-input").checked,
+          ref: newPhotoFilename ? newPhotoFilename.replace(/\.[^.]+$/, "") : (currentEntry ? currentEntry.data.ref || "" : ""),
+          refSource: newPhotoFilename || (currentEntry ? currentEntry.data.refSource || "" : ""),
+          placeId: document.getElementById("place-id-input").value.trim(),
+          id: currentEntry ? currentEntry.data.id || "" : "",
+          addedAt: currentEntry ? currentEntry.data.addedAt : new Date().toISOString(),
+          numberedPeople: markers.length ? JSON.stringify(markers) : ""
+        };
+        var content = JSON.stringify(entry, null, 2) + "\n";
+        var message = (isNew ? "Add photo: " : "Update photo: ") + caption;
+        return cmsPutTextFile(jsonPath, content, message, token, currentEntry ? currentEntry.sha : null);
+      }).then(function () {
+        statusEl.className = "cms-status cms-status-ok";
+        statusEl.textContent = "Saved — it'll appear on the site within about a minute.";
+        saveBtn.disabled = false;
+        if (isNew) {
+          // Bulk-add friendly: clear the form so another photo in the
+          // same category can be added straight away.
+          resetForm();
+          document.getElementById("photo-file").focus();
+        }
+        setTimeout(function () { statusEl.hidden = true; }, 4000);
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        cmsShowError(cmsFriendlyError(err));
+        saveBtn.disabled = false;
+      });
+    });
+
+    document.getElementById("delete-btn").addEventListener("click", function () {
+      if (!currentEntry) return;
+      var caption = currentEntry.data.caption || "this photo";
+      if (!confirm('Remove "' + caption + '"? This can\'t be undone.')) return;
+      var deleteBtn = document.getElementById("delete-btn");
+      deleteBtn.disabled = true;
+      cmsHideError();
+
+      var imagePath = currentEntry.data.src ? String(currentEntry.data.src).replace(/^\//, "") : null;
+      var deleteImage = imagePath
+        ? cmsGetFileSha(imagePath, token).then(function (sha) {
+            return sha ? cmsDeleteFile(imagePath, sha, "Delete photo file: " + caption, token) : null;
+          })
+        : Promise.resolve();
+
+      deleteImage.then(function () {
+        return cmsDeleteFile(currentEntry.path, currentEntry.sha, "Delete photo: " + caption, token);
+      }).then(function () {
+        if (browseMode) { showBrowseStep(); } else { showCategoryStep(); }
+      }).catch(function (err) {
+        deleteBtn.disabled = false;
+        cmsShowError(cmsFriendlyError(err));
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(str) { return escapeHtml(str); }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Cemetery | Memories of Thurmaston Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <a href="index.html">Memories of Thurmaston — Admin</a>
+  <button type="button" id="cms-signout-btn">Sign out</button>
+</header>
+
+<main class="cms-main">
+  <p class="cms-breadcrumb"><a href="index.html">← Back to the admin home</a></p>
+  <div id="cms-error-banner" hidden></div>
+
+  <!-- List view -->
+  <div id="list-view">
+    <h1>Cemetery</h1>
+    <p><button type="button" class="cms-btn cms-btn-primary" id="add-btn">Add a new grave</button></p>
+    <ul class="cms-entry-list" id="grave-list"></ul>
+    <p class="cms-empty" id="grave-list-empty" hidden>No graves have been added yet.</p>
+
+    <p style="margin-top:28px"><a href="cemetery.html?overview=1">Change the cemetery overview photo →</a></p>
+
+    <details id="setup-panel" style="margin-top:20px">
+      <summary>Map reference points (one-time setup)</summary>
+      <p class="cms-hint" style="margin-top:0">These let the position you click for a grave be turned into real map coordinates and a what3words address automatically. Pick 2–3 spots you can point to precisely on the overview photo (a corner building, a road junction).</p>
+
+      <div class="cms-field">
+        <label for="w3w-key-input">what3words API key (optional)</label>
+        <input type="text" id="w3w-key-input" placeholder="Leave blank to skip automatic what3words lookup">
+      </div>
+
+      <div id="setup-no-photo-note" class="cms-hint" hidden>Set up the <a href="cemetery.html?overview=1">cemetery overview photo</a> first, then come back here to set reference points.</div>
+
+      <div id="setup-stage-section" hidden>
+        <div class="cms-stage-wrap" id="setup-stage-wrap">
+          <img id="setup-stage-img" alt="Cemetery overview photo">
+        </div>
+        <div id="ref-rows" style="margin-top:14px"></div>
+      </div>
+    </details>
+  </div>
+
+  <!-- Add/edit a grave -->
+  <div id="form-view" hidden>
+    <p><button type="button" class="cms-btn cms-btn-secondary" id="form-back-btn">← Back to the list</button></p>
+    <h1 id="form-heading"></h1>
+
+    <div class="cms-field">
+      <label for="name-input">Name(s) on the headstone</label>
+      <input type="text" id="name-input" placeholder="e.g. John Smith">
+    </div>
+    <div class="cms-field">
+      <label for="dates-input">Dates</label>
+      <input type="text" id="dates-input" placeholder="e.g. 1892–1964">
+    </div>
+
+    <div class="cms-field">
+      <label>Where is it on the map?</label>
+      <p id="no-overview-note" class="cms-hint" hidden>No cemetery overview photo has been set up yet — you can still save this grave, just without a position on the map. <a href="cemetery.html?overview=1">Set up the photo</a>, then come back and edit this grave to add its position.</p>
+      <div id="pin-stage-wrap-outer" hidden>
+        <p class="cms-hint" style="margin-top:0">Tap this grave's exact spot on the photo below.</p>
+        <div class="cms-stage-wrap" id="pin-stage-wrap">
+          <img id="pin-stage-img" alt="Cemetery overview photo">
+        </div>
+        <p id="pin-readout" class="cms-hint" style="margin-top:8px" hidden></p>
+      </div>
+    </div>
+
+    <details class="cms-more">
+      <summary>More details (optional)</summary>
+      <div class="cms-field">
+        <label for="number-input">Grave number</label>
+        <input type="text" id="number-input">
+      </div>
+      <div class="cms-field">
+        <label for="inscription-input">Inscription</label>
+        <textarea id="inscription-input"></textarea>
+      </div>
+      <div class="cms-field">
+        <label for="notes-input">Notes</label>
+        <textarea id="notes-input"></textarea>
+      </div>
+      <div class="cms-field">
+        <label for="photo-file">Photo of the headstone</label>
+        <input type="file" id="photo-file" accept="image/*">
+        <div id="photo-preview-wrap" style="margin-top:12px" hidden>
+          <img id="photo-preview" alt="" style="max-width:200px;border-radius:12px;display:block">
+        </div>
+      </div>
+    </details>
+
+    <p>
+      <button type="button" class="cms-btn cms-btn-primary" id="save-btn">Save this grave</button>
+      <button type="button" class="cms-btn cms-btn-danger" id="delete-btn" hidden>Remove this grave</button>
+    </p>
+    <p class="cms-status" id="save-status" hidden></p>
+  </div>
+
+  <!-- Overview photo -->
+  <div id="overview-view" hidden>
+    <p><button type="button" class="cms-btn cms-btn-secondary" id="overview-back-btn">← Back to the list</button></p>
+    <h1>Cemetery overview photo</h1>
+    <p class="cms-intro">The single aerial/drone photo shown on /cemetery.html, with a pin for every grave whose position has been recorded.</p>
+    <div class="cms-field">
+      <label for="overview-file">Photo</label>
+      <input type="file" id="overview-file" accept="image/*">
+      <div id="overview-preview-wrap" style="margin-top:12px" hidden>
+        <img id="overview-preview" alt="" style="max-width:320px;border-radius:12px;display:block">
+      </div>
+    </div>
+    <div class="cms-field">
+      <label for="overview-caption-input">Caption</label>
+      <input type="text" id="overview-caption-input" placeholder="e.g. Aerial view of Thurmaston cemetery, 2026">
+    </div>
+    <p><button type="button" class="cms-btn cms-btn-primary" id="overview-save-btn">Save</button></p>
+    <p class="cms-status" id="overview-save-status" hidden></p>
+  </div>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script src="../admin/geo-helpers.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var token = cmsRequireAuth();
+    if (!token) return;
+    cmsInitShell();
+
+    var SETUP_KEY = "thurmaston-cms-cemetery-setup";
+    var params = new URLSearchParams(location.search);
+
+    var setup = loadSetup();
+    var overviewSrc = null; // "/images/cemetery/overview.jpg" or null
+    var armedPointIndex = -1;
+    var currentEntry = null; // { sha, data, path, id } when editing
+    var currentPin = null; // { x, y, lat, lng, w3w }
+    var newPhotoBase64 = null, newPhotoFilename = null;
+
+    function loadSetup() {
+      try {
+        var saved = JSON.parse(localStorage.getItem(SETUP_KEY) || "{}");
+        return {
+          apiKey: saved.apiKey || "",
+          refPoints: [0, 1, 2].map(function (i) { return (saved.refPoints && saved.refPoints[i]) || null; })
+        };
+      } catch (e) { return { apiKey: "", refPoints: [null, null, null] }; }
+    }
+    function saveSetup() { try { localStorage.setItem(SETUP_KEY, JSON.stringify(setup)); } catch (e) {} }
+
+    loadOverviewPhoto().then(function () {
+      if (params.get("overview") === "1") { showOverviewView(); }
+      else if (params.get("edit")) { showFormView(); loadEntryForEdit(params.get("edit")); }
+      else if (params.get("add") === "1") { showFormView(); resetGraveForm(); }
+      else { showListView(); }
+    });
+
+    function loadOverviewPhoto() {
+      return fetch("../data/cemetery-overview.json").then(function (res) { return res.ok ? res.json() : {}; }).catch(function () { return {}; }).then(function (data) {
+        overviewSrc = data && data.photo ? data.photo : null;
+      });
+    }
+
+    function hideAllViews() {
+      document.getElementById("list-view").hidden = true;
+      document.getElementById("form-view").hidden = true;
+      document.getElementById("overview-view").hidden = true;
+    }
+    function showListView() {
+      hideAllViews();
+      document.getElementById("list-view").hidden = false;
+      loadGraveList();
+      document.getElementById("w3w-key-input").value = setup.apiKey;
+      renderSetupStage();
+      renderRefRows();
+    }
+    function showFormView() {
+      hideAllViews();
+      document.getElementById("form-view").hidden = false;
+    }
+    function showOverviewView() {
+      hideAllViews();
+      document.getElementById("overview-view").hidden = false;
+      document.getElementById("overview-caption-input").value = "";
+      document.getElementById("overview-preview-wrap").hidden = true;
+      loadOverviewForEdit();
+    }
+
+    document.getElementById("add-btn").addEventListener("click", function () { location.href = "cemetery.html?add=1"; });
+    document.getElementById("form-back-btn").addEventListener("click", function () { location.href = "cemetery.html"; });
+    document.getElementById("overview-back-btn").addEventListener("click", function () { location.href = "cemetery.html"; });
+
+    // --- List view ---
+
+    function loadGraveList() {
+      var listEl = document.getElementById("grave-list");
+      var emptyEl = document.getElementById("grave-list-empty");
+      listEl.innerHTML = "";
+      fetch("../data/cemetery.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (graves) {
+        if (!graves || graves.length === 0) { emptyEl.hidden = false; return; }
+        emptyEl.hidden = true;
+        listEl.innerHTML = graves.map(function (g) {
+          var pinned = typeof g.pinX === "number" && typeof g.pinY === "number";
+          return (
+            '<li class="cms-entry-row">' +
+              '<span class="cms-entry-title">' + escapeHtml(g.name || "") + "</span>" +
+              '<span class="cms-entry-meta">' + (pinned ? "On the map" : "Not on the map yet") + "</span>" +
+              '<a class="cms-entry-edit" href="cemetery.html?edit=' + encodeURIComponent(g.id) + '">Edit</a>' +
+            "</li>"
+          );
+        }).join("");
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    // --- Reference point setup (list view) ---
+
+    function renderSetupStage() {
+      var noPhotoNote = document.getElementById("setup-no-photo-note");
+      var stageSection = document.getElementById("setup-stage-section");
+      if (!overviewSrc) { noPhotoNote.hidden = false; stageSection.hidden = true; return; }
+      noPhotoNote.hidden = true;
+      stageSection.hidden = false;
+      document.getElementById("setup-stage-img").src = "../" + String(overviewSrc).replace(/^\//, "");
+      renderSetupMarkers();
+    }
+
+    function renderRefRows() {
+      var rowsEl = document.getElementById("ref-rows");
+      rowsEl.innerHTML = "";
+      [0, 1, 2].forEach(function (i) {
+        var row = document.createElement("div");
+        row.style.cssText = "display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--line)";
+
+        var label = document.createElement("span");
+        label.style.cssText = "font-weight:700;width:70px;flex:none";
+        label.textContent = "Point " + (i + 1);
+        row.appendChild(label);
+
+        var setBtn = document.createElement("button");
+        setBtn.type = "button";
+        setBtn.className = "cms-btn cms-btn-secondary";
+        setBtn.style.cssText = "padding:8px 14px;font-size:0.9rem;min-height:auto";
+        setBtn.textContent = armedPointIndex === i ? "Click the photo now…" : ((setup.refPoints[i] && setup.refPoints[i].px != null) ? "Re-set point on photo" : "Set point on photo");
+        setBtn.disabled = !overviewSrc;
+        setBtn.addEventListener("click", function () {
+          armedPointIndex = armedPointIndex === i ? -1 : i;
+          renderRefRows();
+        });
+        row.appendChild(setBtn);
+
+        var latInput = document.createElement("input");
+        latInput.type = "text";
+        latInput.placeholder = "Latitude";
+        latInput.style.cssText = "max-width:120px;padding:8px 10px;border:2px solid var(--line);border-radius:8px;font:inherit";
+        latInput.value = setup.refPoints[i] && setup.refPoints[i].lat != null ? setup.refPoints[i].lat : "";
+        latInput.addEventListener("input", function () {
+          setup.refPoints[i] = setup.refPoints[i] || {};
+          setup.refPoints[i].lat = parseFloat(latInput.value);
+          saveSetup();
+        });
+        row.appendChild(latInput);
+
+        var lngInput = document.createElement("input");
+        lngInput.type = "text";
+        lngInput.placeholder = "Longitude";
+        lngInput.style.cssText = "max-width:120px;padding:8px 10px;border:2px solid var(--line);border-radius:8px;font:inherit";
+        lngInput.value = setup.refPoints[i] && setup.refPoints[i].lng != null ? setup.refPoints[i].lng : "";
+        lngInput.addEventListener("input", function () {
+          setup.refPoints[i] = setup.refPoints[i] || {};
+          setup.refPoints[i].lng = parseFloat(lngInput.value);
+          saveSetup();
+        });
+        row.appendChild(lngInput);
+
+        var status = document.createElement("span");
+        status.className = "cms-hint";
+        status.style.margin = "0";
+        status.textContent = (setup.refPoints[i] && setup.refPoints[i].px != null)
+          ? "Photo spot set (" + setup.refPoints[i].px.toFixed(1) + "%, " + setup.refPoints[i].py.toFixed(1) + "%)"
+          : "Photo spot not set yet";
+        row.appendChild(status);
+
+        rowsEl.appendChild(row);
+      });
+    }
+
+    function renderSetupMarkers() {
+      var wrap = document.getElementById("setup-stage-wrap");
+      Array.prototype.forEach.call(wrap.querySelectorAll(".cms-marker"), function (el) { el.remove(); });
+      setup.refPoints.forEach(function (p, i) {
+        if (!p || p.px == null) return;
+        var m = document.createElement("div");
+        m.className = "cms-marker cms-marker-ref";
+        m.textContent = String(i + 1);
+        m.style.left = p.px + "%";
+        m.style.top = p.py + "%";
+        wrap.appendChild(m);
+      });
+    }
+
+    document.getElementById("w3w-key-input").addEventListener("input", function (e) {
+      setup.apiKey = e.target.value.trim();
+      saveSetup();
+    });
+
+    document.getElementById("setup-stage-wrap").addEventListener("click", function (e) {
+      if (armedPointIndex === -1) return;
+      if (e.target.classList.contains("cms-marker")) return;
+      var img = document.getElementById("setup-stage-img");
+      var rect = img.getBoundingClientRect();
+      var x = ((e.clientX - rect.left) / rect.width) * 100;
+      var y = ((e.clientY - rect.top) / rect.height) * 100;
+      var i = armedPointIndex;
+      setup.refPoints[i] = setup.refPoints[i] || {};
+      setup.refPoints[i].px = x;
+      setup.refPoints[i].py = y;
+      armedPointIndex = -1;
+      saveSetup();
+      renderRefRows();
+      renderSetupMarkers();
+    });
+
+    // --- Add/edit a grave ---
+
+    function resetGraveForm() {
+      currentEntry = null;
+      currentPin = null;
+      newPhotoBase64 = null; newPhotoFilename = null;
+      document.getElementById("form-heading").textContent = "Add a new grave";
+      document.getElementById("name-input").value = "";
+      document.getElementById("dates-input").value = "";
+      document.getElementById("number-input").value = "";
+      document.getElementById("inscription-input").value = "";
+      document.getElementById("notes-input").value = "";
+      document.getElementById("photo-file").value = "";
+      document.getElementById("photo-preview-wrap").hidden = true;
+      document.getElementById("delete-btn").hidden = true;
+      renderPinStage();
+    }
+
+    function renderPinStage() {
+      var noPhotoNote = document.getElementById("no-overview-note");
+      var outer = document.getElementById("pin-stage-wrap-outer");
+      if (!overviewSrc) { noPhotoNote.hidden = false; outer.hidden = true; return; }
+      noPhotoNote.hidden = true;
+      outer.hidden = false;
+      document.getElementById("pin-stage-img").src = "../" + String(overviewSrc).replace(/^\//, "");
+      renderPinMarkers();
+      renderPinReadout();
+    }
+
+    function renderPinMarkers() {
+      var wrap = document.getElementById("pin-stage-wrap");
+      Array.prototype.forEach.call(wrap.querySelectorAll(".cms-marker"), function (el) { el.remove(); });
+      setup.refPoints.forEach(function (p, i) {
+        if (!p || p.px == null) return;
+        var m = document.createElement("div");
+        m.className = "cms-marker cms-marker-ref";
+        m.textContent = String(i + 1);
+        m.style.left = p.px + "%";
+        m.style.top = p.py + "%";
+        wrap.appendChild(m);
+      });
+      if (currentPin) {
+        var m2 = document.createElement("div");
+        m2.className = "cms-marker cms-marker-current";
+        m2.textContent = "●";
+        m2.style.left = currentPin.x + "%";
+        m2.style.top = currentPin.y + "%";
+        wrap.appendChild(m2);
+      }
+    }
+
+    function renderPinReadout() {
+      var readout = document.getElementById("pin-readout");
+      if (!currentPin) { readout.hidden = true; return; }
+      readout.hidden = false;
+      var text = "Pin position: " + currentPin.x + ", " + currentPin.y + ".";
+      if (currentPin.w3w === "pending") {
+        text += " Looking up what3words…";
+      } else if (currentPin.w3w && typeof currentPin.w3w === "object" && currentPin.w3w.error) {
+        text += " what3words: " + currentPin.w3w.error;
+      } else if (currentPin.w3w) {
+        text += " what3words: " + currentPin.w3w;
+      }
+      readout.textContent = text;
+    }
+
+    document.getElementById("pin-stage-wrap").addEventListener("click", function (e) {
+      if (e.target.classList.contains("cms-marker")) return;
+      var img = document.getElementById("pin-stage-img");
+      var rect = img.getBoundingClientRect();
+      var x = Math.round(((e.clientX - rect.left) / rect.width) * 10000) / 100;
+      var y = Math.round(((e.clientY - rect.top) / rect.height) * 10000) / 100;
+      currentPin = { x: x, y: y, w3w: null };
+      renderPinMarkers();
+      renderPinReadout();
+
+      var latLng = cmsPixelToLatLng(setup.refPoints, x, y);
+      if (latLng) {
+        currentPin.w3w = "pending";
+        renderPinReadout();
+        cmsLookupWhat3Words(setup.apiKey, latLng.lat, latLng.lng).then(function (result) {
+          currentPin.w3w = result;
+          renderPinReadout();
+        });
+      }
+    });
+
+    function loadEntryForEdit(id) {
+      var path = "data/graves/" + id + ".json";
+      cmsGetFile(path, token).then(function (file) {
+        if (!file) { cmsShowError("Couldn't find that grave — it may have been removed already."); return; }
+        var data = JSON.parse(file.content);
+        resetGraveForm();
+        currentEntry = { sha: file.sha, data: data, path: path, id: id };
+        document.getElementById("form-heading").textContent = "Edit grave";
+        document.getElementById("name-input").value = data.name || "";
+        document.getElementById("dates-input").value = data.dates || "";
+        document.getElementById("number-input").value = data.number || "";
+        document.getElementById("inscription-input").value = data.inscription || "";
+        document.getElementById("notes-input").value = data.notes || "";
+        document.getElementById("delete-btn").hidden = false;
+        if (data.photo) {
+          document.getElementById("photo-preview").src = "../" + String(data.photo).replace(/^\//, "");
+          document.getElementById("photo-preview-wrap").hidden = false;
+        }
+        if (data.pinPosition) {
+          var m = String(data.pinPosition).match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);
+          if (m) { currentPin = { x: parseFloat(m[1]), y: parseFloat(m[2]), w3w: data.whatThreeWords || null }; }
+        }
+        renderPinStage();
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    document.getElementById("photo-file").addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      newPhotoFilename = file.name;
+      cmsReadFileAsBase64(file).then(function (base64) {
+        newPhotoBase64 = base64;
+        document.getElementById("photo-preview").src = "data:" + (file.type || "image/jpeg") + ";base64," + base64;
+        document.getElementById("photo-preview-wrap").hidden = false;
+      });
+    });
+
+    document.getElementById("save-btn").addEventListener("click", function () {
+      var name = document.getElementById("name-input").value.trim();
+      if (!name) { cmsShowError("Please add a name before saving."); return; }
+      cmsHideError();
+
+      var saveBtn = document.getElementById("save-btn");
+      var statusEl = document.getElementById("save-status");
+      saveBtn.disabled = true;
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+
+      var isNew = !currentEntry;
+      var slug = isNew ? cmsTimestampSlug(name) : currentEntry.id;
+      var jsonPath = "data/graves/" + slug + ".json";
+
+      var photoStep;
+      if (newPhotoBase64) {
+        var ext = cmsFileExtension(newPhotoFilename) || ".jpg";
+        var imagePath = "images/graves/" + slug + ext;
+        var shaLookup = isNew ? Promise.resolve(null) : cmsGetFileSha(imagePath, token);
+        photoStep = shaLookup.then(function (sha) {
+          return cmsPutBinaryFile(imagePath, newPhotoBase64, "Add grave headstone photo for " + name, token, sha);
+        }).then(function () { return "/" + imagePath; });
+      } else {
+        photoStep = Promise.resolve(currentEntry ? (currentEntry.data.photo || "") : "");
+      }
+
+      var w3w = (currentPin && currentPin.w3w && typeof currentPin.w3w === "string") ? currentPin.w3w : "";
+
+      photoStep.then(function (photo) {
+        var entry = {
+          name: name,
+          number: document.getElementById("number-input").value.trim(),
+          dates: document.getElementById("dates-input").value.trim(),
+          whatThreeWords: w3w,
+          pinPosition: currentPin ? (currentPin.x + ", " + currentPin.y) : "",
+          inscription: document.getElementById("inscription-input").value.trim(),
+          notes: document.getElementById("notes-input").value.trim(),
+          photo: photo,
+          addedAt: currentEntry ? currentEntry.data.addedAt : new Date().toISOString()
+        };
+        var content = JSON.stringify(entry, null, 2) + "\n";
+        var message = (isNew ? "Add grave: " : "Update grave: ") + name;
+        return cmsPutTextFile(jsonPath, content, message, token, currentEntry ? currentEntry.sha : null);
+      }).then(function () {
+        location.href = "cemetery.html";
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        cmsShowError(cmsFriendlyError(err));
+        saveBtn.disabled = false;
+      });
+    });
+
+    document.getElementById("delete-btn").addEventListener("click", function () {
+      if (!currentEntry) return;
+      var name = currentEntry.data.name || "this grave";
+      if (!confirm('Remove "' + name + '"? This can\'t be undone.')) return;
+      var deleteBtn = document.getElementById("delete-btn");
+      deleteBtn.disabled = true;
+      cmsHideError();
+
+      var photoPath = currentEntry.data.photo ? String(currentEntry.data.photo).replace(/^\//, "") : null;
+      var deletePhoto = photoPath
+        ? cmsGetFileSha(photoPath, token).then(function (sha) { return sha ? cmsDeleteFile(photoPath, sha, "Delete grave photo: " + name, token) : null; })
+        : Promise.resolve();
+
+      deletePhoto.then(function () {
+        return cmsDeleteFile(currentEntry.path, currentEntry.sha, "Delete grave: " + name, token);
+      }).then(function () {
+        location.href = "cemetery.html";
+      }).catch(function (err) {
+        deleteBtn.disabled = false;
+        cmsShowError(cmsFriendlyError(err));
+      });
+    });
+
+    // --- Overview photo ---
+
+    var overviewEntry = null; // { sha } for data/cemetery-overview.json
+
+    function loadOverviewForEdit() {
+      cmsGetFile("data/cemetery-overview.json", token).then(function (file) {
+        if (!file) { overviewEntry = null; return; }
+        overviewEntry = { sha: file.sha };
+        var data = JSON.parse(file.content);
+        document.getElementById("overview-caption-input").value = data.caption || "";
+        if (data.photo) {
+          document.getElementById("overview-preview").src = "../" + String(data.photo).replace(/^\//, "");
+          document.getElementById("overview-preview-wrap").hidden = false;
+        }
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    var newOverviewBase64 = null, newOverviewFilename = null;
+    document.getElementById("overview-file").addEventListener("change", function (e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      newOverviewFilename = file.name;
+      cmsReadFileAsBase64(file).then(function (base64) {
+        newOverviewBase64 = base64;
+        document.getElementById("overview-preview").src = "data:" + (file.type || "image/jpeg") + ";base64," + base64;
+        document.getElementById("overview-preview-wrap").hidden = false;
+      });
+    });
+
+    document.getElementById("overview-save-btn").addEventListener("click", function () {
+      var saveBtn = document.getElementById("overview-save-btn");
+      var statusEl = document.getElementById("overview-save-status");
+      saveBtn.disabled = true;
+      cmsHideError();
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+
+      var photoStep = Promise.resolve(null);
+      if (newOverviewBase64) {
+        var ext = cmsFileExtension(newOverviewFilename) || ".jpg";
+        var imagePath = "images/cemetery/overview" + ext;
+        photoStep = cmsGetFileSha(imagePath, token).then(function (sha) {
+          return cmsPutBinaryFile(imagePath, newOverviewBase64, "Update cemetery overview photo", token, sha);
+        }).then(function () { return "/" + imagePath; });
+      }
+
+      photoStep.then(function (photo) {
+        var entry = {
+          photo: photo != null ? photo : (overviewSrc || ""),
+          caption: document.getElementById("overview-caption-input").value.trim()
+        };
+        var content = JSON.stringify(entry, null, 2) + "\n";
+        return cmsPutTextFile("data/cemetery-overview.json", content, "Update cemetery overview photo", token, overviewEntry ? overviewEntry.sha : null);
+      }).then(function () {
+        statusEl.className = "cms-status cms-status-ok";
+        statusEl.textContent = "Saved.";
+        saveBtn.disabled = false;
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        cmsShowError(cmsFriendlyError(err));
+        saveBtn.disabled = false;
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+  });
+</script>
+</body>
+</html>
