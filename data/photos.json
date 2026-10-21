@@ -34,24 +34,5 @@
     "id": "20261021151637-test",
     "addedAt": "2026-10-21T14:16:39.968Z",
     "numberedPeople": ""
-  },
-  {
-    "src": "/images/photos/streets/20261021140622-black-horse-pub.jpg",
-    "caption": "Black Horse Pub",
-    "personName": "",
-    "category": "streets",
-    "date": "",
-    "credit": "",
-    "location": "Main Street",
-    "history": "",
-    "consentNoted": false,
-    "ref": "001 Black Horse MOT 1 1-2",
-    "refSource": "001 Black Horse MOT 1 1-2.jpg",
-    "placeId": "",
-    "id": "20261021140622-black-horse-pub",
-    "addedAt": "2026-10-21T13:06:24.569Z",
-    "numberedPeople": "",
-    "lat": 52.679043898577625,
-    "lng": -1.09930906025076
   }
 ]
