@@ -17,8 +17,8 @@
 // CORS-avoidance reason as the (now unused) Photos integration had.
 
 var GOOGLE_DRIVE_CLIENT_ID = "121328946353-omrpogqh5boe8akptqggikc6lo73gc6b.apps.googleusercontent.com";
-var GOOGLE_DRIVE_API_KEY = "REPLACE-WITH-REAL-API-KEY";
-var GOOGLE_DRIVE_APP_ID = "REPLACE-WITH-REAL-PROJECT-NUMBER";
+var GOOGLE_DRIVE_API_KEY = "AIzaSyDjA8yvXwFVQFjVanIrYyADOSUvQiYOGW8";
+var GOOGLE_DRIVE_APP_ID = "121328946353";
 var GOOGLE_DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.file";
 var GOOGLE_DRIVE_TOKEN_KEY = "thurmaston-cms-google-drive-token";
 
