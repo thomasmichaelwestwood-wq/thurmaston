@@ -6,8 +6,7 @@
     "category": "streets",
     "date": "",
     "credit": "",
-    "coords": "",
-    "location": "",
+    "location": "Main Street",
     "history": "",
     "consentNoted": false,
     "ref": "001 Black Horse MOT 1 1-2",
@@ -15,6 +14,8 @@
     "placeId": "",
     "id": "20261021140622-black-horse-pub",
     "addedAt": "2026-10-21T13:06:24.569Z",
-    "numberedPeople": ""
+    "numberedPeople": "",
+    "lat": 52.679043898577625,
+    "lng": -1.09930906025076
   }
 ]
