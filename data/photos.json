@@ -1,20 +1,21 @@
 [
   {
-    "src": "/images/photos/sports/02081805.JPG",
-    "caption": "Magpies",
-    "personName": "",
-    "category": "sports",
-    "date": "2016",
+    "src": "/images/photos/streets/20261021122521-black-horse-pub.jpg",
+    "caption": "Black Horse Pub",
+    "personName": "Fox family - unverified",
+    "category": "streets",
+    "date": "c1900",
     "credit": "",
-    "coords": "",
-    "location": "",
-    "history": "",
-    "consentNoted": false,
-    "ref": "02081805.JPG",
+    "location": "Main Street",
+    "history": "this is a test",
+    "consentNoted": true,
+    "ref": "001 Black Horse MOT 1 1-2",
+    "refSource": "001 Black Horse MOT 1 1-2.jpg",
     "placeId": "",
-    "id": "20260726082419-magpies",
-    "addedAt": "2026-07-27T10:37:52.414Z",
+    "id": "20261021122521-black-horse-pub",
+    "addedAt": "2026-10-21T11:25:22.845Z",
     "numberedPeople": "",
-    "refSource": "02081805.JPG"
+    "lat": 52.6789918611773,
+    "lng": -1.0992554159385832
   }
 ]
