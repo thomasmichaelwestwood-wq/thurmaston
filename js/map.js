@@ -93,6 +93,10 @@ document.addEventListener("DOMContentLoaded", function () {
   var mapPinsPromise = fetch("data/map-pins.json").then(function (res) { return res.ok ? res.json() : { pins: [] }; }).then(function (data) { return data.pins || []; }).catch(function () { return []; });
   var photosPromise = (typeof PHOTOS_DATA_PROMISE !== "undefined") ? PHOTOS_DATA_PROMISE : Promise.resolve([]);
   var eventsPromise = fetch("data/events.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; });
+  // js/map-categories.js fills MAP_CATEGORIES in from data/categories.json
+  // — wait on the same promise it uses, so pins never render with the
+  // "other" fallback colour just because that fetch hasn't resolved yet.
+  var categoriesPromise = (typeof MAP_CATEGORIES_READY !== "undefined") ? MAP_CATEGORIES_READY : Promise.resolve();
 
   // Curated pins store their location as a single "lat, lng" string —
   // the same format Google Maps gives you when you right-click a spot
@@ -103,7 +107,8 @@ document.addEventListener("DOMContentLoaded", function () {
     return { lat: parseFloat(match[1]), lng: parseFloat(match[2]) };
   }
 
-  Promise.all([mapPinsPromise, photosPromise, eventsPromise]).then(function (results) {
+  Promise.all([mapPinsPromise, photosPromise, eventsPromise, categoriesPromise]).then(function (results) {
+    addExtraFilterChips(results[3] || []);
     var curatedPins = results[0].map(function (item) {
       var coords = parseCoords(item.coords);
       if (!coords) return null;
@@ -190,6 +195,30 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       });
       listEl.appendChild(li);
+    });
+  }
+
+  // Appends a chip for any category in data/categories.json beyond the
+  // hand-written ones already in #map-filters (mirrors
+  // initExtraPhotoFilters() in js/main.js for index.html's tiles) — so a
+  // category added through the CMS gets a working map filter with no
+  // code change. Relies on filterEl's existing event-delegated click
+  // handler below, which reads each button's data-category regardless
+  // of whether it was there at page load or appended here.
+  function addExtraFilterChips(categories) {
+    if (!filterEl) return;
+    var existingSlugs = {};
+    Array.prototype.forEach.call(filterEl.querySelectorAll("[data-category]"), function (btn) {
+      existingSlugs[btn.dataset.category] = true;
+    });
+    categories.forEach(function (c) {
+      if (existingSlugs[c.slug]) return;
+      var btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "chip";
+      btn.dataset.category = c.slug;
+      btn.textContent = c.label;
+      filterEl.appendChild(btn);
     });
   }
 

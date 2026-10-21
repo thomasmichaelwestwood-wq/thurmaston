@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Photo categories | Memories of Thurmaston Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="cms.css">
+</head>
+<body>
+<header class="cms-header">
+  <a href="index.html">Memories of Thurmaston — Admin</a>
+  <div style="display:flex;gap:18px;align-items:center">
+    <a href="../index.html">← Back to site</a>
+    <button type="button" id="cms-signout-btn">Sign out</button>
+  </div>
+</header>
+
+<main class="cms-main">
+  <p class="cms-breadcrumb"><a href="index.html">← Back to the admin home</a></p>
+  <div id="cms-error-banner" hidden></div>
+
+  <h1>Add a photo category</h1>
+  <p class="cms-intro">Every photo belongs to a category, like "Streets &amp; Buildings" or "Sports." Add a new one here if a photo doesn't fit any of the categories below.</p>
+
+  <div class="cms-field">
+    <label for="label-input">Category name</label>
+    <input type="text" id="label-input" placeholder="e.g. Allotments">
+  </div>
+  <div class="cms-field">
+    <label for="intro-input">A short description (optional)</label>
+    <textarea id="intro-input" placeholder="A sentence or two about what goes in this category."></textarea>
+  </div>
+  <div class="cms-field">
+    <label>Colour</label>
+    <span class="cms-hint">Pick a colour for this category's tile and map pins. The colours already in use are shown so you can pick a fresh one.</span>
+    <div class="cms-color-grid" id="color-grid"></div>
+  </div>
+  <p>
+    <button type="button" class="cms-btn cms-btn-primary" id="save-btn">Add this category</button>
+  </p>
+  <p class="cms-status" id="save-status" hidden></p>
+
+  <h2>Existing categories</h2>
+  <ul class="cms-color-list" id="existing-list"></ul>
+</main>
+
+<script src="../admin/cms-auth.js"></script>
+<script src="../admin/cms-core.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var token = cmsRequireAuth();
+    if (!token) return;
+    cmsInitShell();
+
+    var FILE_PATH = "data/categories.json";
+    var fileSha = null;
+    var categories = [];
+    var selectedColor = null;
+
+    // A few fresh colours not already used by any existing category —
+    // shown alongside the taken ones so there's always something new
+    // to pick without ever needing a hex input or colour wheel.
+    var FRESH_COLORS = ["#1f7a7a", "#4a3f8c", "#b23a3a"];
+
+    load();
+
+    function load() {
+      cmsGetFile(FILE_PATH, token).then(function (file) {
+        if (!file) { categories = []; fileSha = null; render(); return; }
+        fileSha = file.sha;
+        var data = JSON.parse(file.content);
+        categories = data.categories || [];
+        render();
+      }).catch(function (err) { cmsShowError(cmsFriendlyError(err)); });
+    }
+
+    function render() {
+      renderColorGrid();
+      renderExistingList();
+    }
+
+    function renderColorGrid() {
+      var grid = document.getElementById("color-grid");
+      grid.innerHTML = "";
+      var usedColors = categories.map(function (c) { return c.color; });
+      var options = usedColors.concat(FRESH_COLORS.filter(function (c) { return usedColors.indexOf(c) === -1; }));
+      options.forEach(function (color) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "cms-color-swatch";
+        btn.style.background = color;
+        btn.setAttribute("aria-label", "Choose this colour");
+        btn.dataset.color = color;
+        btn.addEventListener("click", function () {
+          selectedColor = color;
+          Array.prototype.forEach.call(grid.querySelectorAll(".cms-color-swatch"), function (b) {
+            b.classList.toggle("cms-color-swatch-selected", b === btn);
+          });
+        });
+        grid.appendChild(btn);
+      });
+    }
+
+    function renderExistingList() {
+      var listEl = document.getElementById("existing-list");
+      listEl.innerHTML = categories.map(function (c) {
+        return (
+          '<li class="cms-color-list-row">' +
+            '<span class="cms-color-swatch cms-color-swatch-static" style="background:' + escapeAttr(c.color) + '" aria-hidden="true"></span>' +
+            '<span class="cms-entry-title">' + escapeHtml(c.label) + "</span>" +
+          "</li>"
+        );
+      }).join("");
+    }
+
+    document.getElementById("save-btn").addEventListener("click", function () {
+      var label = document.getElementById("label-input").value.trim();
+      var intro = document.getElementById("intro-input").value.trim();
+      if (!label) { cmsShowError("Please give the category a name."); return; }
+      if (!selectedColor) { cmsShowError("Please pick a colour for this category."); return; }
+      var slug = cmsSlugify(label);
+      if (categories.some(function (c) { return c.slug === slug; })) {
+        cmsShowError("A category with a very similar name already exists — please choose a different name.");
+        return;
+      }
+      cmsHideError();
+
+      categories.push({
+        slug: slug,
+        label: label,
+        intro: intro || "Photos from this category.",
+        color: selectedColor
+      });
+
+      var statusEl = document.getElementById("save-status");
+      statusEl.hidden = false;
+      statusEl.className = "cms-status cms-status-pending";
+      statusEl.textContent = "Saving…";
+      var content = JSON.stringify({ categories: categories }, null, 2) + "\n";
+      cmsPutTextFile(FILE_PATH, content, "Add photo category: " + label, token, fileSha).then(function (result) {
+        if (result && result.content && result.content.sha) fileSha = result.content.sha;
+        statusEl.className = "cms-status cms-status-ok";
+        statusEl.textContent = "Added. It'll appear on the website within a minute or two.";
+        document.getElementById("label-input").value = "";
+        document.getElementById("intro-input").value = "";
+        selectedColor = null;
+        render();
+      }).catch(function (err) {
+        statusEl.hidden = true;
+        categories.pop();
+        cmsShowError(cmsFriendlyError(err));
+      });
+    });
+
+    function escapeHtml(str) {
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+    }
+    function escapeAttr(str) { return escapeHtml(str); }
+  });
+</script>
+</body>
+</html>

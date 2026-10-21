@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", function () {
   initHero();
   initSearch();
   initHeroChronology();
+  initExtraPhotoFilters();
 });
 
 // Fetched once, shared by initSearch() (every entry becomes a search
@@ -32,6 +33,17 @@ var CHRONOLOGY_DATA_PROMISE = fetch("data/chronology.json")
 var CEMETERY_DATA_PROMISE = fetch("data/cemetery.json")
   .then(function (res) { return res.ok ? res.json() : []; })
   .catch(function () { return []; });
+
+// The photo category list (slug/label/intro/color) — single source of
+// truth for category.html, index.html's extra tiles beyond the
+// hand-written ones, js/map-categories.js, and the bespoke CMS's own
+// category picker, now that a category can be added through the CMS
+// instead of only ever being one of a fixed, hardcoded set. Resolves
+// to a plain array of { slug, label, intro, color }.
+var CATEGORIES_DATA_PROMISE = fetch("data/categories.json")
+  .then(function (res) { return res.ok ? res.json() : { categories: [] }; })
+  .catch(function () { return { categories: [] }; })
+  .then(function (data) { return data.categories || []; });
 
 // A bulk import of Thurmaston cemetery's historical burial register
 // (2,710 entries as of the spreadsheet this was built from —
@@ -123,6 +135,53 @@ function initHeroChronology() {
     listEl.innerHTML = picks.map(function (e) {
       return '<li><a class="chip" href="year.html?year=' + encodeURIComponent(e.sortYear) + '">' + escapeHtml(e.year) + "</a></li>";
     }).join("");
+  });
+}
+
+// Appends a tile for any category in data/categories.json that isn't
+// already one of the 13 hand-written tiles above — deliberately
+// additive-only, never touching the existing 13: they already work,
+// including js/photos.js's own setCategoryTileImages() (which sets
+// each tile's background photo once PHOTOS_DATA_PROMISE resolves) —
+// rewriting them to render dynamically risked a real timing bug if
+// this script's tiles weren't in the DOM yet when that one runs. A
+// newly-added category's tile is self-sufficient instead: it sets its
+// own background photo right here, so it never depends on that
+// ordering at all.
+function initExtraPhotoFilters() {
+  var filterEl = document.getElementById("photo-filters");
+  if (!filterEl) return;
+
+  Promise.all([
+    CATEGORIES_DATA_PROMISE,
+    typeof PHOTOS_DATA_PROMISE !== "undefined" ? PHOTOS_DATA_PROMISE : Promise.resolve([])
+  ]).then(function (results) {
+    var categories = results[0];
+    var photos = results[1];
+    var existingSlugs = {};
+    Array.prototype.forEach.call(filterEl.querySelectorAll("[data-category]"), function (el) {
+      existingSlugs[el.dataset.category] = true;
+    });
+    var latestByCategory = {};
+    photos.forEach(function (photo) {
+      if (!latestByCategory[photo.category]) latestByCategory[photo.category] = photo;
+    });
+    categories.forEach(function (c) {
+      if (existingSlugs[c.slug]) return; // one of the 13 original tiles — already there
+      var a = document.createElement("a");
+      a.href = "category.html?cat=" + encodeURIComponent(c.slug);
+      a.dataset.category = c.slug;
+      var photoSpan = document.createElement("span");
+      photoSpan.className = "photo-filter-photo";
+      var photo = latestByCategory[c.slug];
+      if (photo) photoSpan.style.backgroundImage = "url(" + JSON.stringify(photo.src) + ")";
+      var labelSpan = document.createElement("span");
+      labelSpan.className = "photo-filter-label";
+      labelSpan.textContent = c.label;
+      a.appendChild(photoSpan);
+      a.appendChild(labelSpan);
+      filterEl.appendChild(a);
+    });
   });
 }
 

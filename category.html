@@ -11,24 +11,15 @@
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="stylesheet" href="css/style.css">
 <script>
-  var CATEGORY_INFO = {
-    streets:  { label: "Streets & Buildings", intro: "Shops, houses, roads and other buildings of Thurmaston through the years." },
-    people:   { label: "People", intro: "Portraits, residents and groups from the village's history." },
-    events:   { label: "Events", intro: "Gatherings, celebrations and occasions from the village's history." },
-    nature:   { label: "Nature & Views", intro: "The park, the river, fields and general scenery around Thurmaston." },
-    aerial:   { label: "Aerial", intro: "Aerial and drone photographs of the village, seen from above." },
-    other:    { label: "Other", intro: "Photos that don't fit neatly into the other categories — still part of the story." },
-    churches: { label: "Churches & Religious Buildings", intro: "Thurmaston's churches, chapels and other places of worship through the years." },
-    groups:   { label: "Groups & Organisations", intro: "Clubs, societies and community groups that have been part of village life." },
-    industry: { label: "Industry", intro: "Workplaces, businesses and industry in and around Thurmaston." },
-    maps:     { label: "Maps", intro: "Historical and hand-drawn maps and plans of Thurmaston through the years." },
-    military: { label: "Military", intro: "Servicemen and women, war memorials and military life connected to Thurmaston through the years." },
-    schools:  { label: "Schools", intro: "Thurmaston's schools, pupils and school life over the years." },
-    sports:   { label: "Sports", intro: "Sports clubs, teams and sporting occasions from the village's history." }
-  };
+  // The category list itself now lives in data/categories.json (so a
+  // category added through the CMS shows up here with no code change)
+  // — see the CATEGORIES_DATA_PROMISE.then() block further down, after
+  // js/main.js has loaded, for the label/intro/title lookup. This part
+  // just needs to run before body parsing, so it stays synchronous and
+  // dumb: take whatever slug the URL asked for, or "streets" if none.
   var params = new URLSearchParams(location.search);
-  var LOCKED_CATEGORY = CATEGORY_INFO[params.get("cat")] ? params.get("cat") : "streets";
-  document.title = CATEGORY_INFO[LOCKED_CATEGORY].label + " | Memories of Thurmaston";
+  var LOCKED_CATEGORY = params.get("cat") || "streets";
+  document.title = "Memories of Thurmaston";
 </script>
 </head>
 <body>
@@ -136,24 +127,31 @@
   </div>
 </div>
 
-<script>
-  document.getElementById("category-crumb").textContent = CATEGORY_INFO[LOCKED_CATEGORY].label;
-  document.getElementById("category-heading").textContent = CATEGORY_INFO[LOCKED_CATEGORY].label;
-  document.getElementById("category-intro").textContent = CATEGORY_INFO[LOCKED_CATEGORY].intro;
-
-  // On every other category the map leads (it's mostly buildings/
-  // streets/places) — but People photos are rarely about a specific
-  // spot, so the map's the least relevant thing to lead with here.
-  // Moved after the photos rather than removed: a person photo can
-  // still have a location pinned, and the map still finds it.
-  if (LOCKED_CATEGORY === "people") {
-    var mapSection = document.getElementById("map");
-    var photosSection = document.getElementById("photos");
-    if (mapSection && photosSection) photosSection.after(mapSection);
-  }
-</script>
 <script src="js/search-index.js"></script>
 <script src="js/main.js"></script>
+<script>
+  CATEGORIES_DATA_PROMISE.then(function (categories) {
+    var info = {};
+    categories.forEach(function (c) { info[c.slug] = c; });
+    var current = info[LOCKED_CATEGORY] || { label: "Category", intro: "Photos from this category." };
+
+    document.title = current.label + " | Memories of Thurmaston";
+    document.getElementById("category-crumb").textContent = current.label;
+    document.getElementById("category-heading").textContent = current.label;
+    document.getElementById("category-intro").textContent = current.intro;
+
+    // On every other category the map leads (it's mostly buildings/
+    // streets/places) — but People photos are rarely about a specific
+    // spot, so the map's the least relevant thing to lead with here.
+    // Moved after the photos rather than removed: a person photo can
+    // still have a location pinned, and the map still finds it.
+    if (LOCKED_CATEGORY === "people") {
+      var mapSection = document.getElementById("map");
+      var photosSection = document.getElementById("photos");
+      if (mapSection && photosSection) photosSection.after(mapSection);
+    }
+  });
+</script>
 <script src="vendor/jspdf/jspdf.umd.min.js"></script>
 <script src="vendor/qrcode-generator/qrcode.js"></script>
 <script src="js/pdf-helpers.js"></script>

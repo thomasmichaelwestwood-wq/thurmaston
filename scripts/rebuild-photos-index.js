@@ -68,13 +68,14 @@ const OUTPUT = path.join(ROOT, "data", "photos.json");
 // (see the Category-mismatch block below).
 const SRC_PATTERN = /^\/images\/photos\/([^/]+)\/([^/]+)$/;
 
-// Matches admin/config.yml's 13 photos_* collection folders exactly —
-// the only categories a photo's Category field (a select dropdown,
-// not free text) could ever actually contain.
-const KNOWN_CATEGORIES = new Set([
-  "aerial", "churches", "events", "groups", "industry", "maps", "military",
-  "nature", "other", "people", "schools", "sports", "streets"
-]);
+// The category list itself lives in data/categories.json now (editable
+// through the CMS's "Add a photo category" screen), so this is read at
+// build time rather than hardcoded — matches whatever slugs a photo's
+// Category field could actually contain.
+const CATEGORIES_FILE = path.join(ROOT, "data", "categories.json");
+const KNOWN_CATEGORIES = new Set(
+  (JSON.parse(fs.readFileSync(CATEGORIES_FILE, "utf8")).categories || []).map((c) => c.slug)
+);
 
 function parseCoords(str) {
   const match = typeof str === "string" && str.match(/(-?\d+(?:\.\d+)?)\s*,\s*(-?\d+(?:\.\d+)?)/);

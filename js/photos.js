@@ -1,19 +1,3 @@
-const PHOTO_CATEGORIES = {
-  streets: { label: "Streets & Buildings" },
-  people: { label: "People" },
-  events: { label: "Events" },
-  nature: { label: "Nature & Views" },
-  aerial: { label: "Aerial" },
-  other: { label: "Other" },
-  churches: { label: "Churches & Religious Buildings" },
-  groups: { label: "Groups & Organisations" },
-  industry: { label: "Industry" },
-  maps: { label: "Maps" },
-  military: { label: "Military" },
-  schools: { label: "Schools" },
-  sports: { label: "Sports" }
-};
-
 // Hero images are for the homepage banner only — a photo used there
 // (even one that's also archived from a category folder) is excluded
 // here so it never also shows up in the photo archive or site search.
@@ -97,6 +81,14 @@ document.addEventListener("DOMContentLoaded", function () {
   var activeCategory = (typeof window.LOCKED_CATEGORY === "string" && window.LOCKED_CATEGORY) ? window.LOCKED_CATEGORY : "streets";
   var allPhotos = [];
   var visiblePhotos = [];
+  var activeCategoryLabel = "Photos";
+
+  if (typeof CATEGORIES_DATA_PROMISE !== "undefined") {
+    CATEGORIES_DATA_PROMISE.then(function (categories) {
+      var match = categories.filter(function (c) { return c.slug === activeCategory; })[0];
+      if (match) activeCategoryLabel = match.label;
+    });
+  }
 
   if (selectAllBtn && selectNoneBtn) wireCheckboxSelectAll(".pick-checkbox", selectAllBtn, selectNoneBtn);
 
@@ -224,7 +216,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
   function wireDownloadPdf(photos) {
     if (!downloadPdfBtn) return;
-    var label = (typeof CATEGORY_INFO !== "undefined" && CATEGORY_INFO[activeCategory]) ? CATEGORY_INFO[activeCategory].label : "Photos";
+    var label = activeCategoryLabel;
     downloadPdfBtn.onclick = function () {
       var checkedIds = checkedPickIds(".pick-checkbox");
       var selected = photos.filter(function (p) { return checkedIds[p.id]; });

@@ -30,7 +30,16 @@ document.addEventListener("DOMContentLoaded", function () {
     return;
   }
 
-  fetch("data/photos.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }).then(function (photos) {
+  // Waits on MAP_CATEGORIES_READY too (js/map-categories.js), so the
+  // category label/colour lookups below never run against a
+  // MAP_CATEGORIES that's still only the "other"/"photo" fallback.
+  var categoriesReadyPromise = (typeof MAP_CATEGORIES_READY !== "undefined") ? MAP_CATEGORIES_READY : Promise.resolve();
+
+  Promise.all([
+    fetch("data/photos.json").then(function (res) { return res.ok ? res.json() : []; }).catch(function () { return []; }),
+    categoriesReadyPromise
+  ]).then(function (results) {
+    var photos = results[0];
     var photoById = {};
     photos.forEach(function (p) { photoById[p.id] = p; });
 

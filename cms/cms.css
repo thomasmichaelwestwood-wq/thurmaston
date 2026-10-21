@@ -113,6 +113,16 @@ h2 { color: var(--green-900); font-size: 1.3rem; margin: 24px 0 12px; }
 }
 .cms-tile:hover { border-color: var(--gold-600); background: #fffaf0; }
 
+/* The single most common action (adding a photo) — filled gold so it
+   reads as "start here" at a glance, not just another tile in the grid. */
+.cms-tile-primary {
+  background: var(--gold-600);
+  border-color: var(--gold-600);
+  color: #fff;
+  font-size: 1.25rem;
+}
+.cms-tile-primary:hover { background: #a6711f; border-color: #a6711f; }
+
 /* --- Photo category grid --- */
 
 .cms-category-grid {
@@ -136,6 +146,37 @@ h2 { color: var(--green-900); font-size: 1.3rem; margin: 24px 0 12px; }
   min-height: 56px;
 }
 .cms-category-grid button:hover { border-color: var(--gold-600); background: #fffaf0; }
+
+/* --- Colour swatches (category admin) --- */
+
+.cms-color-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 10px 0;
+}
+.cms-color-swatch {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 0 0 2px var(--line);
+  cursor: pointer;
+  padding: 0;
+}
+.cms-color-swatch:hover { box-shadow: 0 0 0 2px var(--gold-600); }
+.cms-color-swatch-selected { box-shadow: 0 0 0 3px var(--green-900); }
+.cms-color-swatch-static { cursor: default; width: 36px; height: 36px; }
+.cms-color-swatch-static:hover { box-shadow: 0 0 0 2px var(--line); }
+
+.cms-color-list { list-style: none; margin: 0; padding: 0; }
+.cms-color-list-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line);
+}
 
 /* --- Form fields --- */
 

@@ -1,0 +1,17 @@
+{
+  "categories": [
+    { "slug": "aerial", "label": "Aerial", "intro": "Aerial and drone photographs of the village, seen from above.", "color": "#3f7ea6" },
+    { "slug": "churches", "label": "Churches & Religious Buildings", "intro": "Thurmaston's churches, chapels and other places of worship through the years.", "color": "#8c5a3c" },
+    { "slug": "events", "label": "Events", "intro": "Gatherings, celebrations and occasions from the village's history.", "color": "#6b4c8a" },
+    { "slug": "groups", "label": "Groups & Organisations", "intro": "Clubs, societies and community groups that have been part of village life.", "color": "#4a90a4" },
+    { "slug": "industry", "label": "Industry", "intro": "Workplaces, businesses and industry in and around Thurmaston.", "color": "#5a5a5a" },
+    { "slug": "maps", "label": "Maps", "intro": "Historical and hand-drawn maps and plans of Thurmaston through the years.", "color": "#3d4f91" },
+    { "slug": "military", "label": "Military", "intro": "Servicemen and women, war memorials and military life connected to Thurmaston through the years.", "color": "#6b6b2e" },
+    { "slug": "nature", "label": "Nature & Views", "intro": "The park, the river, fields and general scenery around Thurmaston.", "color": "#2f7d5b" },
+    { "slug": "other", "label": "Other", "intro": "Photos that don't fit neatly into the other categories — still part of the story.", "color": "#7a3b3b" },
+    { "slug": "people", "label": "People", "intro": "Portraits, residents and groups from the village's history.", "color": "#b9822f" },
+    { "slug": "schools", "label": "Schools", "intro": "Thurmaston's schools, pupils and school life over the years.", "color": "#d17a22" },
+    { "slug": "sports", "label": "Sports", "intro": "Sports clubs, teams and sporting occasions from the village's history.", "color": "#b23a6b" },
+    { "slug": "streets", "label": "Streets & Buildings", "intro": "Shops, houses, roads and other buildings of Thurmaston through the years.", "color": "#2c6b4f" }
+  ]
+}

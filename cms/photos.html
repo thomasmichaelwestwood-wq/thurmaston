@@ -123,21 +123,11 @@
     if (!token) return;
     cmsInitShell();
 
-    var CATEGORIES = [
-      { value: "aerial", label: "Aerial" },
-      { value: "churches", label: "Churches & Religious Buildings" },
-      { value: "events", label: "Events" },
-      { value: "groups", label: "Groups & Organisations" },
-      { value: "industry", label: "Industry" },
-      { value: "maps", label: "Maps" },
-      { value: "military", label: "Military" },
-      { value: "nature", label: "Nature & Views" },
-      { value: "other", label: "Other" },
-      { value: "people", label: "People" },
-      { value: "schools", label: "Schools" },
-      { value: "sports", label: "Sports" },
-      { value: "streets", label: "Streets & Buildings" }
-    ];
+    // The category list itself lives in data/categories.json now (so
+    // adding one through the new "Add a photo category" screen shows up
+    // here with no code change) — fetched once below, before anything
+    // that reads CATEGORIES runs.
+    var CATEGORIES = [];
     function categoryLabel(value) {
       var c = CATEGORIES.filter(function (c) { return c.value === value; })[0];
       return c ? c.label : value;
@@ -157,15 +147,18 @@
       ? "Pick a category to see its photos."
       : "Pick the category this photo belongs in.";
 
-    renderCategoryGrid();
+    fetch("../data/categories.json").then(function (res) { return res.ok ? res.json() : { categories: [] }; }).catch(function () { return { categories: [] }; }).then(function (data) {
+      CATEGORIES = (data.categories || []).map(function (c) { return { value: c.slug, label: c.label }; });
+      renderCategoryGrid();
 
-    if (urlCategory && urlEditId) {
-      currentCategory = urlCategory;
-      showFormStep();
-      loadEntryForEdit(urlCategory, urlEditId);
-    } else {
-      showCategoryStep();
-    }
+      if (urlCategory && urlEditId) {
+        currentCategory = urlCategory;
+        showFormStep();
+        loadEntryForEdit(urlCategory, urlEditId);
+      } else {
+        showCategoryStep();
+      }
+    });
 
     function renderCategoryGrid() {
       var grid = document.getElementById("category-grid");
