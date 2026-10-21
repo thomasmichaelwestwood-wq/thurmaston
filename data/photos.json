@@ -1,5 +1,23 @@
 [
   {
+    "src": "/images/photos/sports/20261021154952-magpies.jpg",
+    "caption": "Magpies",
+    "personName": "",
+    "category": "sports",
+    "date": "2000",
+    "credit": "mw",
+    "coords": "",
+    "location": "",
+    "history": "",
+    "consentNoted": true,
+    "ref": "2005 Magpies u14's TT064",
+    "refSource": "2005 Magpies u14's TT064.jpg",
+    "placeId": "",
+    "id": "20261021154952-magpies",
+    "addedAt": "2026-10-21T14:49:54.782Z",
+    "numberedPeople": "[{\"number\":1,\"x\":17.55,\"y\":37.87},{\"number\":2,\"x\":30.37,\"y\":37.69},{\"number\":3,\"x\":43.45,\"y\":35.22},{\"number\":4,\"x\":52.68,\"y\":33.8},{\"number\":5,\"x\":67.81,\"y\":33.98},{\"number\":6,\"x\":78.58,\"y\":33.62},{\"number\":7,\"x\":91.01,\"y\":33.62},{\"number\":8,\"x\":10.88,\"y\":53.08},{\"number\":9,\"x\":25.37,\"y\":55.2},{\"number\":10,\"x\":39.6,\"y\":53.43},{\"number\":11,\"x\":56.4,\"y\":52.9},{\"number\":12,\"x\":68.45,\"y\":52.9},{\"number\":13,\"x\":84.22,\"y\":54.85}]"
+  },
+  {
     "src": "/images/photos/events/20261021151637-test.jpg",
     "caption": "test",
     "personName": "",
