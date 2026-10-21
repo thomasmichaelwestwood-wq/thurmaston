@@ -79,7 +79,13 @@ function gppCreateSession(token, maxItemCount) {
 }
 
 function gppOpenPicker(pickerUri) {
-  var popup = window.open(pickerUri + "/autoclose", "google-photos-picker", "width=1000,height=800");
+  // Deliberately NOT appending "/autoclose" here — that was a
+  // community-documented trick (not in Google's own reference), and in
+  // practice it made Google's own picker page fail with "Couldn't add
+  // photos... connect to Google Photos again." The plain pickerUri
+  // works; the popup just doesn't close itself automatically once
+  // picking is done (polling below still detects completion fine).
+  var popup = window.open(pickerUri, "google-photos-picker", "width=1000,height=800");
   if (!popup) throw new Error("Couldn't open Google Photos — check your browser isn't blocking pop-ups for this site.");
   return popup;
 }
