@@ -11,7 +11,10 @@
 <body>
 <header class="cms-header">
   <a href="index.html">Memories of Thurmaston — Admin</a>
-  <button type="button" id="cms-signout-btn">Sign out</button>
+  <div style="display:flex;gap:18px;align-items:center">
+    <a href="../index.html">← Back to site</a>
+    <button type="button" id="cms-signout-btn">Sign out</button>
+  </div>
 </header>
 
 <main class="cms-main">
@@ -90,6 +93,7 @@
       <div class="cms-field">
         <label for="photo-file">Photo of the headstone</label>
         <input type="file" id="photo-file" accept="image/*">
+        <button type="button" class="cms-btn cms-btn-secondary" id="photo-google-btn" style="margin-top:10px">Choose from Google Photos</button>
         <div id="photo-preview-wrap" style="margin-top:12px" hidden>
           <img id="photo-preview" alt="" style="max-width:200px;border-radius:12px;display:block">
         </div>
@@ -111,6 +115,7 @@
     <div class="cms-field">
       <label for="overview-file">Photo</label>
       <input type="file" id="overview-file" accept="image/*">
+      <button type="button" class="cms-btn cms-btn-secondary" id="overview-google-btn" style="margin-top:10px">Choose from Google Photos</button>
       <div id="overview-preview-wrap" style="margin-top:12px" hidden>
         <img id="overview-preview" alt="" style="max-width:320px;border-radius:12px;display:block">
       </div>
@@ -127,6 +132,7 @@
 <script src="../admin/cms-auth.js"></script>
 <script src="../admin/cms-core.js"></script>
 <script src="../admin/geo-helpers.js"></script>
+<script src="../admin/google-photos-picker.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var token = cmsRequireAuth();
@@ -450,6 +456,27 @@
       });
     });
 
+    document.getElementById("photo-google-btn").addEventListener("click", function () {
+      var btn = document.getElementById("photo-google-btn");
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Waiting for you to choose…";
+      cmsHideError();
+      googlePhotosPickOne().then(function (picked) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        if (!picked) return; // cancelled — nothing to do
+        newPhotoFilename = picked.filename;
+        newPhotoBase64 = picked.base64;
+        document.getElementById("photo-preview").src = "data:" + (cmsFileExtension(picked.filename) === ".png" ? "image/png" : "image/jpeg") + ";base64," + picked.base64;
+        document.getElementById("photo-preview-wrap").hidden = false;
+      }).catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Photos. Please try again.");
+      });
+    });
+
     document.getElementById("save-btn").addEventListener("click", function () {
       var name = document.getElementById("name-input").value.trim();
       if (!name) { cmsShowError("Please add a name before saving."); return; }
@@ -553,6 +580,27 @@
         newOverviewBase64 = base64;
         document.getElementById("overview-preview").src = "data:" + (file.type || "image/jpeg") + ";base64," + base64;
         document.getElementById("overview-preview-wrap").hidden = false;
+      });
+    });
+
+    document.getElementById("overview-google-btn").addEventListener("click", function () {
+      var btn = document.getElementById("overview-google-btn");
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Waiting for you to choose…";
+      cmsHideError();
+      googlePhotosPickOne().then(function (picked) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        if (!picked) return; // cancelled — nothing to do
+        newOverviewFilename = picked.filename;
+        newOverviewBase64 = picked.base64;
+        document.getElementById("overview-preview").src = "data:" + (cmsFileExtension(picked.filename) === ".png" ? "image/png" : "image/jpeg") + ";base64," + picked.base64;
+        document.getElementById("overview-preview-wrap").hidden = false;
+      }).catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Photos. Please try again.");
       });
     });
 

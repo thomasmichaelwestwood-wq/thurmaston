@@ -11,7 +11,10 @@
 <body>
 <header class="cms-header">
   <a href="index.html">Memories of Thurmaston — Admin</a>
-  <button type="button" id="cms-signout-btn">Sign out</button>
+  <div style="display:flex;gap:18px;align-items:center">
+    <a href="../index.html">← Back to site</a>
+    <button type="button" id="cms-signout-btn">Sign out</button>
+  </div>
 </header>
 
 <main class="cms-main">
@@ -42,6 +45,7 @@
     <div class="cms-field">
       <label for="photo-file">Photo</label>
       <input type="file" id="photo-file" accept="image/*">
+      <button type="button" class="cms-btn cms-btn-secondary" id="photo-google-btn" style="margin-top:10px">Choose from Google Photos</button>
       <div id="photo-preview-wrap" style="margin-top:12px" hidden>
         <img id="photo-preview" alt="" style="max-width:260px;border-radius:12px;display:block">
       </div>
@@ -73,6 +77,11 @@
       <div class="cms-field">
         <label for="credit-input">Credit</label>
         <input type="text" id="credit-input" placeholder="Who took or contributed this photo, if known">
+      </div>
+      <div class="cms-field">
+        <label for="ref-input">Reference code</label>
+        <input type="text" id="ref-input" placeholder="e.g. 001 Black Horse MOT 1 1-2">
+        <span class="cms-hint">A short code to help track this photo back to the original. Filled in automatically from the file's name when you choose a photo — change it if you'd like.</span>
       </div>
       <div class="cms-field">
         <label for="coords-input">Google Maps coordinates</label>
@@ -107,6 +116,7 @@
 
 <script src="../admin/cms-auth.js"></script>
 <script src="../admin/cms-core.js"></script>
+<script src="../admin/google-photos-picker.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var token = cmsRequireAuth();
@@ -227,6 +237,7 @@
       document.getElementById("person-input").value = "";
       document.getElementById("date-input").value = "";
       document.getElementById("credit-input").value = "";
+      document.getElementById("ref-input").value = "";
       document.getElementById("coords-input").value = "";
       document.getElementById("location-input").value = "";
       document.getElementById("history-input").value = "";
@@ -250,6 +261,7 @@
         document.getElementById("person-input").value = data.personName || "";
         document.getElementById("date-input").value = data.date || "";
         document.getElementById("credit-input").value = data.credit || "";
+        document.getElementById("ref-input").value = data.ref || "";
         document.getElementById("coords-input").value = data.coords || "";
         document.getElementById("location-input").value = data.location || "";
         document.getElementById("history-input").value = data.history || "";
@@ -279,6 +291,32 @@
         document.getElementById("photo-preview-wrap").hidden = false;
         document.getElementById("numbering-stage-img").src = dataUrl;
         document.getElementById("numbering-section").hidden = false;
+        document.getElementById("ref-input").value = file.name.replace(/\.[^.]+$/, "");
+      });
+    });
+
+    document.getElementById("photo-google-btn").addEventListener("click", function () {
+      var btn = document.getElementById("photo-google-btn");
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Waiting for you to choose…";
+      cmsHideError();
+      googlePhotosPickOne().then(function (picked) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        if (!picked) return; // cancelled — nothing to do
+        newPhotoFilename = picked.filename;
+        newPhotoBase64 = picked.base64;
+        var dataUrl = "data:" + (cmsFileExtension(picked.filename) === ".png" ? "image/png" : "image/jpeg") + ";base64," + picked.base64;
+        document.getElementById("photo-preview").src = dataUrl;
+        document.getElementById("photo-preview-wrap").hidden = false;
+        document.getElementById("numbering-stage-img").src = dataUrl;
+        document.getElementById("numbering-section").hidden = false;
+        document.getElementById("ref-input").value = picked.filename.replace(/\.[^.]+$/, "");
+      }).catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        cmsShowError(err && err.message ? err.message : "Couldn't get that photo from Google Photos. Please try again.");
       });
     });
 
@@ -358,7 +396,7 @@
           location: document.getElementById("location-input").value.trim(),
           history: document.getElementById("history-input").value.trim(),
           consentNoted: document.getElementById("consent-input").checked,
-          ref: newPhotoFilename ? newPhotoFilename.replace(/\.[^.]+$/, "") : (currentEntry ? currentEntry.data.ref || "" : ""),
+          ref: document.getElementById("ref-input").value.trim(),
           refSource: newPhotoFilename || (currentEntry ? currentEntry.data.refSource || "" : ""),
           placeId: document.getElementById("place-id-input").value.trim(),
           id: currentEntry ? currentEntry.data.id || "" : "",

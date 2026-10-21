@@ -1,0 +1,7 @@
+# This site is otherwise a plain static site with no backend of any
+# kind. The one function below exists solely to relay an already-
+# authorized Google Photos download past a browser CORS restriction
+# (see netlify/functions/google-photos-download.js's own comment) —
+# it is not a general-purpose API and should not grow into one.
+[functions]
+  directory = "netlify/functions"

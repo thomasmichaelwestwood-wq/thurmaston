@@ -11,7 +11,10 @@
 <body>
 <header class="cms-header">
   <a href="index.html">Memories of Thurmaston — Admin</a>
-  <button type="button" id="cms-signout-btn">Sign out</button>
+  <div style="display:flex;gap:18px;align-items:center">
+    <a href="../index.html">← Back to site</a>
+    <button type="button" id="cms-signout-btn">Sign out</button>
+  </div>
 </header>
 
 <main class="cms-main">
@@ -46,6 +49,7 @@
     <div class="cms-field">
       <label for="photos-file">Photos</label>
       <input type="file" id="photos-file" accept="image/*" multiple>
+      <button type="button" class="cms-btn cms-btn-secondary" id="photos-google-btn" style="margin-top:10px">Choose from Google Photos</button>
       <span class="cms-hint" id="existing-photos-hint" hidden>There are already photos here — choosing files adds to them (it won't remove the existing ones).</span>
       <div id="photos-preview" style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px"></div>
     </div>
@@ -77,6 +81,7 @@
 
 <script src="../admin/cms-auth.js"></script>
 <script src="../admin/cms-core.js"></script>
+<script src="../admin/google-photos-picker.js"></script>
 <script>
   document.addEventListener("DOMContentLoaded", function () {
     var token = cmsRequireAuth();
@@ -194,6 +199,31 @@
           previewWrap.appendChild(img);
         });
       }));
+    });
+
+    document.getElementById("photos-google-btn").addEventListener("click", function () {
+      var btn = document.getElementById("photos-google-btn");
+      var originalText = btn.textContent;
+      btn.disabled = true;
+      btn.textContent = "Waiting for you to choose…";
+      cmsHideError();
+      googlePhotosPickMany().then(function (picked) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        if (!picked || !picked.length) return; // cancelled — nothing to do
+        var previewWrap = document.getElementById("photos-preview");
+        picked.forEach(function (p) {
+          newPhotosBase64.push({ filename: p.filename, base64: p.base64, type: p.type });
+          var img = document.createElement("img");
+          img.src = "data:" + p.type + ";base64," + p.base64;
+          img.style.width = "90px"; img.style.height = "90px"; img.style.objectFit = "cover"; img.style.borderRadius = "10px";
+          previewWrap.appendChild(img);
+        });
+      }).catch(function (err) {
+        btn.disabled = false;
+        btn.textContent = originalText;
+        cmsShowError(err && err.message ? err.message : "Couldn't get those photos from Google Photos. Please try again.");
+      });
     });
 
     document.getElementById("save-btn").addEventListener("click", function () {
