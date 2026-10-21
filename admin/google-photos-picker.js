@@ -17,8 +17,26 @@
 var GOOGLE_PHOTOS_CLIENT_ID = "121328946353-omrpogqh5boe8akptqggikc6lo73gc6b.apps.googleusercontent.com";
 var GOOGLE_PHOTOS_SCOPE = "https://www.googleapis.com/auth/photospicker.mediaitems.readonly";
 
-var gppCachedToken = null; // { token, expiresAt }
+var GOOGLE_PHOTOS_TOKEN_KEY = "thurmaston-cms-google-photos-token";
 var gppGisLoadPromise = null;
+
+// Kept in sessionStorage (not just an in-memory var) so signing in once
+// carries across every CMS page for the rest of this browser tab's
+// visit — without this, moving from Photos to Events to Memories would
+// each demand a fresh Google sign-in, since every one is a separate
+// page load. sessionStorage clears itself when the tab closes, same
+// safety margin as the GitHub sign-in token already gets from its own
+// localStorage key.
+function gppGetCachedToken() {
+  try {
+    var saved = JSON.parse(sessionStorage.getItem(GOOGLE_PHOTOS_TOKEN_KEY) || "null");
+    if (saved && saved.token && saved.expiresAt > Date.now() + 30000) return saved;
+  } catch (e) {}
+  return null;
+}
+function gppSetCachedToken(token, expiresAt) {
+  try { sessionStorage.setItem(GOOGLE_PHOTOS_TOKEN_KEY, JSON.stringify({ token: token, expiresAt: expiresAt })); } catch (e) {}
+}
 
 function gppLoadGis() {
   if (window.google && window.google.accounts && window.google.accounts.oauth2) return Promise.resolve();
@@ -35,10 +53,8 @@ function gppLoadGis() {
 }
 
 function gppGetAccessToken() {
-  var now = Date.now();
-  if (gppCachedToken && gppCachedToken.expiresAt > now + 30000) {
-    return Promise.resolve(gppCachedToken.token);
-  }
+  var cached = gppGetCachedToken();
+  if (cached) return Promise.resolve(cached.token);
   return gppLoadGis().then(function () {
     return new Promise(function (resolve, reject) {
       var client = google.accounts.oauth2.initTokenClient({
@@ -49,10 +65,7 @@ function gppGetAccessToken() {
             reject(new Error("Couldn't sign in to Google Photos. Please try again."));
             return;
           }
-          gppCachedToken = {
-            token: response.access_token,
-            expiresAt: Date.now() + (Number(response.expires_in || 3600) * 1000)
-          };
+          gppSetCachedToken(response.access_token, Date.now() + (Number(response.expires_in || 3600) * 1000));
           resolve(response.access_token);
         },
         error_callback: function (err) {
