@@ -1,5 +1,23 @@
 [
   {
+    "src": "/images/photos/sports/20261021183816-thurmaston-magpies.jpg",
+    "caption": "Thurmaston Magpies",
+    "personName": "",
+    "category": "sports",
+    "date": "2000",
+    "credit": "",
+    "coords": "",
+    "location": "",
+    "history": "",
+    "consentNoted": true,
+    "ref": "02026 Thurmaston Magpies, Valkenburg",
+    "refSource": "02026 Thurmaston Magpies, Valkenburg.jpg",
+    "placeId": "",
+    "id": "20261021183816-thurmaston-magpies",
+    "addedAt": "2026-10-21T17:38:18.421Z",
+    "numberedPeople": "[{\"number\":1,\"x\":17.1,\"y\":42.97},{\"number\":2,\"x\":25.05,\"y\":41.38},{\"number\":3,\"x\":32.74,\"y\":39.01},{\"number\":4,\"x\":41.07,\"y\":34.66},{\"number\":5,\"x\":48.51,\"y\":35.84},{\"number\":6,\"x\":53.38,\"y\":30.7},{\"number\":7,\"x\":59.28,\"y\":35.45},{\"number\":8,\"x\":68.89,\"y\":36.63},{\"number\":9,\"x\":20.05,\"y\":66.71},{\"number\":10,\"x\":28,\"y\":58.01},{\"number\":11,\"x\":37.23,\"y\":58.99},{\"number\":12,\"x\":46.84,\"y\":61.96},{\"number\":13,\"x\":56.97,\"y\":56.22},{\"number\":14,\"x\":64.92,\"y\":57.02},{\"number\":15,\"x\":75.18,\"y\":55.24},{\"number\":16,\"x\":83.25,\"y\":56.42}]"
+  },
+  {
     "src": "/images/photos/sports/20261021154952-magpies.jpg",
     "caption": "Thurmaston Magpies Under 14s",
     "personName": "",
