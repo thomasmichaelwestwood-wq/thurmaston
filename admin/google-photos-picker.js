@@ -101,7 +101,15 @@ function gppOpenPicker(pickerUri) {
   // photos... connect to Google Photos again." The plain pickerUri
   // works; the popup just doesn't close itself automatically once
   // picking is done (polling below still detects completion fine).
-  var popup = window.open(pickerUri, "google-photos-picker", "width=1000,height=800");
+  //
+  // A fresh, uniquely-named window every time — a fixed, reused window
+  // name meant a second attempt in the same tab reopened the SAME
+  // window instance, which could still be carrying state (cookies,
+  // in-page JS state) from a previous, already-finished session. That's
+  // a plausible cause of this working on one attempt and failing the
+  // next with Google's own "Couldn't add photos" error.
+  var windowName = "google-photos-picker-" + Date.now();
+  var popup = window.open(pickerUri, windowName, "width=1000,height=800");
   if (!popup) throw new Error("Couldn't open Google Photos — check your browser isn't blocking pop-ups for this site.");
   return popup;
 }
@@ -219,6 +227,19 @@ function gppDownloadSequentially(items, token) {
   return next();
 }
 
+// Always closes the popup once this pick is settled (success, error, or
+// cancel) — each attempt now opens its own, uniquely-named window
+// rather than reusing one, so nothing else will close it otherwise.
+function gppSettleWithPopupClosed(promise, popup) {
+  return promise.then(function (value) {
+    try { if (popup && !popup.closed) popup.close(); } catch (e) {}
+    return value;
+  }, function (err) {
+    try { if (popup && !popup.closed) popup.close(); } catch (e) {}
+    throw err;
+  });
+}
+
 // Resolves { base64, filename } for the one photo picked, or null if
 // the editor closed the picker without choosing anything (a deliberate
 // cancel — not an error). Rejects for a genuine failure.
@@ -229,7 +250,7 @@ function googlePhotosPickOne() {
     return gppCreateSession(token);
   }).then(function (session) {
     var popup = gppOpenPicker(session.pickerUri);
-    return gppPollSession(session.id, accessToken, session.pollingConfig, popup).then(function (result) {
+    var result = gppPollSession(session.id, accessToken, session.pollingConfig, popup).then(function (result) {
       if (result.cancelled) {
         gppDeleteSession(session.id, accessToken);
         return null;
@@ -243,6 +264,7 @@ function googlePhotosPickOne() {
         });
       });
     });
+    return gppSettleWithPopupClosed(result, popup);
   });
 }
 
@@ -255,7 +277,7 @@ function googlePhotosPickMany() {
     return gppCreateSession(token);
   }).then(function (session) {
     var popup = gppOpenPicker(session.pickerUri);
-    return gppPollSession(session.id, accessToken, session.pollingConfig, popup).then(function (result) {
+    var result = gppPollSession(session.id, accessToken, session.pollingConfig, popup).then(function (result) {
       if (result.cancelled) {
         gppDeleteSession(session.id, accessToken);
         return [];
@@ -266,5 +288,6 @@ function googlePhotosPickMany() {
         return gppDownloadSequentially(items, accessToken);
       });
     });
+    return gppSettleWithPopupClosed(result, popup);
   });
 }
