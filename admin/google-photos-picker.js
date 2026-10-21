@@ -14,7 +14,7 @@
 // Google's content domain directly from here, to avoid a documented
 // CORS wall for browser-only apps.
 
-var GOOGLE_PHOTOS_CLIENT_ID = "REPLACE-WITH-REAL-CLIENT-ID.apps.googleusercontent.com";
+var GOOGLE_PHOTOS_CLIENT_ID = "121328946353-omrpogqh5boe8akptqggikc6lo73gc6b.apps.googleusercontent.com";
 var GOOGLE_PHOTOS_SCOPE = "https://www.googleapis.com/auth/photospicker.mediaitems.readonly";
 
 var gppCachedToken = null; // { token, expiresAt }
