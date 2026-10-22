@@ -62,6 +62,7 @@
       <div class="cms-stage-wrap" id="numbering-stage-wrap">
         <img id="numbering-stage-img" alt="Tap to number people in this photo">
       </div>
+      <div id="numbering-names-list"></div>
     </div>
 
     <details class="cms-more">
@@ -313,7 +314,10 @@
       });
     });
 
-    // --- Numbering (same output shape as the old number-photo.html tool: [{number, x, y}]) ---
+    // --- Numbering: [{number, x, y, name}] — position/number shape is
+    // the same as the old number-photo.html tool; name is new, and
+    // optional (added as names become known, not necessarily all at
+    // once — see renderNumberingMarkers below). ---
 
     document.getElementById("numbering-stage-wrap").addEventListener("click", function (e) {
       if (e.target.classList.contains("cms-marker")) return;
@@ -321,7 +325,7 @@
       var rect = img.getBoundingClientRect();
       var x = ((e.clientX - rect.left) / rect.width) * 100;
       var y = ((e.clientY - rect.top) / rect.height) * 100;
-      markers.push({ number: markers.length + 1, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 });
+      markers.push({ number: markers.length + 1, x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100, name: "" });
       renderNumberingMarkers();
     });
 
@@ -331,6 +335,14 @@
       renderNumberingMarkers();
     }
 
+    // Re-renders both the numbered dots on the photo AND the plain list
+    // of name fields below it, every time a marker is added/removed — so
+    // the list always matches whatever's actually in `markers`, same
+    // "rebuild from the array" approach the dots themselves already use.
+    // Each row's own input updates markers[i].name directly; names stay
+    // attached to the right person even after a removal renumbers
+    // everyone after it, since name lives on the marker object itself,
+    // not a separate array indexed by position.
     function renderNumberingMarkers() {
       var wrap = document.getElementById("numbering-stage-wrap");
       Array.prototype.forEach.call(wrap.querySelectorAll(".cms-marker"), function (el) { el.remove(); });
@@ -342,6 +354,30 @@
         el.style.top = m.y + "%";
         el.addEventListener("click", function (e) { e.stopPropagation(); removeMarker(i); });
         wrap.appendChild(el);
+      });
+
+      var namesList = document.getElementById("numbering-names-list");
+      namesList.innerHTML = "";
+      if (markers.length === 0) return;
+      var intro = document.createElement("p");
+      intro.className = "cms-hint";
+      intro.style.marginTop = "14px";
+      intro.textContent = "Know any of their names? Add them here — leave any you don't know blank for now, you can always come back later.";
+      namesList.appendChild(intro);
+      markers.forEach(function (m, i) {
+        var row = document.createElement("div");
+        row.className = "cms-field";
+        row.style.marginBottom = "10px";
+        var label = document.createElement("label");
+        label.textContent = "Person " + m.number;
+        var input = document.createElement("input");
+        input.type = "text";
+        input.placeholder = "Name (optional)";
+        input.value = m.name || "";
+        input.addEventListener("input", function () { markers[i].name = input.value; });
+        row.appendChild(label);
+        row.appendChild(input);
+        namesList.appendChild(row);
       });
     }
 

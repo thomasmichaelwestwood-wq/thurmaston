@@ -161,19 +161,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
     points.forEach(function (p) {
       if (typeof p.number !== "number" || typeof p.x !== "number" || typeof p.y !== "number") return;
+      var name = typeof p.name === "string" ? p.name.trim() : "";
       var marker = document.createElement("button");
       marker.type = "button";
       marker.className = "place-photo-marker";
       marker.style.left = p.x + "%";
       marker.style.top = p.y + "%";
       marker.textContent = String(p.number);
-      marker.setAttribute("aria-label", "Name number " + p.number);
+      // A known name shows as a plain hover/long-press tooltip (title)
+      // rather than a label always on screen — with several people
+      // numbered, permanent on-photo text for each would get crowded
+      // fast. The aria-label carries the same information either way.
+      if (name) {
+        marker.title = name;
+        marker.setAttribute("aria-label", "Number " + p.number + ": " + name + " — tap to edit");
+      } else {
+        marker.setAttribute("aria-label", "Name number " + p.number);
+      }
       marker.addEventListener("click", function (e) {
         // Sits on top of the click-to-zoom image underneath it — stop
         // the click reaching that handler too, or a marker tap would
         // both open this popover and the full-screen zoom overlay at once.
         e.stopPropagation();
-        openNamePersonInline(photo, p.number, marker, mediaEl);
+        openNamePersonInline(photo, p.number, name, marker, mediaEl);
       });
       mediaEl.appendChild(marker);
     });
@@ -200,7 +210,12 @@ document.addEventListener("DOMContentLoaded", function () {
     activeNamePopover = null;
   }
 
-  function openNamePersonInline(photo, personNumber, marker, mediaEl) {
+  // currentName is "" for an un-named marker, or the name already on
+  // file for one someone's corrected before — either way the box opens
+  // with that value already in the field, so naming someone for the
+  // first time and correcting an existing name are the same "edit the
+  // name, press Save" action rather than two different flows.
+  function openNamePersonInline(photo, personNumber, currentName, marker, mediaEl) {
     // Tapping the same marker again, or a different one, just moves
     // the popover rather than stacking a second one.
     closeNamePopover();
@@ -217,10 +232,10 @@ document.addEventListener("DOMContentLoaded", function () {
     var inputId = "place-name-input-" + personNumber;
     popover.innerHTML =
       '<form class="place-name-popover-form">' +
-        '<label for="' + inputId + '">Who is number ' + personNumber + '?</label>' +
-        '<input type="text" id="' + inputId + '" placeholder="Their name" autocomplete="off">' +
+        '<label for="' + inputId + '">Number ' + personNumber + "'s name</label>" +
+        '<input type="text" id="' + inputId + '" placeholder="Their name" autocomplete="off" value="' + escapeAttr(currentName) + '">' +
         '<div class="place-name-popover-actions">' +
-          '<button type="submit" class="btn btn-primary">Submit</button>' +
+          '<button type="submit" class="btn btn-primary">Save</button>' +
           '<button type="button" class="place-name-popover-cancel">Cancel</button>' +
         "</div>" +
       "</form>";
@@ -229,6 +244,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     var input = popover.querySelector("input");
     input.focus();
+    input.select();
     input.addEventListener("keydown", function (e) {
       if (e.key === "Escape") closeNamePopover();
     });
@@ -236,8 +252,8 @@ document.addEventListener("DOMContentLoaded", function () {
     popover.querySelector("form").addEventListener("submit", function (e) {
       e.preventDefault();
       var name = input.value.trim();
-      if (!name) { input.focus(); return; }
-      submitPersonName(photo, personNumber, name, popover);
+      if (!name || name === currentName) { input.focus(); return; }
+      submitPersonName(photo, personNumber, name, currentName, popover);
     });
 
     // A tap anywhere else on the page closes it — deferred by a tick so
@@ -252,15 +268,20 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 0);
   }
 
-  function submitPersonName(photo, personNumber, name, popover) {
+  // previousName (blank if there wasn't one) rides along as its own
+  // field purely so whoever reviews this submission in the Netlify
+  // dashboard can see it was a correction ("was X, suggested Y") rather
+  // than guessing from the name alone.
+  function submitPersonName(photo, personNumber, name, previousName, popover) {
     var submitBtn = popover.querySelector("button[type=submit]");
     submitBtn.disabled = true;
-    submitBtn.textContent = "Sending…";
+    submitBtn.textContent = "Saving…";
     var body = new URLSearchParams({
       "form-name": "name-person",
       "photo-id": photo.id,
       "person-number": String(personNumber),
-      "name": name
+      "name": name,
+      "previous-name": previousName || ""
     });
     fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
       .then(function (res) {
