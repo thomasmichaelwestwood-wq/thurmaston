@@ -1455,43 +1455,33 @@ a.chronology-year:hover { text-decoration: underline; }
   outline: none;
 }
 
-/* Inline "who is this?" popover (js/place.js openNamePersonInline) —
-   opens right on the photo next to the marker that triggered it,
-   instead of the heavier "Know more" modal, which asks for an email
-   address and a message just to type in one name. */
-.place-name-popover {
-  position: absolute;
-  z-index: 10;
-  width: min(220px, 80%);
-  background: #fff;
+/* "Know who's in this photo?" (js/place.js renderNamesPanel) — one
+   plain list of "Person N" + a name field, one shared Save button,
+   the same shape as cms/photos.html's own numbering form (deliberately
+   — requested as "the same way" for viewers as the CMS already has),
+   rather than a separate popover per numbered marker. Sits right under
+   the photo panel, so it reads as part of that photo, not a detached
+   feedback form elsewhere on the page. */
+.place-names-panel { margin: 0 auto 24px; max-width: 900px; }
+.place-names-panel h3 { margin: 0 0 4px; }
+.place-names-intro { color: var(--ink-soft); font-size: 0.85rem; margin: 0 0 14px; }
+.place-names-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.place-names-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.place-names-row label {
   color: var(--ink);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow-lg);
-  padding: 12px 14px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  flex: 0 0 90px;
 }
-.place-name-popover-form { display: flex; flex-direction: column; gap: 8px; }
-.place-name-popover-form label { font-size: 0.8rem; font-weight: 600; }
-.place-name-popover-form input[type="text"] {
+.place-names-row input[type="text"] {
+  flex: 1 1 180px;
   font: inherit;
   font-size: 0.9rem;
-  padding: 8px 10px;
+  padding: 9px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-.place-name-popover-actions { display: flex; gap: 8px; align-items: center; }
-.place-name-popover-actions .btn {
-  padding: 7px 14px;
-  font-size: 0.82rem;
-}
-.place-name-popover-cancel {
-  background: none;
-  border: none;
-  color: var(--ink-soft);
-  font-size: 0.82rem;
-  cursor: pointer;
-  text-decoration: underline;
-}
-.place-name-popover-thanks { margin: 0; font-size: 0.88rem; font-weight: 600; }
+.place-names-status { font-size: 0.85rem; font-weight: 600; color: var(--ink); margin: 10px 0 0; }
 .place-photo-panel-info {
   flex: 1 1 260px;
   padding: 24px 26px;

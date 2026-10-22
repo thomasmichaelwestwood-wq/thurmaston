@@ -4,6 +4,10 @@ document.addEventListener("DOMContentLoaded", function () {
   var headingEl = document.getElementById("place-heading");
   var crumbEl = document.getElementById("place-crumb");
   var photoPanelEl = document.getElementById("place-photo-panel");
+  var namesPanelEl = document.getElementById("place-names-panel");
+  var namesListEl = document.getElementById("place-names-list");
+  var namesSaveBtn = document.getElementById("place-names-save-btn");
+  var namesStatusEl = document.getElementById("place-names-status");
   var historyEl = document.getElementById("place-history");
   var actionsEl = document.getElementById("place-actions");
   var knowMoreBtn = document.getElementById("place-know-more-btn");
@@ -137,163 +141,170 @@ document.addEventListener("DOMContentLoaded", function () {
     renderNumberedPeople(photo);
   }
 
-  // A group photo can have people numbered for identification —
-  // placed with the standalone admin/number-photo.html tool (Sveltia
-  // has no custom-field-type support yet, so there's no way to build a
-  // "click the photo" widget directly into the CMS form — see that
-  // tool's own comment) and stored as a plain JSON string in the
-  // photo's "Numbered people (JSON)" field: [{number, x, y}, ...],
-  // x/y as percentages of the image so markers stay correctly placed
-  // at any display size. Each marker opens a small inline popover
-  // right there on the photo (openNamePersonInline, below) — not the
-  // full "Know more" popup, which asks for an email address and a
-  // message just to type one name.
+  // A group photo can have people numbered for identification — stored
+  // as a plain JSON string in the photo's numberedPeople field,
+  // [{number, x, y, name}, ...], x/y as percentages of the image so
+  // markers stay correctly placed at any display size (added through
+  // cms/photos.html's own numbering tool, which also has a name field
+  // per person — see CLAUDE.md). The dots on the photo are a visual
+  // map of who's who; the actual name-editing happens in the plain list
+  // right below (renderNamesPanel), the same "Person N + a text field"
+  // layout as the CMS, rather than a separate popover per marker —
+  // requested explicitly, after an earlier per-marker-popover version,
+  // as "the same way" viewers and Dad should both be able to add names.
   function renderNumberedPeople(photo) {
     var mediaEl = photoPanelEl.querySelector(".place-photo-panel-media");
-    if (!mediaEl || !photo.numberedPeople) return;
     var points;
     try {
-      points = JSON.parse(photo.numberedPeople);
+      points = photo.numberedPeople ? JSON.parse(photo.numberedPeople) : [];
     } catch (e) {
+      points = [];
+    }
+    if (!Array.isArray(points)) points = [];
+    points = points.filter(function (p) { return typeof p.number === "number" && typeof p.x === "number" && typeof p.y === "number"; });
+    if (points.length === 0) return;
+
+    if (mediaEl) {
+      points.forEach(function (p) {
+        var name = typeof p.name === "string" ? p.name.trim() : "";
+        var marker = document.createElement("button");
+        marker.type = "button";
+        marker.className = "place-photo-marker";
+        marker.style.left = p.x + "%";
+        marker.style.top = p.y + "%";
+        marker.textContent = String(p.number);
+        // A known name shows as a plain hover/long-press tooltip (title)
+        // rather than a label always on screen — with several people
+        // numbered, permanent on-photo text for each would get crowded
+        // fast. The aria-label carries the same information either way.
+        if (name) {
+          marker.title = name;
+          marker.setAttribute("aria-label", "Number " + p.number + ": " + name);
+        } else {
+          marker.setAttribute("aria-label", "Number " + p.number + ", not yet named");
+        }
+        marker.addEventListener("click", function (e) {
+          // Sits on top of the click-to-zoom image underneath it — stop
+          // the click reaching that handler too, or a tap would both
+          // jump to the name field below AND open the full-screen zoom.
+          e.stopPropagation();
+          focusNameRow(p.number);
+        });
+        mediaEl.appendChild(marker);
+      });
+    }
+
+    renderNamesPanel(photo, points);
+  }
+
+  // Scrolls to and focuses a numbered person's row in the names list —
+  // what tapping their marker on the photo does, so the photo and the
+  // list read as one connected thing rather than two separate features.
+  function focusNameRow(personNumber) {
+    var input = document.getElementById("place-name-input-" + personNumber);
+    if (!input) return;
+    input.scrollIntoView({ behavior: "smooth", block: "center" });
+    input.focus();
+  }
+
+  // The actual "add/correct a name" UI — one plain list, one Save
+  // button, same shape as cms/photos.html's own numbering form, rather
+  // than a popover per marker. Submits straight to Netlify Forms (the
+  // same proven, no-backend-needed pattern submit-event-photos.html
+  // already uses) as its own "name-person" form — see the hidden
+  // static copy of that form in place.html, which is only there so
+  // Netlify's build-time scanner finds and registers it; this panel
+  // submits the real, filled-in version, in saveNames() below.
+  function renderNamesPanel(photo, points) {
+    if (!namesPanelEl || !namesListEl) return;
+    namesListEl.innerHTML = "";
+    points.forEach(function (p) {
+      var row = document.createElement("div");
+      row.className = "place-names-row";
+      var inputId = "place-name-input-" + p.number;
+      var label = document.createElement("label");
+      label.setAttribute("for", inputId);
+      label.textContent = "Person " + p.number;
+      var input = document.createElement("input");
+      input.type = "text";
+      input.id = inputId;
+      input.placeholder = "Name (optional)";
+      input.value = typeof p.name === "string" ? p.name : "";
+      input.dataset.personNumber = String(p.number);
+      input.dataset.originalName = input.value;
+      row.appendChild(label);
+      row.appendChild(input);
+      namesListEl.appendChild(row);
+    });
+    namesPanelEl.hidden = false;
+
+    namesSaveBtn.onclick = function () { saveNames(photo); };
+  }
+
+  // Submits one Netlify Forms record per person whose name actually
+  // changed since the panel loaded — not a single bundled submission —
+  // so Dad's Netlify dashboard still reads as one plain row per person,
+  // exactly like naming just one person used to look, whether a viewer
+  // corrects one name or fills in five at once in a single Save.
+  function saveNames(photo) {
+    var inputs = Array.prototype.slice.call(namesListEl.querySelectorAll("input"));
+    var changed = inputs
+      .map(function (input) {
+        var name = input.value.trim();
+        var previousName = input.dataset.originalName || "";
+        return { input: input, personNumber: input.dataset.personNumber, name: name, previousName: previousName };
+      })
+      .filter(function (entry) { return entry.name && entry.name !== entry.previousName; });
+
+    if (changed.length === 0) {
+      showNamesStatus("Nothing's changed to save yet.", false);
       return;
     }
-    if (!Array.isArray(points) || points.length === 0) return;
 
-    points.forEach(function (p) {
-      if (typeof p.number !== "number" || typeof p.x !== "number" || typeof p.y !== "number") return;
-      var name = typeof p.name === "string" ? p.name.trim() : "";
-      var marker = document.createElement("button");
-      marker.type = "button";
-      marker.className = "place-photo-marker";
-      marker.style.left = p.x + "%";
-      marker.style.top = p.y + "%";
-      marker.textContent = String(p.number);
-      // A known name shows as a plain hover/long-press tooltip (title)
-      // rather than a label always on screen — with several people
-      // numbered, permanent on-photo text for each would get crowded
-      // fast. The aria-label carries the same information either way.
-      if (name) {
-        marker.title = name;
-        marker.setAttribute("aria-label", "Number " + p.number + ": " + name + " — tap to edit");
-      } else {
-        marker.setAttribute("aria-label", "Name number " + p.number);
-      }
-      marker.addEventListener("click", function (e) {
-        // Sits on top of the click-to-zoom image underneath it — stop
-        // the click reaching that handler too, or a marker tap would
-        // both open this popover and the full-screen zoom overlay at once.
-        e.stopPropagation();
-        openNamePersonInline(photo, p.number, name, marker, mediaEl);
+    namesSaveBtn.disabled = true;
+    namesSaveBtn.textContent = "Saving…";
+    showNamesStatus("Saving…", false);
+
+    var failed = false;
+    changed.reduce(function (chain, entry) {
+      return chain.then(function () {
+        return submitPersonName(photo.id, entry.personNumber, entry.name, entry.previousName).then(function () {
+          entry.input.dataset.originalName = entry.name;
+        }).catch(function () { failed = true; });
       });
-      mediaEl.appendChild(marker);
+    }, Promise.resolve()).then(function () {
+      namesSaveBtn.disabled = false;
+      namesSaveBtn.textContent = "Save names";
+      if (failed) {
+        showNamesStatus("Something didn't send — check your connection and try again.", true);
+      } else {
+        showNamesStatus("Thanks — we'll take a look!", false);
+      }
     });
   }
 
-  // A simple inline "who is this?" popover, anchored right next to the
-  // marker that opened it — just a name field, no email, no message —
-  // the replacement for routing a numbered-person tap through the full
-  // "Know more" popup. Submits straight to Netlify Forms (the same
-  // proven, no-backend-needed pattern submit-event-photos.html already
-  // uses) as its own "name-person" form — see the hidden static copy
-  // of that form in place.html, which is only there so Netlify's
-  // build-time scanner finds and registers it; the real, filled-in
-  // version is this popover, submitted by fetch in submitPersonName().
-  var activeNamePopover = null;
-  var activeNamePopoverOutsideHandler = null;
-
-  function closeNamePopover() {
-    if (activeNamePopoverOutsideHandler) {
-      document.removeEventListener("click", activeNamePopoverOutsideHandler);
-      activeNamePopoverOutsideHandler = null;
-    }
-    if (activeNamePopover && activeNamePopover.parentNode) activeNamePopover.parentNode.removeChild(activeNamePopover);
-    activeNamePopover = null;
-  }
-
-  // currentName is "" for an un-named marker, or the name already on
-  // file for one someone's corrected before — either way the box opens
-  // with that value already in the field, so naming someone for the
-  // first time and correcting an existing name are the same "edit the
-  // name, press Save" action rather than two different flows.
-  function openNamePersonInline(photo, personNumber, currentName, marker, mediaEl) {
-    // Tapping the same marker again, or a different one, just moves
-    // the popover rather than stacking a second one.
-    closeNamePopover();
-
-    var popover = document.createElement("div");
-    popover.className = "place-name-popover";
-    // Anchored just below the marker, clamped so it can't spill past
-    // either edge of the photo for a marker placed near its border.
-    var left = Math.min(Math.max(parseFloat(marker.style.left) || 0, 18), 82);
-    var top = Math.min((parseFloat(marker.style.top) || 0) + 6, 90);
-    popover.style.left = left + "%";
-    popover.style.top = top + "%";
-
-    var inputId = "place-name-input-" + personNumber;
-    popover.innerHTML =
-      '<form class="place-name-popover-form">' +
-        '<label for="' + inputId + '">Number ' + personNumber + "'s name</label>" +
-        '<input type="text" id="' + inputId + '" placeholder="Their name" autocomplete="off" value="' + escapeAttr(currentName) + '">' +
-        '<div class="place-name-popover-actions">' +
-          '<button type="submit" class="btn btn-primary">Save</button>' +
-          '<button type="button" class="place-name-popover-cancel">Cancel</button>' +
-        "</div>" +
-      "</form>";
-    mediaEl.appendChild(popover);
-    activeNamePopover = popover;
-
-    var input = popover.querySelector("input");
-    input.focus();
-    input.select();
-    input.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeNamePopover();
-    });
-    popover.querySelector(".place-name-popover-cancel").addEventListener("click", closeNamePopover);
-    popover.querySelector("form").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var name = input.value.trim();
-      if (!name || name === currentName) { input.focus(); return; }
-      submitPersonName(photo, personNumber, name, currentName, popover);
-    });
-
-    // A tap anywhere else on the page closes it — deferred by a tick so
-    // the click that opened it (which already called stopPropagation on
-    // the marker itself) doesn't immediately close what it just opened.
-    setTimeout(function () {
-      activeNamePopoverOutsideHandler = function (e) {
-        if (popover.contains(e.target)) return;
-        closeNamePopover();
-      };
-      document.addEventListener("click", activeNamePopoverOutsideHandler);
-    }, 0);
+  function showNamesStatus(message, isError) {
+    if (!namesStatusEl) return;
+    namesStatusEl.hidden = false;
+    namesStatusEl.textContent = message;
+    namesStatusEl.style.color = isError ? "#9b2c2c" : "";
   }
 
   // previousName (blank if there wasn't one) rides along as its own
   // field purely so whoever reviews this submission in the Netlify
   // dashboard can see it was a correction ("was X, suggested Y") rather
   // than guessing from the name alone.
-  function submitPersonName(photo, personNumber, name, previousName, popover) {
-    var submitBtn = popover.querySelector("button[type=submit]");
-    submitBtn.disabled = true;
-    submitBtn.textContent = "Saving…";
+  function submitPersonName(photoId, personNumber, name, previousName) {
     var body = new URLSearchParams({
       "form-name": "name-person",
-      "photo-id": photo.id,
+      "photo-id": photoId,
       "person-number": String(personNumber),
       "name": name,
       "previous-name": previousName || ""
     });
-    fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
+    return fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString() })
       .then(function (res) {
         if (!res.ok) throw new Error("Form submission failed");
-        popover.innerHTML = '<p class="place-name-popover-thanks">Thanks — we’ll take a look!</p>';
-        setTimeout(closeNamePopover, 2500);
-      })
-      .catch(function () {
-        popover.innerHTML =
-          '<p class="place-name-popover-thanks">Couldn’t send that — check your connection and try again.</p>' +
-          '<button type="button" class="place-name-popover-cancel">Close</button>';
-        popover.querySelector(".place-name-popover-cancel").addEventListener("click", closeNamePopover);
       });
   }
 
