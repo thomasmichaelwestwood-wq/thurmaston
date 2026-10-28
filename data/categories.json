@@ -89,6 +89,12 @@
       "label": "Post Offices",
       "intro": "Photos from this category.",
       "color": "#4a3f8c"
+    },
+    {
+      "slug": "post-office",
+      "label": "Post Office",
+      "intro": "Photos from this category.",
+      "color": "#b23a3a"
     }
   ]
 }
