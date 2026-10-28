@@ -83,6 +83,12 @@
       "label": "Canal & River",
       "intro": "Canal and river",
       "color": "#b23a3a"
+    },
+    {
+      "slug": "post-offices",
+      "label": "Post Offices",
+      "intro": "Photos from this category.",
+      "color": "#4a3f8c"
     }
   ]
 }
